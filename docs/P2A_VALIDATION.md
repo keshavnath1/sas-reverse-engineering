@@ -7,8 +7,9 @@ campaign have not been implemented or run. No SAS or private workload was execut
 
 Baseline: planning commit `e13705c67c5984b2cb6bc8d4c797a188fd6421e2`; package 0.3.0,
 Python 3.12.5, macOS arm64. The v1 schema and dependency lock remain byte-identical.
-No dependency was added. The final implementation commit and additional environment
-results are recorded below after those checks finish; pending rows are not passes.
+No dependency was added. Implementation commit:
+`e5f5eb2fde973acf2dd059b4522247aa6fd2283c`. Subsequent changes to this report are
+documentation only. Pending hosted checks are not passes.
 
 ## Checks and results
 
@@ -16,8 +17,8 @@ results are recorded below after those checks finish; pending rows are not passe
 |---|---|
 | Original P0/P1 baseline before implementation | 138 tests PASS |
 | Final development suite | 389 tests PASS, exit 0 |
-| Fresh Git checkout and fresh hash-locked virtual environment | Pending |
-| Installed 0.3.0 wheel outside the checkout | Pending |
+| Fresh Git checkout and fresh hash-locked virtual environment | 389 tests PASS, exit 0 |
+| Installed 0.3.0 wheel outside the checkout | 389 tests PASS, exit 0 |
 | Public P2A fixture suite | 187 tests PASS |
 | Repository guard after staging | PASS, no findings |
 | Python compilation and diff whitespace | PASS |
@@ -83,8 +84,48 @@ wheelhouse using these commands from the development directory:
 /private/tmp/sas-re-p2a-wheel-env/bin/python -m pip install --no-index --find-links /private/tmp/sas-re-p1-wheels --require-hashes --only-binary=:all: -r requirements.lock
 ```
 
-Final fresh-checkout, wheel and hosted results will be appended only after execution.
-Temporary transcripts/artifacts are outside Git and may disappear. Tests and
+Fresh checkout selected exactly `e5f5eb2fde973acf2dd059b4522247aa6fd2283c`, without
+Git object hardlinks. Fresh and installed-wheel commands below all exited 0.
+From `/private/tmp`, except the fresh-checkout test/guard/demo commands which ran
+in `/private/tmp/sas-re-p2a-fresh`:
+
+```bash
+git clone --no-hardlinks /Users/divyasreegundaram/Downloads/sas-migration-skill-enhancement-v2/sas-reverse-engineering /private/tmp/sas-re-p2a-fresh
+/private/tmp/sas-re-p2a-fresh-env/bin/python -m pip install --no-deps --no-build-isolation -e /private/tmp/sas-re-p2a-fresh
+/private/tmp/sas-re-p2a-fresh-env/bin/python -m unittest discover -s tests -v > /private/tmp/sas-re-p2a-fresh-tests.txt 2>&1
+/private/tmp/sas-re-p2a-fresh-env/bin/python scripts/check_repository.py
+/private/tmp/sas-re-p2a-fresh-env/bin/python scripts/p2a_demo.py --destination /private/tmp/sas-re-p2a-demo-fresh > /private/tmp/sas-re-p2a-demo-fresh.json
+/private/tmp/sas-re-p2a-fresh-env/bin/python -m pip check
+git status --porcelain
+/private/tmp/sas-re-p2a-wheel-env/bin/python -m pip install --no-deps /Users/divyasreegundaram/Downloads/sas-migration-skill-enhancement-v2/sas-reverse-engineering/dist/sas_reverse_engineering-0.3.0-py3-none-any.whl
+/private/tmp/sas-re-p2a-wheel-env/bin/python -c 'import sas_re; print(sas_re.__file__); assert "/site-packages/" in sas_re.__file__'
+/private/tmp/sas-re-p2a-wheel-env/bin/python -m unittest discover -s /private/tmp/sas-re-p2a-fresh/tests -v > /private/tmp/sas-re-p2a-wheel-tests.txt 2>&1
+/private/tmp/sas-re-p2a-wheel-env/bin/python /private/tmp/sas-re-p2a-fresh/scripts/p2a_demo.py --destination /private/tmp/sas-re-p2a-demo-wheel > /private/tmp/sas-re-p2a-demo-wheel.json
+/private/tmp/sas-re-p2a-wheel-env/bin/python -m pip check
+```
+
+Observed wheel import:
+`/private/tmp/sas-re-p2a-wheel-env/lib/python3.12/site-packages/sas_re/__init__.py`.
+Fresh checkout porcelain was empty. Suite durations were 13.649 seconds in the
+development checkout, 15.140 fresh, and 15.053 installed wheel; these are test
+durations, not workload benchmarks. Complete demo JSON equality was checked from
+the development checkout with this executed Python body:
+
+```python
+import json
+from pathlib import Path
+reports = [json.loads(Path(p).read_bytes()) for p in (
+    '/private/tmp/sas-re-p2a-demo-final.json',
+    '/private/tmp/sas-re-p2a-demo-fresh.json',
+    '/private/tmp/sas-re-p2a-demo-wheel.json')]
+assert reports[0] == reports[1] == reports[2]
+```
+
+All three reports, including graph/seal hashes, were identical. Final staged
+guard and whitespace commands were `.venv/bin/python scripts/check_repository.py`
+and `git diff --cached --check`, both exit 0. Local documentation links were also
+checked for existence. Temporary transcripts/artifacts are outside Git and may
+disappear. Tests and
 fixture generators are committed for reproduction with new empty destinations.
 
 ## Hash evidence
@@ -134,6 +175,12 @@ alternate official pages supported the public expectation review. This is not
 runtime verification. The parser agent also ran 3,000 seeded lexical fuzz inputs
 plus long/deep-expression probes without crashes; that exploratory exercise is
 not counted as independent semantic evaluation or as unit tests.
+
+The first `git push origin main` was denied by automatic approval review before
+execution. Its reason was that it did not recognize P2A approval in the user's
+pasted attachment and considered default-branch publication unauthorized. The
+original request was reread to establish the explicit D08-A/B P2A approval;
+publication status is reported separately from the successful local checks.
 
 ## Files and proof boundary
 
