@@ -1,6 +1,16 @@
 # Open decisions and compatibility risks
 
-Status: P2A D08-A/B approved; D08-C and D09 awaiting P2B decisions. Updated 2026-11-05.
+Status: P2A accepted; P2B readiness documentation authorized; D08-C and D09
+execution decisions remain OPEN. Updated 2026-11-05.
+
+**Current checkpoint authorization:** the user accepted P2A at
+`56154dd75a0149043c36081da9704b0a939230e1` and approved only a read-only P2B
+assessment and documentation checkpoint. Deliverables are
+[P2B_READINESS.md](P2B_READINESS.md),
+[BEST_PRACTICES_ADOPTION.md](BEST_PRACTICES_ADOPTION.md) and necessary decision-ledger
+updates. No code/tests, isolated runner, provider adapter, grader, gold or campaign
+is authorized. This supersedes the older stop wording only for documentation;
+P2B execution and independent semantic acceptance remain BLOCKED.
 
 **Current P2A authorization:** the user reviewed planning commit
 `e13705c67c5984b2cb6bc8d4c797a188fd6421e2` and approved D08-A/B for deterministic
@@ -39,6 +49,8 @@ No decision becomes human-approved merely by appearing in these documents.
 | P1 result | ACCEPTED by the user's review | Structural scope at the exact commit above; not semantic correctness |
 | P2 readiness documentation | APPROVED scope for this checkpoint | Only the two P2 design documents and this decision ledger |
 | D08-A and D08-B | APPROVED for P2A | Exact synthetic subset and canonical v2 evolution; deterministic reconstruction and reviewed public tests only |
+| P2A result | ACCEPTED by the user's review | Commit `56154dd75a0149043c36081da9704b0a939230e1`; public synthetic scope, no independent semantic acceptance |
+| P2B readiness documentation | APPROVED for this checkpoint | Two readiness/practice documents and necessary decision-ledger updates only; preserve code, tests, hashes and downstream pin |
 | D08-C and D09-A/B/C below | RECOMMENDED, NOT APPROVED for P2B | No provider selection, protected-gold grader, isolation deployment or independent acceptance |
 | D10–D12 | OPEN | Business/oracle/runtime/downstream choices remain later human decisions |
 
@@ -70,16 +82,49 @@ the P2B approval checkpoint. D10–D12 remain future decisions and must not be g
 
 | Item | Recommendation | Still needed before implementation |
 |---|---|---|
-| D08-A: semantics and granularity | APPROVED P2A: static synthetic SAS 9.4-profile subset; top-level operations with ordered internal facts and explicit unsupported blockers | P2A result review; no SAS execution, private pilot or independent acceptance approved |
-| D08-B: canonical contract | APPROVED P2A: canonical v2 numerical/order/state/step facts; reused P1 inventory/citations/IDs; immutable v1 and explicit lineage | P2A compatibility review; independent verifier judgments remain P2B |
-| D08-C: environment and budgets | Pinned configurable candidate/reviewer adapters, bounded source retrieval, scope-read/staging-write tools, synthetic-only provider broker; three calls/32k input/8k output/five minutes per role/case maximum | Name actual model/provider revision, permitted endpoint/data policy, implementation runner and budget settings; none is assumed available |
+| D08-A: semantics and granularity | APPROVED and accepted P2A: static synthetic SAS 9.4-profile subset; top-level operations with ordered internal facts and explicit unsupported blockers | No SAS execution, private pilot or independent acceptance approved |
+| D08-B: canonical contract | APPROVED and accepted P2A: canonical v2 numerical/order/state/step facts; reused P1 inventory/citations/IDs; immutable v1 and explicit lineage | Independent verifier judgments remain P2B and must not rewrite candidate seals |
+| D08-C: environment and budgets | New readiness recommendation: frozen deterministic P2A candidate plus separately implemented model reviewer for the first pilot; earlier model-candidate option remains an alternative. Per model role/case: three calls/32k aggregate input/8k aggregate output/five minutes maximum | Approve topology; name actual provider/model revision, endpoint/account/data policy, supported controls, usage accounting and dollar ceiling. No provider or topology selected; no live call authorized |
 | D09-A: gold ownership | SAS domain author plus second reviewer; separate custodian freezes source, source-anchored facts, exact expected gates, evaluator and denominator versions before runs | Named author/reviewer/custodian and private gold store; no maker-generated expected answers or copying public examples into “hidden” gold |
-| D09-B: isolation | Dedicated Linux host/VM, separate OS identities and process/mount boundaries, gold absent from candidate/reviewer views, trusted immutable submission handoff; real denial tests before scoring | Provisioned runner/security policy and evaluator-owned storage; shared-user folders/chats are not an acceptable fallback |
+| D09-B: isolation | First authorize only B1 sentinel probes and trusted handoff on dedicated Linux host/VM, separate identities/process/mount/network boundaries, positive controls and explicit denial tests; gold comes later | Named host/admin/security reviewer, approved image/runtime/policy, location, retention and spending ceiling; no host supplied or tested. Shared-user folders/chats are not an acceptable fallback |
 | D09-C: corpus, metrics and feedback | 12 families × P/N/U = 36 hidden cases; reconstruction and checker-challenge lanes; five fixed attempts per case/lane; all required positive facts correct, exact negative gates, 100% obligation coverage and zero critical false approvals | Approval of strict finite-pilot thresholds, repetition/transport-failure policy and restricted diagnostic release; actual gold-derived assertion denominators frozen before running |
 
 No particular person, model, evaluator host, hidden corpus or semantic test result
 has been supplied/verified by this checkpoint. If those dependencies are absent,
 future implementation/evaluation must report BLOCKED rather than invent them.
+
+### P2B readiness refinements, proposed only
+
+[P2B_READINESS.md](P2B_READINESS.md) assesses D08-C and D09-A/B/C without approving
+them. The minimum next authorization is B1's sentinel-only proof, not the campaign.
+Provider and gold choices need not block B1 because B1 has neither; they block
+later live evaluation. Named infrastructure/ownership/cost decisions still block B1.
+
+- **D08-C topology and cost:** retain the 360 case-attempt schedule. A deterministic
+  candidate requires 360 model reviewer role-cases (up to 1,080 calls); a model
+  candidate as well requires 540 role-cases (up to 1,620 calls). The documented
+  token ceilings and hypothetical price sensitivity are estimates, not usage,
+  current vendor quotes or provider-supported settings.
+- **D08-C synthetic policy:** local synthetic approval does not authorize model
+  transmission. Obtain endpoint retention/training/region and account approval;
+  gold, expected labels, restricted diagnostics and private intake never enter
+  candidate/reviewer model context. No cache or billing capabilities assumed.
+- **D09-A ownership:** domain author, independent second reviewer, custodian and
+  adjudication/release responsibilities must be named. Public examples cannot
+  become hidden gold. No expected-answer authoring occurs in this checkpoint.
+- **D09-B proof:** exact eventual principals and host controls, harmless canaries,
+  permitted-access positive controls, denied reads/writes/egress, protected hashes
+  and receipt-bound submission copies. Local stub tests do not verify live
+  provider behavior; administrators remain trusted. No probes were executed here.
+- **D09-C eligibility and stops:** complete sealed semantic PARTIAL/BLOCKED evidence
+  is eligible for U tests; incomplete structural publication is not. Lane V
+  semantic attacks must pass structural checks without P2A semantic prefiltering.
+  Preserve all scheduled entries after a stop; no automatic hidden transport
+  retries or feedback repair. Seeded challenge defects are inputs, not scored
+  failures. Freeze strict thresholds/denominators and protect diagnostics.
+- **Practice evidence:** the companion ledger backfills only attributable
+  historical records. Its final report and any cost/quality experiments require
+  future authorization; no telemetry or effectiveness benefit is invented.
 
 ### Canonical-model compatibility decision
 
@@ -139,11 +184,13 @@ gold isolation or safe parallelism.
 
 ## Approval boundary and recommended next action
 
-Review the P2A design and validation record. For a separately authorized P2B,
-approve or amend D08-C and D09-A/B/C, supply the named gold author/reviewer/custodian,
-model/tool/egress policy and isolated Linux environment, and freeze the 36-case,
-five-attempt, two-track evaluation baseline. Prove access denial and immutable
-handoff before loading protected gold. Missing dependencies keep P2B BLOCKED.
+Review the P2B readiness and practice ledger, then separately authorize B1 only
+with its named host, administrator/security reviewer, image/policy, retention and
+budget. B1 would implement and test deterministic sentinel probes and trusted
+handoff, with no agents, provider calls, semantic grader or hidden gold. Review
+that proof before authorizing B2 preparation; full 360-attempt B3 execution needs
+another explicit approval after corpus/protocol/provider/custody freeze.
 
-Stop after P2A. No automatic P2B/P3, PRD/ADR generation, parallelization analysis,
-private-data feature, SAS execution or downstream integration is authorized.
+Stop after this documentation checkpoint. No P2B implementation/campaign, P3,
+PRD/ADR generation, parallelization analysis, private-data feature, SAS execution
+or downstream integration is authorized by it.

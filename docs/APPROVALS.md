@@ -55,3 +55,18 @@ demonstrate bounded reconstruction behavior only. Semantic acceptance remains
 BLOCKED and benchmark execution NOT_RUN. Do not execute SAS, read private business
 inputs, change Agent-mastery or start P2B/P3. Stop after P2A and provide the missing
 P2B readiness decisions for separate review.
+
+On 2026-11-05 the user reviewed and accepted P2A at
+`56154dd75a0149043c36081da9704b0a939230e1` and approved **P2B readiness only**:
+a read-only assessment and documentation checkpoint. Authorized deliverables are
+`docs/P2B_READINESS.md`, `docs/BEST_PRACTICES_ADOPTION.md` and necessary
+decision-ledger updates. Assess D08-C and D09-A/B/C, propose sentinel-only proof,
+budgets/stops and the next authorization, and backfill practice evidence only
+from attributable existing records. Preserve P0/P1/P2A code/tests, source hashes
+and Agent-mastery compatibility pins.
+
+This does not approve a provider, candidate agent, semantic grader, isolation
+infrastructure, hidden gold or campaign. D08-C and D09 execution decisions remain
+open; independent semantic acceptance remains BLOCKED. Stop after documentation
+for review. The prior remote-publication authorization remains in effect, without
+granting any later implementation or downstream authority.

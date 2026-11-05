@@ -1,0 +1,225 @@
+# Engineering-practice adoption and evidence ledger
+
+Prepared 2026-11-05. Historical project baseline:
+`56154dd75a0149043c36081da9704b0a939230e1` (accepted P2A).
+This is a retrospective comparison with Jim Thompson's published practices,
+not proof that every historical action was caused by those guides. Alignment
+with a practice does not establish reduced cost, latency or defects.
+P2B is at a documentation-only readiness checkpoint; execution remains BLOCKED.
+
+## Sources and attribution
+
+Primary guidance was read from `jimthompson5802/coding-assistant-practices` at
+commit **`abdf5661855dae25e002578fe25c961a6200db5d`**, verified through the GitHub
+connector on 2026-11-05. This is the same tip recorded in the original project
+plan; this assessment read the actual pinned guide files. The sources below are
+paraphrased and linked, not imported as repository instructions or software.
+
+| ID | Primary source | Practice used in this ledger |
+|---|---|---|
+| J0 | [README](https://github.com/jimthompson5802/coding-assistant-practices/blob/abdf5661855dae25e002578fe25c961a6200db5d/README.md) | Guide index and limitations of local usage counters |
+| J1 | [Model selection](https://github.com/jimthompson5802/coding-assistant-practices/blob/abdf5661855dae25e002578fe25c961a6200db5d/model-selection-guidance.md), common-practice sections 1.1–1.8 | Match capability to task; assess cost per successful outcome |
+| J2 | [Planning practices](https://github.com/jimthompson5802/coding-assistant-practices/blob/abdf5661855dae25e002578fe25c961a6200db5d/coding-assistant-planning-practices.md), 1.1–1.12 | Repository-aware, proportional plans, stages, acceptance and developer gates |
+| J3 | [Open and closed loops](https://github.com/jimthompson5802/coding-assistant-practices/blob/abdf5661855dae25e002578fe25c961a6200db5d/open-vs-closed-loop-practices.md), sections 2 and 4 | Observable feedback, bounded correction and verification integrity |
+| J4 | [Subagents](https://github.com/jimthompson5802/coding-assistant-practices/blob/abdf5661855dae25e002578fe25c961a6200db5d/subagent-practices.md), 1.1–1.9 | Bounded delegation, separate review and central reconciliation |
+| J5 | [Context management](https://github.com/jimthompson5802/coding-assistant-practices/blob/abdf5661855dae25e002578fe25c961a6200db5d/context-window-management.md), 1.1–1.8 | Progressive retrieval, focused tasks and durable milestones |
+| J6 | [Cache guidance](https://github.com/jimthompson5802/coding-assistant-practices/blob/abdf5661855dae25e002578fe25c961a6200db5d/cache-token-guidance.md), 1.2–1.8 | Stable reusable context and measurements with explicit limits |
+
+The pinned repository's MIT license was inspected. Product-specific examples in
+these guides are the author's guidance, not verification of this account's model
+availability, pricing, retention or cache controls. No counter scripts were run,
+no user session logs inspected and no usage values inferred from missing logs.
+
+The supplied v2 ZIP remains SHA-256
+`e3cbf3d9df6cc20c594261556c5e3ea1dfc292c9c1a30672c2d7b1a736b9718e`.
+Its `docs/10_ENGINEERING_PRACTICES_TO_EXECUTABLE_CONTROLS.md` is the project's
+adaptation of guidance into proposed controls, SHA-256
+`c562f8de0fb90b4ec2230e7be7a2836fd67085d9e6eb29e6826192fc262ee1da`.
+Its embedded `references/Jim Thompson Best Practices_ A Deep Learning Guide.md`
+lists **Manus AI** as author and is a secondary explanatory guide, SHA-256
+`d373d4599488514b2954c4f6c08909fb4bc4c9daef06b45cab66492ac2bd9a76`.
+Do not attribute that secondary text to Jim as a direct quotation. Pack documents
+01/08/10 require a later evidence showcase; their proposed demonstrations are not
+results. The separate embedded Agent-mastery audit's reported 43 tests were not
+rerun here and do not establish this repository's behavior.
+
+## Status rules
+
+- **DEMONSTRATED:** an attributable existing commit/report/test record supports
+  the exact narrow claim. It does not imply independent reproduction in this audit.
+- **PARTIAL:** some components are evidenced but a material part of the practice
+  or its proof remains missing. The missing part must be named.
+- **NOT_APPLICABLE:** deliberately outside that phase's authorized scope; state
+  why. This status is not a passing score or a waiver for a later phase.
+- **NOT_VERIFIED:** proposed, absent, unmeasured or not supported by retained
+  evidence. Unknown usage is not zero usage; unrun work is not a failure rate.
+
+These are documentation assessment labels, not new product enums or semantic
+verdicts. No aggregate adoption percentage is calculated. One practice can be
+demonstrated for a bounded control while its broader effectiveness is unverified.
+
+## Historical evidence register
+
+| Evidence ID | Immutable implementation / record | What it supports and does not support |
+|---|---|---|
+| E0 | P0 implementation [`2c34b98`](https://github.com/keshavnath1/sas-reverse-engineering/commit/2c34b9838308012b545010b84044ae2fc803375b), report/correction [`6893fd2`](https://github.com/keshavnath1/sas-reverse-engineering/commit/6893fd2e7a2bde1f3333ffb65dafb8c1698afcb3); [P0 validation](P0_VALIDATION.md) | 25 distinct foundation tests across three install modes; pinned baselines, blocked placeholders, staged-content guard and corrected YAML. Recorded read-only reviewer did not execute tests. Hosted CI was NOT_RUN at that historical checkpoint |
+| E1 | P1 implementation [`0e1f682`](https://github.com/keshavnath1/sas-reverse-engineering/commit/0e1f6822871d3aa6956695a776672b63454c7958), report [`5c8aea7`](https://github.com/keshavnath1/sas-reverse-engineering/commit/5c8aea7588290925250b76c9cbd5091a3ea89f13); [P1 validation](P1_VALIDATION.md) | 138 cumulative tests, development/fresh/wheel and separately recorded review run; citations, scope, races/crashes, append-only attempts and false-authority rejection. Structural evidence only |
+| E1-CI | [Run 42094717277](https://github.com/keshavnath1/sas-reverse-engineering/actions/runs/42094717277) at `0e1f682` | Historical report records both jobs and 138 checkout/wheel tests passing; not evidence of independent semantics |
+| E2 | P2 planning [`e13705c`](https://github.com/keshavnath1/sas-reverse-engineering/commit/e13705c67c5984b2cb6bc8d4c797a188fd6421e2); P2A implementation [`e5f5eb2`](https://github.com/keshavnath1/sas-reverse-engineering/commit/e5f5eb2fde973acf2dd059b4522247aa6fd2283c); report updates `7da79ab` and [`56154dd`](https://github.com/keshavnath1/sas-reverse-engineering/commit/56154dd75a0149043c36081da9704b0a939230e1); [P2A validation](P2A_VALIDATION.md) | 389 cumulative tests; 187 public tests; 26 valid-citation mutations, of which 22 pass schema and fail source consistency, four fail closed schema. Complete reconstruction still has BLOCKED semantic acceptance |
+| E2-CI | [Recorded run 42104309091](https://github.com/keshavnath1/sas-reverse-engineering/actions/runs/42104309091) at `7da79ab`; [accepted run 42104609308](https://github.com/keshavnath1/sas-reverse-engineering/actions/runs/42104609308) at `56154dd` | Exact hosted records, distinct from local runs and later commits. CI success is regression evidence, not evaluator isolation |
+| E2-R | [Public fixture review](P2A_FIXTURE_REVIEW.md) at accepted P2A baseline; [expectations](../tests/p2a_expectations.py) | Separate expectation author did not read candidate implementation/output; root reviewed before consumption. Same development environment, no human SAS certification or protected gold. Reviewed expectation SHA `f42549738a041db87d3547adec59ddfd0f9b15aa2621f1cf0b7ea7fa9f7ffd93` |
+| EG | [Implementation plan](IMPLEMENTATION_PLAN.md), [approvals](APPROVALS.md), [decisions](OPEN_DECISIONS.md); historical versions at accepted P2A commit | Recorded user scope gates and deferred decisions; publication authorization does not approve later phases or downstream release |
+| EB | [P2 evaluation design](P2_EVALUATION_DESIGN.md) and [P2B readiness](P2B_READINESS.md) | Proposed ownership, isolation, costs and strict gates. No deployed controls, gold or campaign results |
+
+Local document/test links are navigation aids. Historical claims bind the immutable
+commits above; later edits must not rewrite those past results. Counts 25 → 138 →
+389 are overlapping cumulative suites, not additive distinct tests. Repeating a
+suite in three installation modes does not create three independent semantic
+samples. Reported test durations measure test runs, not assistant productivity,
+SAS workload performance or cost savings.
+
+## Phase-by-phase ledger
+
+Each cell is limited by its evidence IDs and the qualifications below. Future
+means P3–P7; none of those phases is authorized by this checkpoint.
+
+| Practice / bounded claim | P0 | P1 | P2A | P2B | Future |
+|---|---|---|---|---|---|
+| J2: repository-aware plans, acceptance criteria and phase gates | DEMONSTRATED E0/EG | DEMONSTRATED E1/EG | DEMONSTRATED E2/EG | PARTIAL EB: readiness only | NOT_VERIFIED |
+| J5: durable plans/decisions and versioned checkpoints | DEMONSTRATED E0 | DEMONSTRATED E1 | DEMONSTRATED E2 | PARTIAL EB: no evaluator checkpoints | NOT_VERIFIED |
+| J3: executable feedback and preserved regressions | DEMONSTRATED E0 | DEMONSTRATED E1 | DEMONSTRATED E2 | NOT_VERIFIED | NOT_VERIFIED |
+| J3: verification integrity and explicit proof limits | DEMONSTRATED E0 | DEMONSTRATED E1 | DEMONSTRATED E2 | PARTIAL EB: protocol only | NOT_VERIFIED |
+| J5: focused progressive context, with actual retrieval evidence | PARTIAL E0/EG | PARTIAL E1 | PARTIAL E2 | NOT_VERIFIED | NOT_VERIFIED |
+| J1: task-appropriate capability and evaluated model selection | PARTIAL E0 | PARTIAL E1 | PARTIAL E2 | NOT_VERIFIED, D08-C open | NOT_VERIFIED |
+| J3: bounded correction with enforced retry/escalation policy | PARTIAL E0 | PARTIAL E1 | PARTIAL E2 | NOT_VERIFIED | NOT_VERIFIED |
+| J4: separate development review and central integration | DEMONSTRATED E0, narrow review record | DEMONSTRATED E1 | DEMONSTRATED E2-R | NOT_VERIFIED for deployed roles | NOT_VERIFIED |
+| J4: subagents improve quality/latency/total usage versus serial work | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED |
+| Project adaptation: protected independent semantic evaluation | NOT_APPLICABLE, foundation | NOT_APPLICABLE, structural scope | PARTIAL E2-R, public review only | NOT_VERIFIED | NOT_VERIFIED |
+| J1/J6: authoritative token/cache/billing and cost comparisons | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED | NOT_VERIFIED |
+| J2/project adaptation: phase scope respected; no self-approval | DEMONSTRATED E0/EG | DEMONSTRATED E1/EG | DEMONSTRATED E2/EG | PARTIAL EB, planned gates | NOT_VERIFIED |
+| Project adaptation: runtime benchmarks and architecture adoption | NOT_APPLICABLE | NOT_APPLICABLE | NOT_APPLICABLE | NOT_APPLICABLE to semantic pilot | NOT_VERIFIED |
+
+Qualifications and counterevidence are part of the ledger:
+
+- **Focused context:** plans and citations provide focused entry points; P1
+  enforces file scope and P2A bounds syntax/source size. These do not show which
+  context an assistant actually loaded, whether retrieval omitted dependencies,
+  or whether context/latency improved. A future role retrieval ledger and
+  quality-matched comparison are missing. This checkpoint read-only delegation
+  is not a usage experiment.
+- **Model choice:** deterministic code is appropriate for hashes, paths and
+  bounded reconstruction, but no product provider/model routing was evaluated.
+  Development assistant usage is not product evaluation usage. The proposed
+  deterministic candidate in P2B readiness remains a human decision.
+- **Bounded repair:** reports preserve concrete failures/fixes, explicit attempts
+  and source invalidation. There is no implemented end-to-end agent retry-budget
+  controller or complete historical retry ledger. Parser limits are not agent
+  repair limits. Do not backfill a compliant retry count from successful commits.
+- **Separate review:** P0 recorded independent read-only review without a suite
+  rerun; P1 recorded separate probes and tests; P2A recorded public expectation
+  authorship/review and cross-reviews. Shared environment and shared source-checker
+  logic prevent a claim of independent semantic acceptance.
+- **Human ownership:** current contracts/status behavior reject false upstream
+  approval and keep future commands blocked. The upstream repository does not
+  establish an authentic downstream signature or enforce Agent-mastery's entire
+  approval chain. Downstream integration has not been implemented or tested.
+- **Metrics:** no observed token, cache, invoice, total-agent-cost or productivity
+  comparison is in the cited phase records. Cache hits cannot be inferred from
+  stable prompts. Upstream scripts' ability to report usage is not evidence that
+  they were used here. Missing telemetry stays NOT_VERIFIED.
+
+Concrete feedback examples already in the records:
+
+| Phase | Finding and response | Retained proof and limit |
+|---|---|---|
+| P0 | Corrected workflow YAML quoting and staged-content secret-guard gap | E0 command/results and regression; not complete data-loss prevention |
+| P1 | Rejected forged inventory citations, detected cross-file mutation and clarified ambiguous observations | E1 failures/fixes and [workflow tests](../tests/test_runs.py)/[safe I/O tests](../tests/test_safeio.py); integrity, not SAS meaning |
+| P2A | Corrected source anchors, conservative state/numeric bounds, ordering propagation and LOG/LST ambiguity | E2 failures/fixes and [graph tests](../tests/test_p2a_graph.py)/[workflow tests](../tests/test_p2a_runs.py); reviewed public expectations were not weakened to fit outputs, according to E2-R |
+
+## Pack showcase obligations and later phases
+
+| Pack document 10 demonstration | Current status | Evidence required for the broader claim |
+|---|---|---|
+| Scoped retrieval versus loading every log | NOT_VERIFIED | Authorized comparable tasks, retrieval spans, dependency recall, total context/latency measurements |
+| Independent rejection of a false ADR with a valid citation | NOT_APPLICABLE to completed phases; future NOT_VERIFIED | Independently evaluated ADR verifier and exact counterevidence; P2A graph mutations are narrower public regressions |
+| Missing evidence stops with UNVERIFIABLE | DEMONSTRATED for P1/P2A's bounded controls | E1/E2; no generalized arbitrary-SAS coverage claim |
+| Source changes invalidate checkpoints and ADRs | PARTIAL | E1/E2 demonstrate checkpoint invalidation; ADR invalidation is future NOT_VERIFIED |
+| Selective subagents versus serial investigation | NOT_VERIFIED | Same authorized tasks, quality gates, total calls/usage/retries and elapsed-time evidence; agent count alone is insufficient |
+
+| Future phase | Practice obligation to carry forward | Status and required evidence |
+|---|---|---|
+| P2B | Separate ownership, protected expected facts, bounded roles, frozen feedback and observable costs | NOT_VERIFIED; named custody, reviewed sentinel proof, real capability matrix, immutable handoff and full preregistered attempt ledger |
+| P3 | Evidence-driven challenge of proposed computation changes | NOT_VERIFIED; authorized implementation and independent counterexamples before any safety claim |
+| P4 | Separate exploration, closed review and human decision on requirements/design drafts | NOT_VERIFIED; claim-to-source links, independent review and unresolved assumptions; no fabricated comparisons |
+| P5 | Repeated independent verification as skills/contracts change | NOT_VERIFIED; versioned evaluators, access controls and complete negative-case records; P2B is an earlier bounded prerequisite, not completion of all P5 work |
+| P6 | Reproducible draft handoff with explicit compatibility limits | NOT_VERIFIED; immutable manifest, stale/tampered rejection and no approval impersonation |
+| P7 | Human-owned downstream reconciliation and approval | NOT_VERIFIED; separately authorized integration and demonstrated non-bypass at the frozen downstream baseline |
+
+These are evidence obligations, not new PRDs, ADRs, parallelism designs or
+authorization to implement those phases. No claimed runtime winner, speedup or
+full-population parity follows from the practice ledger.
+
+## Proposed final best-practices evidence report
+
+Create a final report only at a separately authorized completion checkpoint;
+the proposed name is `docs/BEST_PRACTICES_EVIDENCE_REPORT.md`. It should contain:
+
+1. Immutable guide/pack/product/evaluator/environment identities, authorized
+   scope, dates and an evidence index separating observed, reported and proposed.
+2. A claim-level ledger: practice ID, project adaptation, phase, one of the four
+   statuses, immutable evidence pointer, counterevidence, limitations and
+   accountable reviewer. Preserve this historical ledger as the baseline.
+3. Planned versus observed stages and approval boundaries; exact commands, exit
+   codes, artifacts/hashes and installation/CI identity. Note unavailable logs.
+4. Failure/correction history with attempt IDs, hypothesis, owning component,
+   original failure and final outcome; no erased attempts or altered oracle.
+5. Independence evidence: named gold author/reviewer/custodian, actual effective
+   access policy, positive/negative sentinel controls, handoff receipts, gold
+   freeze and leakage review. Development agent separation is not a substitute.
+6. Full finite-pilot results: preregistered obligations and denominators, all
+   scheduled/attempted/completed cases, abstentions, critical errors, stops and
+   retained limitations. Public fixture tests stay separate from withheld results.
+7. Efficiency evidence only for separately authorized comparisons: same tasks
+   and quality gates, frozen configurations, total candidate/reviewer/retry usage,
+   provider-observed units, wall time, documented rates and actual charges
+   distinguished. Human effort requires recorded observations, not reconstruction.
+8. Gaps and future obligations, downstream boundaries and a sanitized public
+   summary. Protected answers, detailed hidden-case diagnostics and credentials
+   remain outside the public report and Git.
+
+For any later efficiency comparison, preregister the quality/correctness gate,
+baseline, task set and stop rule. Include failed attempts in cost per successful
+task; account for all roles and retries, not only the winning answer. Distinguish
+input totals from included cached subsets so tokens are not counted twice.
+Report cache discounts only from supported authoritative accounting. Model or
+tool changes need a separately frozen comparison; do not tune against hidden
+acceptance feedback. No such experiment is authorized or measured here.
+
+Acceptance criteria for that report:
+
+- Every DEMONSTRATED claim resolves to an immutable record supporting its exact
+  scope. Recorded versus independently rerun results are distinguished.
+- Every PARTIAL/NOT_VERIFIED item names its missing evidence; NOT_APPLICABLE has
+  a phase-specific reason. No invented historical usage or adoption percentage.
+- Full attempt and obligation totals reconcile, with critical failures,
+  incomplete work and stopped entries retained. No best-of-five or weakened gates.
+- Independence claims require named accountable ownership and tested deployment
+  boundaries, not model disagreement, public fixture tests or separate chats.
+- No savings or reliability claim is inferred from test counts, agent count,
+  suite durations, hypothetical rates or unseen invoices. Unavailable metrics
+  remain unavailable; a truthful report may remain PARTIAL.
+- P0/P1/P2A compatibility/regression evidence binds exact commits and hashes;
+  semantic PASS, benchmark execution and human approval remain distinct.
+- A custodian reviews public output for leakage, and a named human reviewer
+  approves the report's scope and limitations. This does not grant downstream
+  release approval or authorize unfinished phases.
+
+## This checkpoint's evidence boundary
+
+The assessment used existing Git records, repository reports/test names,
+read-only ZIP inspection/hash checks and pinned upstream guide reads. It did not
+rerun historical suites locally, inspect private intake/session logs, execute
+usage counters, create gold or perform access-isolation tests. Exact current
+documentation checks are recorded in [P2B_READINESS.md](P2B_READINESS.md).
+Readiness plans and a practice ledger are the deliverables; they are not a
+successful P2B evaluation or an effectiveness measurement.
