@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sas-reverse-engineering"
-version = "0.2.0"
-description = "P1 canonical source evidence foundation for a SAS architecture planner"
+version = "0.3.0"
+description = "P2A bounded synthetic SAS reconstruction with canonical source evidence"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = ["jsonschema==4.26.0"]
@@ -17,4 +17,4 @@ sas-re = "sas_re.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-sas_re = ["data/*.json", "contracts/v1/*.json"]
+sas_re = ["data/*.json", "contracts/v1/*.json", "contracts/v2/*.json"]

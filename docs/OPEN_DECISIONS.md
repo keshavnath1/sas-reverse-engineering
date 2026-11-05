@@ -1,6 +1,15 @@
 # Open decisions and compatibility risks
 
-Status: P2 readiness planning — recommendations awaiting approval. Updated 2026-11-05.
+Status: P2A D08-A/B approved; D08-C and D09 awaiting P2B decisions. Updated 2026-11-05.
+
+**Current P2A authorization:** the user reviewed planning commit
+`e13705c67c5984b2cb6bc8d4c797a188fd6421e2` and approved D08-A/B for deterministic
+synthetic reconstruction, canonical v2, reviewed public fixtures, CLI/CI and
+validation only. [P2A_DESIGN.md](P2A_DESIGN.md) records implementation choices;
+[P2A_VALIDATION.md](P2A_VALIDATION.md) records actual checks. P2B's model/provider,
+protected gold, independent acceptance and isolation remain unapproved. Public
+tests cannot satisfy D09. The historical planning text below is superseded only
+for the explicitly approved P2A scope.
 
 **P1 update, 2026-11-05:** the user approved D01–D03 for P0 and D04–D07 for
 synthetic P1. The tables below retain the original recommendations for traceability;
@@ -29,7 +38,8 @@ No decision becomes human-approved merely by appearing in these documents.
 | D04–D07 | APPROVED by the user for synthetic P1 | One canonical graph, byte identity, explicit scope/provenance and local safe publication |
 | P1 result | ACCEPTED by the user's review | Structural scope at the exact commit above; not semantic correctness |
 | P2 readiness documentation | APPROVED scope for this checkpoint | Only the two P2 design documents and this decision ledger |
-| D08-A/B/C and D09-A/B/C below | RECOMMENDED, NOT APPROVED | No extraction, grader, isolation deployment, schema change or agent implementation yet |
+| D08-A and D08-B | APPROVED for P2A | Exact synthetic subset and canonical v2 evolution; deterministic reconstruction and reviewed public tests only |
+| D08-C and D09-A/B/C below | RECOMMENDED, NOT APPROVED for P2B | No provider selection, protected-gold grader, isolation deployment or independent acceptance |
 | D10–D12 | OPEN | Business/oracle/runtime/downstream choices remain later human decisions |
 
 ## Decision register
@@ -47,21 +57,21 @@ authorization.
 | D05 / P1 | Source identity, stable IDs and hash canonicalization | Hash original bytes; version payload/envelope rules; IDs stable for identical source spans and operation kinds; explicit revision mapping after edits; declared encoding and newline policy | Citation and identity tests cannot be precise; decide whether logical identity survives line shifts |
 | D06 / P1 | Scope authorization and log provenance | Explicit allowed roots, required dependencies and declared source/log run bindings; no implicit expansion or guessed matches; unresolved dynamic includes remain blocked | Inventory cannot establish completeness or log linkage; actual run provenance needs external evidence |
 | D07 / before private intake | Evidence retention, permitted data, and seal trust model | Synthetic-only M1; private external read-only intake later; metadata-only reports; access-controlled immutable storage/trusted digest history for production | Local hashes alone do not provide authenticated or adversary-resistant history; PII handling cannot be inferred |
-| D08 / P2 | Exact bounded semantic subset, canonical representation and reconstruction environment | Approve D08-A/B/C below and the closed synthetic subset in P2_READINESS.md; narrow canonical graph v2 using P1 identity primitives, no full interpreter | Missing schema/version or runtime decisions prevent defensible semantic reconstruction; no silent relaxation of v1 |
+| D08 / P2A–P2B | Exact bounded semantic subset, canonical representation and reconstruction environment | D08-A/B approved for deterministic P2A; D08-C provider/runtime policy remains open for P2B | No model/provider or independent acceptance may be inferred from deterministic implementation |
 | D09 / P2–P5 | Independent gold, two-lane semantic evaluation and enforced isolation | Approve D09-A/B/C below and P2_EVALUATION_DESIGN.md; separate gold custodian/evaluator identity and fixed metrics/gates | No hidden-gold or independent semantic reliability claim until access-denial tests and frozen-corpus checks actually pass |
 | D10 / P4–P6 | Business intent, corrected legacy behavior, keys, oracle, tolerances and population | Leave unresolved in upstream drafts; domain owner chooses in downstream interview/specify/test gates | No parity or release claim, no convenient sample/population default |
 | D11 / P4–P6 | Platform constraints and benchmark protocol | Assess Spark/Ray/Dask/native fairly; agree resources, data sizes, repetitions, cache conditions, objectives and training equivalence before measurement | No winner, cost ranking or speedup assertion; benchmark status stays NOT_RUN |
 | D12 / P7 | Receiving-side owner and authorization | Separate Agent-mastery change proposal, isolated branch, independent reconciliation and existing human gates | Candidate handoff may be packaged in P6 but cannot be automatically imported or approved |
 
-D01–D07 have been decided for their approved phases. D08/D09 are the present
-approval checkpoint. D10–D12 remain future decisions and must not be guessed.
+D01–D07 and D08-A/B have been decided for their approved phases. D08-C/D09 are
+the P2B approval checkpoint. D10–D12 remain future decisions and must not be guessed.
 
 ## D08/D09 proposed resolutions requiring human input
 
 | Item | Recommendation | Still needed before implementation |
 |---|---|---|
-| D08-A: semantics and granularity | Static synthetic SAS 9.4-profile subset: constrained DATA/SET/MERGE, SQL, literal macros/includes, BY, RETAIN/SUM/LAG, sort and fixed LOG/LST layouts; top-level operations with ordered internal facts; unsupported constructs explicitly BLOCKED | Approval of the exact allowlist/exclusions in P2_READINESS.md and symbolic-proof limits; no SAS execution or private pilot |
-| D08-B: canonical contract | Version the existing composed graph to narrow v2 for numerical/order/state/step facts; reuse P1 inventory/citations/ID derivation; immutable v1 remains supported; explicit new IDs and predecessor mapping | Approval for future versioned schema/validator/envelope evolution, including graph-owned semantic facts and hash-bound verifier judgments |
+| D08-A: semantics and granularity | APPROVED P2A: static synthetic SAS 9.4-profile subset; top-level operations with ordered internal facts and explicit unsupported blockers | P2A result review; no SAS execution, private pilot or independent acceptance approved |
+| D08-B: canonical contract | APPROVED P2A: canonical v2 numerical/order/state/step facts; reused P1 inventory/citations/IDs; immutable v1 and explicit lineage | P2A compatibility review; independent verifier judgments remain P2B |
 | D08-C: environment and budgets | Pinned configurable candidate/reviewer adapters, bounded source retrieval, scope-read/staging-write tools, synthetic-only provider broker; three calls/32k input/8k output/five minutes per role/case maximum | Name actual model/provider revision, permitted endpoint/data policy, implementation runner and budget settings; none is assumed available |
 | D09-A: gold ownership | SAS domain author plus second reviewer; separate custodian freezes source, source-anchored facts, exact expected gates, evaluator and denominator versions before runs | Named author/reviewer/custodian and private gold store; no maker-generated expected answers or copying public examples into “hidden” gold |
 | D09-B: isolation | Dedicated Linux host/VM, separate OS identities and process/mount boundaries, gold absent from candidate/reviewer views, trusted immutable submission handoff; real denial tests before scoring | Provisioned runner/security policy and evaluator-owned storage; shared-user folders/chats are not an acceptable fallback |
@@ -75,12 +85,12 @@ future implementation/evaluation must report BLOCKED rather than invent them.
 
 Observed: P1 v1 cannot serialize exact expressions, state reset, row ordering or
 detailed LOG/LST semantics, and its semantic status is constant UNVERIFIABLE.
-Recommendation D08-B is an explicit evolution of that same factual graph,
+D08-B is the approved P2A evolution of that same factual graph,
 not a second graph/IR. Facts remain in canonical nodes/operations/edges; verifier
 reports contain judgments and references only. Adding semantic payload changes
 operation IDs under D05, so v1-to-v2 lineage must be explicit. Golden test anchors
 cannot depend solely on candidate operation IDs because a wrong interpretation
-also changes the ID. No v1 contract or artifact changes in this planning step.
+also changes the ID. P2A preserves v1 schema bytes and historical artifacts.
 
 The pack's P2 “DAG” is a derived canonical-ID visualization preserving state
 cycles/unknowns. It does not authorize P3 scheduling or independence analysis.
@@ -94,7 +104,7 @@ checks explicitly required for this P2 pilot.
 | C01 | The reference audit proposes early discovery within Agent-mastery; normative 01/02 requires a separate upstream planner | Follow 01/02. Research proposals do not amend downstream workflow. P7 requires separate authorization |
 | C02 | Build phase P3 precedes requirements in P4, while document 02's runtime flow drafts requirements before parallelism analysis | Treat phase numbers as development sequencing; enforce document 02 at runtime |
 | C03 | README calls for one scoped graph; document 02 also describes per-module/run records | Proposed composed-run graph in D04; module views reference it. Avoid silently choosing incompatible authority models |
-| C04 | Proposed source schema v0.1 was smaller than the narrative; P1 v1 now covers structural identities but not detailed semantic facts | P1 implemented the structural expansion. D08-B proposes narrow canonical v2 semantics and explicit version migration; not implemented or approved yet |
+| C04 | Proposed source schema v0.1 was smaller than the narrative; P1 v1 covers structural identities but not detailed semantic facts | Approved P2A implements narrow canonical v2 facts and explicit identity lineage; historical v1 remains unchanged |
 | C05 | Claim and handoff schemas omit several required narrative fields; enum field names differ across files | One versioned serialization specification with required provenance, counterevidence, preconditions and explicit field-name mapping |
 | C06 | Document 10 says generated drafts remain CANDIDATE, while document 02's authority enum uses DRAFT/EVIDENCE_CHECKED | Use document 02's authority enum; candidate is descriptive, not a new authority value |
 | C07 | Final checklist asks for three ADRs; requirements call for evaluating four runtime families with justified exclusions | Evaluate all four families; generate full designs for every viable candidate. Do not invent three viable options when evidence excludes them; report the unmet showcase condition |
@@ -129,11 +139,11 @@ gold isolation or safe parallelism.
 
 ## Approval boundary and recommended next action
 
-Review the two P2 design documents; approve or amend D08-A/B/C and D09-A/B/C,
-and supply the named owners, model/tool policy and isolation environment. Then
-issue an explicit P2-only implementation instruction using their acceptance
-criteria. Approval of documentation alone does not start extraction, skills,
-agents, semantic graders or contract implementation.
+Review the P2A design and validation record. For a separately authorized P2B,
+approve or amend D08-C and D09-A/B/C, supply the named gold author/reviewer/custodian,
+model/tool/egress policy and isolated Linux environment, and freeze the 36-case,
+five-attempt, two-track evaluation baseline. Prove access denial and immutable
+handoff before loading protected gold. Missing dependencies keep P2B BLOCKED.
 
-Stop after this checkpoint. No PRD/ADR generation, parallelization analysis,
+Stop after P2A. No automatic P2B/P3, PRD/ADR generation, parallelization analysis,
 private-data feature, SAS execution or downstream integration is authorized.

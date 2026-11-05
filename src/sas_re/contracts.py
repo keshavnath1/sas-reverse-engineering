@@ -12,11 +12,13 @@ from jsonschema import Draft202012Validator
 from .safeio import EvidenceError
 
 
-@lru_cache(maxsize=1)
-def _schema() -> dict[str, Any]:
+@lru_cache(maxsize=2)
+def _schema(version: str = "1.0") -> dict[str, Any]:
     """Read only the package resource, never an input-supplied schema or URI."""
+    if version not in {"1.0", "2.0"}:
+        raise EvidenceError("SCHEMA_INVALID")
     schema = json.loads(
-        files("sas_re").joinpath("contracts", "v1", "evidence.schema.json").read_text(
+        files("sas_re").joinpath("contracts", "v" + version[0], "evidence.schema.json").read_text(
             encoding="utf-8"
         )
     )
@@ -27,9 +29,9 @@ def _schema() -> dict[str, Any]:
 CONTRACT_NAMES = tuple(_schema()["$defs"])
 
 
-def load_schema() -> dict[str, Any]:
+def load_schema(version: str = "1.0") -> dict[str, Any]:
     """Return a copy so callers cannot modify the process's trusted validators."""
-    return deepcopy(_schema())
+    return deepcopy(_schema(version))
 
 
 def _json_value(value: Any) -> bool:
@@ -45,10 +47,10 @@ def _json_value(value: Any) -> bool:
 
 
 @lru_cache(maxsize=None)
-def _validator(name: str) -> Draft202012Validator:
-    if name not in CONTRACT_NAMES:
+def _validator(name: str, version: str = "1.0") -> Draft202012Validator:
+    schema = _schema(version)
+    if name not in schema["$defs"]:
         raise EvidenceError("SCHEMA_INVALID")
-    schema = _schema()
     return Draft202012Validator(
         {
             "$schema": schema["$schema"],
@@ -58,14 +60,14 @@ def _validator(name: str) -> Draft202012Validator:
     )
 
 
-def validate_contract(name: str, value: Any) -> None:
+def validate_contract(name: str, value: Any, *, version: str = "1.0") -> None:
     """Reject malformed structure without disclosing supplied values or paths.
 
     Citation integrity, referential integrity, ownership, freshness and lexical
     path safety require the deterministic verifier in addition to this check.
     P1 semantic_verification is always UNVERIFIABLE, even for a valid contract.
     """
-    if not isinstance(name, str) or name not in CONTRACT_NAMES:
+    if not isinstance(name, str) or not isinstance(version, str):
         raise EvidenceError("SCHEMA_INVALID")
     try:
         json_value = _json_value(value)
@@ -73,5 +75,12 @@ def validate_contract(name: str, value: Any) -> None:
         raise EvidenceError("SCHEMA_INVALID") from None
     if not json_value:
         raise EvidenceError("SCHEMA_INVALID")
-    if not _validator(name).is_valid(value):
+    if not _validator(name, version).is_valid(value):
         raise EvidenceError("SCHEMA_INVALID")
+
+
+def validate_versioned_contract(name: str, value: Any) -> None:
+    """Opt-in dispatch; P1 call sites retain the immutable v1 boundary."""
+    if type(value) is not dict or type(value.get("schema_version")) is not str:
+        raise EvidenceError("SCHEMA_INVALID")
+    validate_contract(name, value, version=value["schema_version"])

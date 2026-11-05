@@ -1,4 +1,4 @@
-name: P0 and P1 validation
+name: P0, P1 and P2A validation
 
 on:
   push:
@@ -19,14 +19,15 @@ jobs:
       - name: Install hash-locked dependencies and packaging tools
         run: |
           python -m pip install --require-hashes --only-binary=:all: -r requirements.lock
-      - name: Install P1 package
+      - name: Install P2A package
         run: python -m pip install --no-deps --no-build-isolation -e .
-      - name: Check tracked files and P0/P1 behavior
+      - name: Check tracked files and P0/P1/P2A behavior
         run: |
           python -m pip check
           python scripts/check_repository.py
           python -m unittest discover -s tests -v
           python scripts/p1_demo.py --destination "$RUNNER_TEMP/synthetic-p1"
+          python scripts/p2a_demo.py --destination "$RUNNER_TEMP/synthetic-p2a"
       - name: Build and install distributable
         run: |
           python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .
@@ -34,6 +35,7 @@ jobs:
           cd "$RUNNER_TEMP"
           python -c 'import sas_re; assert "site-packages" in sas_re.__file__, sas_re.__file__'
           python -m unittest discover -s "$GITHUB_WORKSPACE/tests" -v
+          python "$GITHUB_WORKSPACE/scripts/p2a_demo.py" --destination "$RUNNER_TEMP/synthetic-p2a-wheel"
           sas-re status
           python -m sas_re --version
 

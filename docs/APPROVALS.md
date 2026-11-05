@@ -40,3 +40,18 @@ This supersedes the earlier P0-only implementation restriction. It does not
 authorize P2, private intake, SAS execution, agents, architectural recommendations,
 PRD/ADR generation, downstream integration, or any human approval claim.
 Stop after P1 and await review and explicit P2 approval.
+
+On 2026-11-05 the user reviewed P2 planning at
+`e13705c67c5984b2cb6bc8d4c797a188fd6421e2` and explicitly approved **P2A only**,
+including D08-A (exact synthetic SAS subset) and D08-B (canonical graph v2).
+Authorized: deterministic reconstruction, versioned contracts and validators,
+explicit identity lineage, source-grounded public synthetic regression fixtures
+whose expectations are independently reviewed, CLI/CI and design/validation docs.
+Preserve v1 evidence, source read-only boundaries and append-only attempts.
+
+D08-C and D09 remain open for P2B. No model provider, protected-gold environment,
+independent evaluator or semantic acceptance claim is authorized. Public tests
+demonstrate bounded reconstruction behavior only. Semantic acceptance remains
+BLOCKED and benchmark execution NOT_RUN. Do not execute SAS, read private business
+inputs, change Agent-mastery or start P2B/P3. Stop after P2A and provide the missing
+P2B readiness decisions for separate review.

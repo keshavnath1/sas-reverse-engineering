@@ -1,6 +1,9 @@
 # P2 readiness: bounded semantic reconstruction
 
 Status: **PROPOSED — planning only; P2 implementation is not approved.**
+Historical planning status at `e13705c`. The subsequent user instruction approved
+D08-A/B for deterministic **P2A only**; D08-C/D09 and independent acceptance remain
+open for P2B. See [P2A_DESIGN.md](P2A_DESIGN.md) and [APPROVALS.md](APPROVALS.md).
 Prepared 2026-11-05. The user accepted P1 at
 `5c8aea7588290925250b76c9cbd5091a3ea89f13` and requested this design checkpoint.
 Read with [P2_EVALUATION_DESIGN.md](P2_EVALUATION_DESIGN.md) and the current

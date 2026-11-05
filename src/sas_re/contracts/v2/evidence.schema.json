@@ -1,0 +1,2927 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sas-re.invalid/contracts/v2/evidence.schema.json",
+  "title": "SAS Reverse Engineering P1 Source Evidence Contracts",
+  "description": "Version 1.0 structural contracts only. P1 cannot authenticate provenance, assert semantic correctness, or grant human approval. Select a named contract from $defs.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/Scope"
+    },
+    {
+      "$ref": "#/$defs/Inventory"
+    },
+    {
+      "$ref": "#/$defs/Graph"
+    },
+    {
+      "$ref": "#/$defs/Seal"
+    },
+    {
+      "$ref": "#/$defs/ModuleView"
+    },
+    {
+      "$ref": "#/$defs/RevisionMap"
+    },
+    {
+      "$ref": "#/$defs/Attempt"
+    },
+    {
+      "$ref": "#/$defs/Report"
+    },
+    {
+      "$ref": "#/$defs/VerificationReport"
+    }
+  ],
+  "$defs": {
+    "SchemaVersion": {
+      "const": "2.0"
+    },
+    "SafeId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}(?![\\s\\S])"
+    },
+    "Sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "FileKey": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}:[^\\r\\n]+(?![\\s\\S])"
+    },
+    "RelativePath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "SasName": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_.]{0,127}(?![\\s\\S])"
+    },
+    "FileId": {
+      "type": "string",
+      "pattern": "^file_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "DatasetId": {
+      "type": "string",
+      "pattern": "^ds_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "ColumnId": {
+      "type": "string",
+      "pattern": "^col_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "OperationId": {
+      "type": "string",
+      "pattern": "^op_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "EdgeId": {
+      "type": "string",
+      "pattern": "^edge_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "LogObservationId": {
+      "type": "string",
+      "pattern": "^log_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "NodeId": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/DatasetId"
+        },
+        {
+          "$ref": "#/$defs/ColumnId"
+        }
+      ]
+    },
+    "NonNegativeInteger": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "Classification": {
+      "type": "string",
+      "enum": [
+        "OBSERVATION",
+        "INFERENCE",
+        "ASSUMPTION",
+        "HYPOTHESIS",
+        "MEASUREMENT"
+      ]
+    },
+    "VerificationStatus": {
+      "type": "string",
+      "enum": [
+        "VERIFIED",
+        "PARTIAL",
+        "UNSUPPORTED",
+        "CONTRADICTED",
+        "UNVERIFIABLE"
+      ]
+    },
+    "StageGate": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED"
+      ]
+    },
+    "Stage": {
+      "type": "string",
+      "enum": [
+        "RECONSTRUCTION",
+        "RECONSTRUCTION_CHECK"
+      ]
+    },
+    "FileKind": {
+      "type": "string",
+      "enum": [
+        "SAS",
+        "LOG",
+        "LST",
+        "INCLUDE",
+        "CONFIG",
+        "FORMAT",
+        "REFERENCE"
+      ]
+    },
+    "Encoding": {
+      "type": "string",
+      "enum": [
+        "utf-8",
+        "utf-8-sig",
+        "ascii",
+        "latin-1",
+        "binary"
+      ]
+    },
+    "Root": {
+      "type": "object",
+      "properties": {
+        "root_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^/",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "root_id",
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "ScopedFile": {
+      "type": "object",
+      "properties": {
+        "file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "root_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "path": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "kind": {
+          "$ref": "#/$defs/FileKind"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "encoding": {
+          "$ref": "#/$defs/Encoding"
+        }
+      },
+      "required": [
+        "file_key",
+        "root_id",
+        "path",
+        "kind",
+        "module_id",
+        "encoding"
+      ],
+      "additionalProperties": false
+    },
+    "Dependency": {
+      "type": "object",
+      "properties": {
+        "dependency_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "from_file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "to_file_key": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FileKey"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "INCLUDE",
+            "CONFIG",
+            "FORMAT",
+            "MACRO",
+            "OTHER"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "DECLARED",
+            "UNRESOLVED"
+          ]
+        }
+      },
+      "required": [
+        "dependency_id",
+        "from_file_key",
+        "to_file_key",
+        "kind",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "LogAssociation": {
+      "type": "object",
+      "properties": {
+        "association_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "log_file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "source_file_keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FileKey"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "execution_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "status": {
+          "const": "DECLARED"
+        }
+      },
+      "required": [
+        "association_id",
+        "log_file_key",
+        "source_file_keys",
+        "execution_id",
+        "run_id",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "File": {
+      "type": "object",
+      "properties": {
+        "file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "root_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "path": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "kind": {
+          "$ref": "#/$defs/FileKind"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "encoding": {
+          "$ref": "#/$defs/Encoding"
+        },
+        "sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "size_bytes": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "line_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "newline": {
+          "type": "string",
+          "enum": [
+            "LF",
+            "CRLF",
+            "CR",
+            "MIXED",
+            "NONE",
+            "BINARY"
+          ]
+        },
+        "file_id": {
+          "$ref": "#/$defs/FileId"
+        }
+      },
+      "required": [
+        "file_key",
+        "root_id",
+        "path",
+        "kind",
+        "module_id",
+        "encoding",
+        "sha256",
+        "size_bytes",
+        "line_count",
+        "newline",
+        "file_id"
+      ],
+      "additionalProperties": false
+    },
+    "Citation": {
+      "type": "object",
+      "properties": {
+        "file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "line_start": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "line_end": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "excerpt_sha256": {
+          "$ref": "#/$defs/Sha256"
+        }
+      },
+      "required": [
+        "file_key",
+        "source_sha256",
+        "line_start",
+        "line_end",
+        "excerpt_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "Issue": {
+      "type": "object",
+      "properties": {
+        "issue_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "MISSING_DEPENDENCY",
+            "DYNAMIC_DEPENDENCY",
+            "MISSING_LOG_PROVENANCE",
+            "CONTRADICTION",
+            "OTHER"
+          ]
+        },
+        "file_keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FileKey"
+          },
+          "uniqueItems": true
+        },
+        "operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "uniqueItems": true
+        },
+        "status": {
+          "const": "UNRESOLVED"
+        },
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{0,63}$"
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          }
+        },
+        "spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Span"
+          }
+        },
+        "missing_proof": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "issue_id",
+        "kind",
+        "file_keys",
+        "operation_ids",
+        "status",
+        "code",
+        "citations",
+        "spans",
+        "missing_proof"
+      ],
+      "additionalProperties": false
+    },
+    "Dataset": {
+      "type": "object",
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/DatasetId"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "name": {
+          "$ref": "#/$defs/SasName"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "INPUT",
+            "OUTPUT",
+            "UNRESOLVED"
+          ]
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          }
+        }
+      },
+      "required": [
+        "dataset_id",
+        "module_id",
+        "name",
+        "semantic_verification",
+        "role",
+        "citations"
+      ],
+      "additionalProperties": false
+    },
+    "Column": {
+      "type": "object",
+      "properties": {
+        "column_id": {
+          "$ref": "#/$defs/ColumnId"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "dataset_id": {
+          "$ref": "#/$defs/DatasetId"
+        },
+        "name": {
+          "$ref": "#/$defs/SasName"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "type": {
+          "const": "NUMERIC"
+        },
+        "length": {
+          "const": 8
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          }
+        }
+      },
+      "required": [
+        "column_id",
+        "module_id",
+        "dataset_id",
+        "name",
+        "semantic_verification",
+        "type",
+        "length",
+        "citations"
+      ],
+      "additionalProperties": false
+    },
+    "Operation": {
+      "type": "object",
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "DATA_STEP",
+            "PROC_SQL",
+            "PROC_SORT",
+            "MACRO",
+            "INCLUDE",
+            "UNKNOWN"
+          ]
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "minItems": 1
+        },
+        "reads": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NodeId"
+          },
+          "uniqueItems": true
+        },
+        "writes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NodeId"
+          },
+          "uniqueItems": true
+        },
+        "stateful_constructs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "RETAIN",
+              "SUM",
+              "LAG",
+              "BY",
+              "FIRST_LAST",
+              "GLOBAL_MACRO",
+              "MERGE",
+              "OTHER"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "classification": {
+          "$ref": "#/$defs/Classification"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "span": {
+          "$ref": "#/$defs/Span"
+        },
+        "sequence": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Fact"
+          }
+        },
+        "lineage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Lineage"
+          }
+        },
+        "state_effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StateEffect"
+          }
+        },
+        "order_contract": {
+          "$ref": "#/$defs/OrderContract"
+        },
+        "numeric_policy": {
+          "$ref": "#/$defs/NumericPolicy"
+        },
+        "cardinality": {
+          "type": "string",
+          "enum": [
+            "INPUT_ROWS_OR_SUBSET",
+            "CONCATENATED_ROWS_OR_SUBSET",
+            "MATCH_MERGE_MAX_PER_BY_GROUP_OR_SUBSET",
+            "SQL_JOIN_MULTIPLICITY_OR_SUBSET",
+            "SORT_PRESERVES_ROWS",
+            "NOT_APPLICABLE",
+            "UNRESOLVED"
+          ]
+        },
+        "interpretation_rules": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "BY_PREFIX_KEY_FLAGS",
+              "MERGE_ADVANCE_WITH_RETAINED_EXHAUSTED_INPUT",
+              "MERGE_NOT_CARTESIAN",
+              "SQL_ON_BEFORE_WHERE",
+              "SQL_MISSING_EQUALS_MISSING",
+              "SUM_SKIP_MISSING",
+              "LAG_QUEUE_PER_CALLSITE"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "control_lineage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ControlLineage"
+          }
+        }
+      },
+      "required": [
+        "operation_id",
+        "module_id",
+        "kind",
+        "citations",
+        "reads",
+        "writes",
+        "stateful_constructs",
+        "classification",
+        "semantic_verification",
+        "span",
+        "sequence",
+        "facts",
+        "lineage",
+        "state_effects",
+        "order_contract",
+        "numeric_policy",
+        "cardinality",
+        "interpretation_rules",
+        "control_lineage"
+      ],
+      "additionalProperties": false
+    },
+    "Edge": {
+      "type": "object",
+      "properties": {
+        "edge_id": {
+          "$ref": "#/$defs/EdgeId"
+        },
+        "from_operation_id": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "to_operation_id": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "DATA",
+            "STATE",
+            "ORDER",
+            "SIDE_EFFECT",
+            "RESOURCE",
+            "UNKNOWN"
+          ]
+        },
+        "node_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NodeId"
+          },
+          "uniqueItems": true
+        },
+        "evidence_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "classification": {
+          "$ref": "#/$defs/Classification"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        }
+      },
+      "required": [
+        "edge_id",
+        "from_operation_id",
+        "to_operation_id",
+        "type",
+        "node_ids",
+        "evidence_operation_ids",
+        "classification",
+        "semantic_verification"
+      ],
+      "additionalProperties": false
+    },
+    "LogObservation": {
+      "type": "object",
+      "properties": {
+        "observation_id": {
+          "$ref": "#/$defs/LogObservationId"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "association_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "execution_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "log_citation": {
+          "$ref": "#/$defs/Citation"
+        },
+        "source_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "metric": {
+          "type": "string",
+          "enum": [
+            "READ_ROWS",
+            "OUTPUT_ROWS",
+            "OUTPUT_COLUMNS",
+            "ELAPSED_SECONDS",
+            "CPU_SECONDS",
+            "WARNING_COUNT",
+            "LST_CELL"
+          ]
+        },
+        "classification": {
+          "const": "OBSERVATION"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "value_lexeme": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "rows",
+            "columns",
+            "seconds",
+            "count",
+            "none"
+          ]
+        },
+        "dataset": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DatasetName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "row": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "column": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Name"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cell_kind": {
+          "enum": [
+            "NUMBER",
+            "MISSING",
+            "BLANK",
+            null
+          ]
+        }
+      },
+      "required": [
+        "observation_id",
+        "module_id",
+        "run_id",
+        "attempt_id",
+        "association_id",
+        "execution_id",
+        "log_citation",
+        "source_operation_ids",
+        "metric",
+        "classification",
+        "semantic_verification",
+        "value_lexeme",
+        "unit",
+        "dataset",
+        "row",
+        "column",
+        "cell_kind"
+      ],
+      "additionalProperties": false
+    },
+    "Coverage": {
+      "type": "object",
+      "properties": {
+        "file_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "operation_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "dataset_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "column_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "edge_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "log_observation_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "unknown_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "contradiction_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "covered_source_file_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        }
+      },
+      "required": [
+        "file_count",
+        "operation_count",
+        "dataset_count",
+        "column_count",
+        "edge_count",
+        "log_observation_count",
+        "unknown_count",
+        "contradiction_count",
+        "covered_source_file_count"
+      ],
+      "additionalProperties": false
+    },
+    "Graph": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "module_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SafeId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "scope_manifest_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "source_fingerprint": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "artifact_authority": {
+          "const": "DRAFT"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "datasets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Dataset"
+          }
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Column"
+          }
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Operation"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Edge"
+          }
+        },
+        "log_observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LogObservation"
+          }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "contradictions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "coverage": {
+          "$ref": "#/$defs/Coverage"
+        },
+        "inventory_schema_version": {
+          "const": "1.0"
+        },
+        "profile_file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "profile_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "interpretation_profile": {
+          "const": "sas94-synthetic-v1"
+        },
+        "semantic_acceptance": {
+          "const": "BLOCKED"
+        },
+        "benchmark_execution": {
+          "const": "NOT_RUN"
+        },
+        "statement_coverage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatementCoverage"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "workspace_id",
+        "run_id",
+        "attempt_id",
+        "module_ids",
+        "scope_manifest_sha256",
+        "source_fingerprint",
+        "artifact_authority",
+        "semantic_verification",
+        "datasets",
+        "columns",
+        "operations",
+        "edges",
+        "log_observations",
+        "unknowns",
+        "contradictions",
+        "coverage",
+        "inventory_schema_version",
+        "profile_file_key",
+        "profile_sha256",
+        "interpretation_profile",
+        "semantic_acceptance",
+        "benchmark_execution",
+        "statement_coverage"
+      ],
+      "additionalProperties": false
+    },
+    "Seal": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "module_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SafeId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "stage": {
+          "$ref": "#/$defs/Stage"
+        },
+        "stage_gate": {
+          "$ref": "#/$defs/StageGate"
+        },
+        "artifact_authority": {
+          "const": "DRAFT"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "publication_state": {
+          "const": "COMPLETE"
+        },
+        "artifacts": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "enum": [
+              "attempt.json",
+              "source_inventory.json",
+              "source_record.json",
+              "validation_report.json",
+              "verification_report.json",
+              "revision_map.json",
+              "module_views.json"
+            ]
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Sha256"
+          }
+        },
+        "semantic_acceptance": {
+          "const": "BLOCKED"
+        }
+      },
+      "required": [
+        "schema_version",
+        "workspace_id",
+        "run_id",
+        "attempt_id",
+        "module_ids",
+        "stage",
+        "stage_gate",
+        "artifact_authority",
+        "semantic_verification",
+        "publication_state",
+        "artifacts",
+        "semantic_acceptance"
+      ],
+      "additionalProperties": false
+    },
+    "ModuleView": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "source_record_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "uniqueItems": true
+        },
+        "dataset_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DatasetId"
+          },
+          "uniqueItems": true
+        },
+        "column_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ColumnId"
+          },
+          "uniqueItems": true
+        },
+        "edge_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EdgeId"
+          },
+          "uniqueItems": true
+        },
+        "log_observation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LogObservationId"
+          },
+          "uniqueItems": true
+        },
+        "artifact_authority": {
+          "const": "DRAFT"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        }
+      },
+      "required": [
+        "schema_version",
+        "workspace_id",
+        "run_id",
+        "attempt_id",
+        "module_id",
+        "source_record_sha256",
+        "operation_ids",
+        "dataset_ids",
+        "column_ids",
+        "edge_ids",
+        "log_observation_ids",
+        "artifact_authority",
+        "semantic_verification"
+      ],
+      "additionalProperties": false
+    },
+    "RevisionMap": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "previous_record_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "current_record_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "retained_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "uniqueItems": true
+        },
+        "removed_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "uniqueItems": true
+        },
+        "added_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "uniqueItems": true
+        },
+        "semantic_equivalence": {
+          "const": "NOT_ASSERTED"
+        },
+        "previous_schema_version": {
+          "type": "string",
+          "enum": [
+            "1.0",
+            "2.0"
+          ]
+        },
+        "current_schema_version": {
+          "const": "2.0"
+        },
+        "operation_mappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "previous_operation_id": {
+                "$ref": "#/$defs/OperationId"
+              },
+              "current_operation_ids": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/OperationId"
+                },
+                "uniqueItems": true
+              },
+              "basis": {
+                "const": "OVERLAPPING_SOURCE_ANCHOR_ONLY"
+              }
+            },
+            "required": [
+              "previous_operation_id",
+              "current_operation_ids",
+              "basis"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "previous_record_sha256",
+        "current_record_sha256",
+        "retained_operation_ids",
+        "removed_operation_ids",
+        "added_operation_ids",
+        "semantic_equivalence",
+        "previous_schema_version",
+        "current_schema_version",
+        "operation_mappings"
+      ],
+      "additionalProperties": false
+    },
+    "Attempt": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "module_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SafeId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "stage": {
+          "$ref": "#/$defs/Stage"
+        },
+        "publication_state": {
+          "const": "STARTED"
+        }
+      },
+      "required": [
+        "schema_version",
+        "workspace_id",
+        "run_id",
+        "attempt_id",
+        "module_ids",
+        "stage",
+        "publication_state"
+      ],
+      "additionalProperties": false
+    },
+    "Finding": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{0,63}(?![\\s\\S])"
+        },
+        "gate": {
+          "type": "string",
+          "enum": [
+            "FAIL",
+            "BLOCKED"
+          ]
+        }
+      },
+      "required": [
+        "code",
+        "gate"
+      ],
+      "additionalProperties": false
+    },
+    "Report": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "stage_gate": {
+          "$ref": "#/$defs/StageGate"
+        },
+        "structural_verification": {
+          "type": "string",
+          "enum": [
+            "PASSED",
+            "FAILED",
+            "BLOCKED"
+          ]
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "benchmark_execution": {
+          "const": "NOT_RUN"
+        },
+        "artifact_authority": {
+          "const": "DRAFT"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Finding"
+          }
+        },
+        "coverage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Coverage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "semantic_acceptance": {
+          "const": "BLOCKED"
+        },
+        "source_consistency": {
+          "enum": [
+            "PASSED",
+            "FAILED",
+            "BLOCKED"
+          ]
+        },
+        "reconstruction_status": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "NOT_RUN"
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "stage_gate",
+        "structural_verification",
+        "semantic_verification",
+        "benchmark_execution",
+        "artifact_authority",
+        "findings",
+        "coverage",
+        "semantic_acceptance",
+        "source_consistency",
+        "reconstruction_status"
+      ],
+      "additionalProperties": false
+    },
+    "VerificationReport": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "stage_gate": {
+          "$ref": "#/$defs/StageGate"
+        },
+        "structural_verification": {
+          "type": "string",
+          "enum": [
+            "PASSED",
+            "FAILED",
+            "BLOCKED"
+          ]
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "benchmark_execution": {
+          "const": "NOT_RUN"
+        },
+        "artifact_authority": {
+          "const": "DRAFT"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Finding"
+          }
+        },
+        "coverage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Coverage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subject_attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "subject_seal_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "semantic_acceptance": {
+          "const": "BLOCKED"
+        },
+        "source_consistency": {
+          "enum": [
+            "PASSED",
+            "FAILED",
+            "BLOCKED"
+          ]
+        },
+        "reconstruction_status": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "NOT_RUN"
+          ]
+        },
+        "lineage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RevisionMap"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "stage_gate",
+        "structural_verification",
+        "semantic_verification",
+        "benchmark_execution",
+        "artifact_authority",
+        "findings",
+        "coverage",
+        "subject_attempt_id",
+        "subject_seal_sha256",
+        "semantic_acceptance",
+        "source_consistency",
+        "reconstruction_status",
+        "lineage"
+      ],
+      "additionalProperties": false
+    },
+    "Name": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,31}$"
+    },
+    "QualifiedName": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,31}(?:\\.[A-Za-z_][A-Za-z0-9_]{0,31})?$"
+    },
+    "DatasetName": {
+      "type": "string",
+      "pattern": "^work\\.[A-Za-z_][A-Za-z0-9_]{0,31}$"
+    },
+    "DecimalLexeme": {
+      "type": "string",
+      "pattern": "^(?:[+-]?[0-9]+(?:\\.[0-9]*)?|\\.)$"
+    },
+    "Span": {
+      "type": "object",
+      "properties": {
+        "file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "start": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "end": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "line_start": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "line_end": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "citation": {
+          "$ref": "#/$defs/Citation"
+        },
+        "byte_sha256": {
+          "$ref": "#/$defs/Sha256"
+        }
+      },
+      "required": [
+        "file_key",
+        "start",
+        "end",
+        "line_start",
+        "line_end",
+        "citation",
+        "byte_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "Expression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "literal"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "lexeme": {
+              "$ref": "#/$defs/DecimalLexeme"
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "lexeme"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "name"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "name": {
+              "$ref": "#/$defs/QualifiedName"
+            },
+            "lexeme": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "name",
+            "lexeme"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "unary"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
+                "+",
+                "-"
+              ]
+            },
+            "operand": {
+              "$ref": "#/$defs/Expression"
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "operator",
+            "operand"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "binary"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
+                "+",
+                "-",
+                "*",
+                "/"
+              ]
+            },
+            "left": {
+              "$ref": "#/$defs/Expression"
+            },
+            "right": {
+              "$ref": "#/$defs/Expression"
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "operator",
+            "left",
+            "right"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "group"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "expression": {
+              "$ref": "#/$defs/Expression"
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "expression"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "lag"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "name": {
+              "type": "string",
+              "enum": [
+                "lag",
+                "lag2"
+              ]
+            },
+            "argument": {
+              "$ref": "#/$defs/Expression"
+            },
+            "queue_size": {
+              "enum": [
+                1,
+                2
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "name",
+            "argument",
+            "queue_size"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Condition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "comparison"
+            },
+            "left": {
+              "$ref": "#/$defs/Expression"
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
+                "=",
+                "^=",
+                "<",
+                "<=",
+                ">",
+                ">="
+              ]
+            },
+            "right": {
+              "$ref": "#/$defs/Expression"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            }
+          },
+          "required": [
+            "kind",
+            "left",
+            "operator",
+            "right",
+            "span"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "by_flag"
+            },
+            "flag": {
+              "type": "string",
+              "enum": [
+                "first",
+                "last"
+              ]
+            },
+            "key": {
+              "$ref": "#/$defs/Name"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            }
+          },
+          "required": [
+            "kind",
+            "flag",
+            "key",
+            "span"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "SqlInput": {
+      "type": "object",
+      "properties": {
+        "dataset": {
+          "$ref": "#/$defs/DatasetName"
+        },
+        "alias": {
+          "$ref": "#/$defs/Name"
+        }
+      },
+      "required": [
+        "dataset",
+        "alias"
+      ],
+      "additionalProperties": false
+    },
+    "SqlSelect": {
+      "type": "object",
+      "properties": {
+        "output": {
+          "$ref": "#/$defs/Name"
+        },
+        "expression": {
+          "$ref": "#/$defs/Expression"
+        }
+      },
+      "required": [
+        "output",
+        "expression"
+      ],
+      "additionalProperties": false
+    },
+    "SqlJoin": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "INNER",
+            "LEFT"
+          ]
+        },
+        "left": {
+          "$ref": "#/$defs/Expression"
+        },
+        "right": {
+          "$ref": "#/$defs/Expression"
+        }
+      },
+      "required": [
+        "kind",
+        "left",
+        "right"
+      ],
+      "additionalProperties": false
+    },
+    "Fact": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "output"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "dataset": {
+              "$ref": "#/$defs/DatasetName"
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "dataset"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "input"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "SET",
+                "MERGE"
+              ]
+            },
+            "datasets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/DatasetName"
+              },
+              "minItems": 1,
+              "maxItems": 2
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "mode",
+            "datasets"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "by"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "keys": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Name"
+              },
+              "minItems": 1,
+              "maxItems": 2
+            },
+            "ascending": {
+              "const": true
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "keys",
+            "ascending"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "retain"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "target": {
+              "$ref": "#/$defs/Name"
+            },
+            "initial": {
+              "$ref": "#/$defs/Expression"
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "target",
+            "initial"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "assignment"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "target": {
+              "$ref": "#/$defs/Name"
+            },
+            "expression": {
+              "$ref": "#/$defs/Expression"
+            },
+            "guard": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Condition"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "target",
+            "expression",
+            "guard"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "sum"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "target": {
+              "$ref": "#/$defs/Name"
+            },
+            "expression": {
+              "$ref": "#/$defs/Expression"
+            },
+            "guard": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Condition"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "target",
+            "expression",
+            "guard"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "subset_if"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "condition": {
+              "$ref": "#/$defs/Condition"
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "condition"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "keep"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "names": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Name"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "names"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "drop"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "names": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Name"
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "names"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "sort"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "input": {
+              "$ref": "#/$defs/DatasetName"
+            },
+            "output": {
+              "$ref": "#/$defs/DatasetName"
+            },
+            "keys": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Name"
+              },
+              "minItems": 1,
+              "maxItems": 2
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "input",
+            "output",
+            "keys"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "sql"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/SqlInput"
+              },
+              "minItems": 1,
+              "maxItems": 2
+            },
+            "select": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/SqlSelect"
+              },
+              "minItems": 1
+            },
+            "join": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SqlJoin"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "where": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Condition"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "order_by": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Name"
+              },
+              "maxItems": 2
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "inputs",
+            "select",
+            "join",
+            "where",
+            "order_by"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "macro_binding"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "name": {
+              "$ref": "#/$defs/Name"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "name",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "macro_use"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "name": {
+              "$ref": "#/$defs/Name"
+            },
+            "value": {
+              "type": "string"
+            },
+            "definition_span": {
+              "$ref": "#/$defs/Span"
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "name",
+            "value",
+            "definition_span"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "include"
+            },
+            "span": {
+              "$ref": "#/$defs/Span"
+            },
+            "path": {
+              "type": "string"
+            },
+            "target_file_key": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FileKey"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "span",
+            "path",
+            "target_file_key"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "StateEffect": {
+      "type": "object",
+      "properties": {
+        "fact_index": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "RETAIN",
+            "SUM",
+            "LAG",
+            "BY",
+            "MERGE",
+            "INPUT_PDV"
+          ]
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Name"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "initialization": {
+          "type": "string",
+          "enum": [
+            "LITERAL",
+            "ZERO_UNLESS_RETAIN_INITIALIZED",
+            "MISSING_QUEUE",
+            "INPUT_BY_GROUP",
+            "GROUP_FLAGS",
+            "MISSING_PDV"
+          ]
+        },
+        "persistence": {
+          "type": "string",
+          "enum": [
+            "ACROSS_ROWS",
+            "WITHIN_BY_GROUP",
+            "BY_KEY_PREFIX"
+          ]
+        },
+        "reset": {
+          "type": "string",
+          "enum": [
+            "ONLY_EXPLICIT_ASSIGNMENT",
+            "NONE_IMPLICIT",
+            "BY_GROUP",
+            "KEY_PREFIX_CHANGE",
+            "INPUT_STATEMENT"
+          ]
+        },
+        "queue_size": {
+          "enum": [
+            null,
+            1,
+            2
+          ]
+        },
+        "call_policy": {
+          "type": "string",
+          "enum": [
+            "NOT_APPLICABLE",
+            "EXECUTED_CALLS_ONLY"
+          ]
+        },
+        "guard": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Condition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "fact_index",
+        "kind",
+        "target",
+        "initialization",
+        "persistence",
+        "reset",
+        "queue_size",
+        "call_policy",
+        "guard"
+      ],
+      "additionalProperties": false
+    },
+    "OrderContract": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "UNSPECIFIED",
+            "INPUT_ORDER",
+            "CONCATENATION_ORDER",
+            "ASCENDING_KEYS"
+          ]
+        },
+        "keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Name"
+          },
+          "maxItems": 2
+        },
+        "requires_sorted_inputs": {
+          "type": "boolean"
+        },
+        "precondition": {
+          "type": "string",
+          "enum": [
+            "NOT_REQUIRED",
+            "DECLARED_SYNTHETIC_INPUT",
+            "SOURCE_SORT",
+            "UNRESOLVED"
+          ]
+        },
+        "tie_order": {
+          "const": "UNSPECIFIED"
+        }
+      },
+      "required": [
+        "kind",
+        "keys",
+        "requires_sorted_inputs",
+        "precondition",
+        "tie_order"
+      ],
+      "additionalProperties": false
+    },
+    "Lineage": {
+      "type": "object",
+      "properties": {
+        "fact_index": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "output_column_id": {
+          "$ref": "#/$defs/ColumnId"
+        },
+        "input_column_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ColumnId"
+          },
+          "uniqueItems": true
+        },
+        "input_fact_indices": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "uniqueItems": true
+        },
+        "input_phase": {
+          "enum": [
+            "CURRENT_ITERATION",
+            "PRIOR_ITERATION_OR_INITIAL_MISSING",
+            "STATIC"
+          ]
+        }
+      },
+      "required": [
+        "fact_index",
+        "output_column_id",
+        "input_column_ids",
+        "input_fact_indices",
+        "input_phase"
+      ],
+      "additionalProperties": false
+    },
+    "NumericPolicy": {
+      "type": "object",
+      "properties": {
+        "storage": {
+          "const": "SAS_NUMERIC_8"
+        },
+        "missing_order": {
+          "const": "ORDINARY_MISSING_BELOW_FINITE"
+        },
+        "missing_arithmetic": {
+          "const": "PROPAGATE_EXCEPT_SUM_STATEMENT"
+        },
+        "expression_order": {
+          "const": "SOURCE_TREE_NO_REASSOCIATION"
+        },
+        "runtime_equivalence": {
+          "const": "NOT_ASSERTED"
+        },
+        "exactness": {
+          "type": "string",
+          "enum": [
+            "BOUNDED_SYNTHETIC_PRECONDITIONS",
+            "UNRESOLVED"
+          ]
+        },
+        "missing_join": {
+          "enum": [
+            "SAS_ORDINARY_MISSING_EQUALS_MISSING",
+            "UNRESOLVED"
+          ]
+        }
+      },
+      "required": [
+        "storage",
+        "missing_order",
+        "missing_arithmetic",
+        "expression_order",
+        "runtime_equivalence",
+        "exactness",
+        "missing_join"
+      ],
+      "additionalProperties": false
+    },
+    "StatementCoverage": {
+      "type": "object",
+      "properties": {
+        "span": {
+          "$ref": "#/$defs/Span"
+        },
+        "classification": {
+          "type": "string",
+          "enum": [
+            "HEADER",
+            "FACT",
+            "TERMINATOR",
+            "COMMENT",
+            "UNKNOWN"
+          ]
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OperationId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "span",
+        "classification",
+        "operation_id"
+      ],
+      "additionalProperties": false
+    },
+    "ProfileColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Name"
+        },
+        "type": {
+          "const": "NUMERIC"
+        },
+        "length": {
+          "const": 8
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "length"
+      ],
+      "additionalProperties": false
+    },
+    "ProfileInput": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/DatasetName"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProfileColumn"
+          },
+          "minItems": 1
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/DecimalLexeme"
+            }
+          },
+          "maxItems": 1000
+        },
+        "sorted_by": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Name"
+          },
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "name",
+        "module_id",
+        "columns",
+        "rows",
+        "sorted_by"
+      ],
+      "additionalProperties": false
+    },
+    "LogBinding": {
+      "type": "object",
+      "properties": {
+        "association_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "operation_file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "operation_start": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "start_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "association_id",
+        "operation_file_key",
+        "operation_start",
+        "start_line",
+        "end_line",
+        "complete"
+      ],
+      "additionalProperties": false
+    },
+    "LstColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Name"
+        },
+        "start": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "name",
+        "start",
+        "end"
+      ],
+      "additionalProperties": false
+    },
+    "LstBinding": {
+      "type": "object",
+      "properties": {
+        "association_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "operation_file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "operation_start": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "start_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LstColumn"
+          },
+          "minItems": 1
+        },
+        "header_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "data_start_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "data_end_line": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "association_id",
+        "operation_file_key",
+        "operation_start",
+        "start_line",
+        "end_line",
+        "complete",
+        "title",
+        "columns",
+        "header_line",
+        "data_start_line",
+        "data_end_line"
+      ],
+      "additionalProperties": false
+    },
+    "Profile": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "2.0"
+        },
+        "profile_id": {
+          "const": "sas94-synthetic-v1"
+        },
+        "entrypoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FileKey"
+          },
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProfileInput"
+          }
+        },
+        "log_bindings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LogBinding"
+          }
+        },
+        "lst_bindings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LstBinding"
+          }
+        },
+        "numeric_missing_join_policy": {
+          "enum": [
+            "SAS_ORDINARY_MISSING_EQUALS_MISSING",
+            "UNRESOLVED"
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "profile_id",
+        "entrypoints",
+        "inputs",
+        "log_bindings",
+        "lst_bindings",
+        "numeric_missing_join_policy"
+      ],
+      "additionalProperties": false
+    },
+    "ReconstructionReport": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "stage_gate": {
+          "$ref": "#/$defs/StageGate"
+        },
+        "structural_verification": {
+          "type": "string",
+          "enum": [
+            "PASSED",
+            "FAILED",
+            "BLOCKED"
+          ]
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "benchmark_execution": {
+          "const": "NOT_RUN"
+        },
+        "artifact_authority": {
+          "const": "DRAFT"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Finding"
+          }
+        },
+        "coverage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Coverage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subject_attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "subject_seal_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "semantic_acceptance": {
+          "const": "BLOCKED"
+        },
+        "source_consistency": {
+          "enum": [
+            "PASSED",
+            "FAILED",
+            "BLOCKED"
+          ]
+        },
+        "reconstruction_status": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "NOT_RUN"
+          ]
+        },
+        "lineage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RevisionMap"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "stage_gate",
+        "structural_verification",
+        "semantic_verification",
+        "benchmark_execution",
+        "artifact_authority",
+        "findings",
+        "coverage",
+        "subject_attempt_id",
+        "subject_seal_sha256",
+        "semantic_acceptance",
+        "source_consistency",
+        "reconstruction_status",
+        "lineage"
+      ],
+      "additionalProperties": false
+    },
+    "ControlLineage": {
+      "type": "object",
+      "properties": {
+        "fact_index": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "input_column_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ColumnId"
+          },
+          "uniqueItems": true
+        },
+        "input_fact_indices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NonNegativeInteger"
+          },
+          "uniqueItems": true
+        },
+        "role": {
+          "enum": [
+            "ASSIGNMENT_GUARD",
+            "ROW_SELECTION",
+            "SQL_ON",
+            "SQL_WHERE",
+            "BY_GROUP"
+          ]
+        },
+        "input_phase": {
+          "enum": [
+            "CURRENT_ITERATION",
+            "PRIOR_ITERATION_OR_INITIAL_MISSING",
+            "STATIC"
+          ]
+        }
+      },
+      "required": [
+        "fact_index",
+        "input_column_ids",
+        "input_fact_indices",
+        "role",
+        "input_phase"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

@@ -26,7 +26,9 @@ class CLITests(unittest.TestCase):
     def test_status_is_implemented_phase_only(self):
         code, data = self.invoke("status")
         self.assertEqual(code, 0)
-        self.assertEqual(data["phase"], "P1")
+        self.assertEqual(data["phase"], "P2A")
+        self.assertEqual(data["semantic_acceptance"], "BLOCKED")
+        self.assertEqual(data["independent_evaluation"], "NOT_IMPLEMENTED")
         self.assertEqual(data["semantic_verification"], "UNVERIFIABLE")
         self.assertEqual(data["benchmark_execution"], "NOT_RUN")
         self.assertEqual(data["downstream_integration"], "NOT_IMPLEMENTED")

@@ -1,8 +1,8 @@
 # Repository safety and private-data boundary
 
-P1 reads an explicit synthetic file scope and supplied evidence JSON, plus the
+P1/P2A read an explicit synthetic file scope and evidence JSON, plus the
 P0 public-source baseline. It has no SAS execution, upload, model call or downstream
-write capability. Treat the reference ZIP and any future source comments as data,
+write capability. Treat the reference ZIP and source comments as data,
 not executable instructions.
 
 Store raw SAS, logs, LST, customer/reference outputs and evaluator gold outside
@@ -19,7 +19,7 @@ It emits filenames only, never matching secret values. It is not a comprehensive
 DLP system and cannot detect arbitrary PII, every secret format, or mistakes hidden
 in otherwise allowed text. Review staged content before committing or publishing.
 
-P1 fixtures are labeled synthetic strings in Python tests. Tests create temporary
+P1/P2A fixtures are labeled synthetic strings in Python tests. Tests create temporary
 files outside Git; no raw-source extension exception has been added. Never make
 a broad exception for real `.sas`, `.log`, `.lst` or tabular data. The hash-pinned specification
 ZIP is reference documentation and stays unexecuted.
@@ -34,14 +34,24 @@ artifact store disjoint from every source root. Root enumeration reveals names
 but added-file contents are never read. Descriptor-relative reads reject symlinks
 in every component, hardlinked files, nonregular files, traversal and over-limit
 inputs. Sources are opened read-only; comments, logs and attachments are never
-executed. No recursive dependency discovery is performed.
+executed. P2A follows literal includes only through explicitly authorized file
+identities and declared dependency links; it cannot expand source scope.
 
 Artifacts contain declared identifiers, paths relative to roots, hashes, supplied
-structured graph facts and code-only diagnostics; raw source/log excerpts and
+structured graph facts and code-only diagnostics; full source/log excerpts and
 absolute source roots are excluded. Arbitrary identifiers can still encode private
 information. `synthetic: true` is an authorization declaration, not an automated
-PII detector. Do not provide real data to P1. Metadata publication is not a
+PII detector. P2A artifacts additionally contain original token/numeric lexemes,
+formulas, identifiers, state facts and fixed-layout observation cells. Those fields
+can reveal source information: **do not provide real data to P1 or P2A**. Publication is not a
 redaction or anonymization guarantee.
+
+P2A's public fixture author and reviewer are separate development agents in the
+same environment, not a protected-gold boundary. The deterministic source checker
+shares reconstruction code. No public test result establishes evaluator isolation
+or independent semantic reliability. P2B must provision and test those controls;
+semantic acceptance stays BLOCKED. No model provider or outbound source channel
+is configured by P2A.
 
 POSIX local publication uses exclusive attempt reservation, a per-attempt process
 lock, no-clobber atomic file installation, fsync, and a seal installed last.
