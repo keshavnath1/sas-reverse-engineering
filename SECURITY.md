@@ -12,6 +12,9 @@ do not prevent force-add, protect previously tracked files, or inspect file cont
 
 `scripts/check_repository.py` checks tracked files for prohibited paths/extensions,
 symlink files, the reference archive hash and a limited set of credential formats.
+Content checks cover both index and working-tree bytes; the local symlink-mode
+check applies to the working tree. A staged symlink replaced locally by a regular
+file is rejected on the CI checkout, not by that local mode check.
 It emits filenames only, never matching secret values. It is not a comprehensive
 DLP system and cannot detect arbitrary PII, every secret format, or mistakes hidden
 in otherwise allowed text. Review staged content before committing or publishing.
