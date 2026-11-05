@@ -1,7 +1,8 @@
 # P0 validation record — 2026-11-05
 
 P0 foundation acceptance passed locally. P1 is not started or authorized.
-The new repository has its own Git history and no configured remote. The original
+At the time of this validation, the new repository had its own Git history and
+no configured remote; subsequent publication authorization is in APPROVALS.md. The original
 workspace planning files and Agent-mastery checkout were not modified.
 
 ## Environment and pins

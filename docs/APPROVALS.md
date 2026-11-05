@@ -17,3 +17,8 @@ local foundation tests. Stop after P0; P1 requires separate user approval.
 copies. Their pending D01–D03 language is superseded by this record. D04 onward
 remain open. This engineering-scope approval is not a downstream PRD, ADR,
 oracle, tie-out, runtime, merge or release approval.
+
+The user subsequently authorized pushing this P0 repository to
+`https://github.com/keshavnath1/sas-reverse-engineering` on 2026-11-05.
+This supersedes the initial local-only publication restriction. P1 remains
+unapproved; publication does not change any downstream human approval boundary.

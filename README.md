@@ -104,15 +104,16 @@ A baseline PASS proves identity only, not compatibility of a future bundle or
 authorization to implement a migration. P0 does not write to Agent-mastery.
 
 Keep real intake and protected evaluator answers outside this repository. See
-[SECURITY.md](SECURITY.md) for exclusions, limitations and reporting. No remote
-repository is configured or published by this foundation step.
+[SECURITY.md](SECURITY.md) for exclusions, limitations and reporting. The authorized
+remote is [keshavnath1/sas-reverse-engineering](https://github.com/keshavnath1/sas-reverse-engineering).
 
 ## Validation and next checkpoint
 
 GitHub Actions defines separate foundation and remote-drift jobs using pinned
 action commits. Remote drift is deliberately a failing check if the branch moves
-or cannot be reached; it does not silently update the baseline. Hosted Actions
-has not run until this local repository is published and a workflow executes.
+or cannot be reached; it does not silently update the baseline. Check
+[GitHub Actions](https://github.com/keshavnath1/sas-reverse-engineering/actions)
+for hosted run status; the P0 validation report records the earlier local checks.
 
 See [P0 validation report](docs/P0_VALIDATION.md) for actual commands and results.
 Stop at P0. Review D04–D07 and explicitly authorize P1 before implementing source
