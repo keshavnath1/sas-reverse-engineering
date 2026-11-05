@@ -27,7 +27,7 @@ documentation only. Pending hosted checks are not passes.
 | Local Agent-mastery compatibility | PASS: exact pinned HEAD, clean tree, 20 matching digests |
 | Remote Agent-mastery drift | PASS: branch resolves to the frozen pin |
 | Public synthetic CLI demo | PASS for expected outcomes; independent acceptance BLOCKED |
-| Hosted CI | Pending publication |
+| Hosted CI | PASS: [run 42104309091](https://github.com/keshavnath1/sas-reverse-engineering/actions/runs/42104309091), both jobs successful |
 
 The status test now expects phase P2A and adds blocked-acceptance checks; existing
 P0/P1 behavioral, contract and security assertions were retained. The public suite
@@ -128,6 +128,26 @@ checked for existence. Temporary transcripts/artifacts are outside Git and may
 disappear. Tests and
 fixture generators are committed for reproduction with new empty destinations.
 
+Publication used `git push origin main`, exit 0, advancing the remote from
+`e13705c` to `7da79ab4b72f894d473948ce198436a5abe1f6cd`. GitHub Actions run
+`42104309091` completed successfully at that exact commit; both `foundation`
+and `downstream-drift` passed. The foundation job log independently records
+389 checkout tests (15.866 seconds) and 389 installed-wheel tests (15.725 seconds),
+both `OK`, plus successful public CLI demonstrations with semantic acceptance
+still BLOCKED and historical bytes unchanged. These are CI test durations,
+not workload benchmarks. This report's subsequent documentation-only update
+does not alter the tested implementation.
+
+Hosted results were read through the GitHub connector using these exact GET
+resources and decoded job-log request:
+
+```text
+https://api.github.com/repos/keshavnath1/sas-reverse-engineering/actions/runs?head_sha=7da79ab4b72f894d473948ce198436a5abe1f6cd&per_page=5
+https://api.github.com/repos/keshavnath1/sas-reverse-engineering/actions/runs/42104309091
+https://api.github.com/repos/keshavnath1/sas-reverse-engineering/actions/runs/42104309091/jobs
+fetch_workflow_job_logs(repo_full_name="keshavnath1/sas-reverse-engineering", job_id=127514966739)
+```
+
 ## Hash evidence
 
 | Artifact | SHA-256 |
@@ -180,7 +200,8 @@ The first `git push origin main` was denied by automatic approval review before
 execution. Its reason was that it did not recognize P2A approval in the user's
 pasted attachment and considered default-branch publication unauthorized. The
 original request was reread to establish the explicit D08-A/B P2A approval;
-publication status is reported separately from the successful local checks.
+the same push was then approved and succeeded. No alternate publication route
+or approval bypass was used. Hosted results are recorded above.
 
 ## Files and proof boundary
 
