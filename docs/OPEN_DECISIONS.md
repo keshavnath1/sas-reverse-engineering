@@ -2,6 +2,13 @@
 
 Status: PROPOSED — Step 1 only. Reviewed 2026-11-05.
 
+**P1 update, 2026-11-05:** the user approved D01–D03 for P0 and D04–D07 for
+synthetic P1. The tables below retain the original recommendations for traceability;
+their pending-approval language is historical. [APPROVALS.md](APPROVALS.md) records
+the authorization. [P1_DESIGN.md](P1_DESIGN.md) records the implemented rationale
+and conservative ID policy. D08–D12 remain open. Production data/provenance and
+storage authorization remain unresolved; D07 permits synthetic P1 only.
+
 Companion: [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md). No decision below is human-approved by virtue of appearing here. Recommendations distinguish proposed design from observed evidence. Resolve only decisions needed for the next phase; do not block P0 on future runtime or business choices.
 
 ## Decisions requiring human input

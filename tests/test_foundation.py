@@ -23,10 +23,11 @@ class CLITests(unittest.TestCase):
             code = main(list(args))
         return code, json.loads(out.getvalue())
 
-    def test_status_is_foundation_only(self):
+    def test_status_is_implemented_phase_only(self):
         code, data = self.invoke("status")
         self.assertEqual(code, 0)
-        self.assertEqual(data["phase"], "P0")
+        self.assertEqual(data["phase"], "P1")
+        self.assertEqual(data["semantic_verification"], "UNVERIFIABLE")
         self.assertEqual(data["benchmark_execution"], "NOT_RUN")
         self.assertEqual(data["downstream_integration"], "NOT_IMPLEMENTED")
         self.assertNotIn("stage_gate", data)

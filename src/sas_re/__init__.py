@@ -1,1 +1,1 @@
-"""Foundation only; no SAS processing or evidence validation is implemented."""
+"""P1 source integrity foundation; no SAS parsing or semantic verification."""

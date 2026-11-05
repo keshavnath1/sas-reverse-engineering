@@ -1,29 +1,31 @@
 # SAS Reverse Engineering and Computation Architecture Planner
 
-**P0 foundation only.** This local repository contains an installable Python 3.12
-package, an honest status CLI, a read-only downstream baseline check, and scaffold
-tests. It does not read or execute SAS workloads.
+**P1 source evidence foundation.** Python 3.12 package for explicitly authorized
+synthetic inventory, byte identity, supplied graph validation and append-only
+local evidence attempts. No SAS parser, semantic reconstruction or workload
+execution is implemented. A structural `PASS` always retains semantic
+`UNVERIFIABLE`, authority `DRAFT`, and benchmarks `NOT_RUN`.
 
-| Implemented in P0 | Planned, not implemented |
+| Implemented | Planned; requires later approval |
 |---|---|
-| Package and console entry point | Evidence inventory, sealing, schemas and validation |
-| JSON status and explicit future-command rejection | SAS/log/LST reconstruction and dependency graphs |
-| Frozen specification and downstream source metadata | Requirements, specifications, parallelism analysis |
-| Local checkout and remote branch drift checks | Spark/Ray/Dask/native ADRs and HLD/LLD generation |
-| Hash-locked packaging tools, local tests, CI definition | Agent skills, independent semantic evaluation, handoff integration |
-| Git exclusions and tracked-file guard | SAS parity, workload benchmarks or release approval |
+| P0 package, status, frozen baseline and drift checks | SAS/log/LST semantic extraction |
+| P1 JSON contracts, authorized inventory and byte hashes | Agent skills and independent semantic evaluation |
+| Citation, ID, ownership, reference and coverage checks | PRD/SPEC, parallelism, ADR/HLD/LLD generation |
+| Explicit log declarations and unresolved dependencies | Runtime comparisons and workload benchmarks |
+| Local append-only attempts and fresh-source verification | Downstream handoff/integration and release approval |
+| Derived module views and explicit ID revision maps (Python API) | Production provenance and immutable storage |
 
-See [approval scope](docs/APPROVALS.md), [implementation plan](docs/IMPLEMENTATION_PLAN.md),
-[open decisions](docs/OPEN_DECISIONS.md), and [compatibility boundary](docs/COMPATIBILITY.md).
-The plan and open-decisions copies preserve the Step 1 record; APPROVALS.md records
-the subsequent D01–D03 approval. P1 remains unapproved.
+See [P1 design](docs/P1_DESIGN.md), [P1 validation](docs/P1_VALIDATION.md),
+[approval scope](docs/APPROVALS.md), [plan](docs/IMPLEMENTATION_PLAN.md),
+[open decisions](docs/OPEN_DECISIONS.md), and [compatibility](docs/COMPATIBILITY.md).
+D01–D07 are approved for this scope. Stop after P1; D08–D12 remain open.
 
-## Install and check
+## Install and validate
 
-Python 3.12 is required; the tested patch version and CI baseline are 3.12.5.
-The package permits 3.12.x only. No third-party runtime or test dependencies are
-needed. `requirements.lock` pins pip, setuptools and wheel with SHA-256 wheel
-hashes. Do not use an unpinned build-isolation environment for the acceptance run.
+Python 3.12 is required; local validation and CI pin 3.12.5. The complete runtime
+and packaging dependency closure is SHA-256 locked. The lock currently supports
+CPython 3.12 macOS arm64 and manylinux x86_64. Publication uses POSIX filesystem
+APIs; Windows is not supported. No model or runtime engine dependency is included.
 
 ```bash
 python3.12 -m venv .venv
@@ -36,85 +38,101 @@ python scripts/check_repository.py
 sas-re status
 ```
 
-The repository guard inspects tracked/staged files; run it after staging newly
-created files. It is an additional control, not a complete secret/PII detector.
-The approved specification archive is the only permitted tracked ZIP, and its
-exact hash is checked. No synthetic SAS fixtures are needed or allowed in P0;
-future synthetic-source exceptions require a narrow policy change at P1.
+For offline installation, add `--no-index --find-links /path/to/wheels` to the
+hash-locked install. Keep hash checking enabled. Run the repository guard after
+staging new files; it checks index and working-tree content, not arbitrary PII.
+Synthetic test files are generated in temporary directories from labeled Python
+strings. No raw SAS/log/LST exception was added to Git exclusions.
 
-Build and smoke-test the installed wheel separately:
+Build and test the installed wheel from another directory:
 
 ```bash
 python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .
-python -m pip install --no-deps --force-reinstall dist/*.whl
-cd /tmp
+python -m pip install --no-deps --force-reinstall dist/sas_reverse_engineering-0.2.0-py3-none-any.whl
+# Set CHECKOUT to this checkout's absolute path before changing directories.
+CHECKOUT="$PWD"
+cd /private/tmp  # Linux: /tmp; avoid symlink aliases for authorized source roots.
+python -m unittest discover -s "$CHECKOUT/tests" -v
 sas-re status
-python -m sas_re --version
+python -c 'import sas_re; print(sas_re.__file__)'
 ```
 
-For an offline setup, obtain the three universal wheels using the locked versions,
-then add `--no-index --find-links /path/to/wheels` to the hash-locked install. Hash
-checking is still required. These pins reproduce the toolchain; OS, Git and Python
-patch versions must also be recorded for any stronger reproducibility claim.
+The last path must identify installed site-packages for a wheel validation run.
+The test files retain their checkout location for the P0 Git/reference tests;
+the installed application must not import source code from that checkout.
 
-## CLI behavior
+## P1 CLI
 
-All result bodies are JSON; help/version use normal CLI text. The CLI works
-outside the repository directory because baseline metadata is bundled in the
-installed package. It neither creates run state nor advances a migration.
+All result bodies are JSON; help/version and argument-usage errors use normal
+CLI text. Scope and record input are strict finite UTF-8 JSON with no duplicate
+keys. Bundled [v1 contracts](src/sas_re/contracts/v1/evidence.schema.json) define
+all required fields. Scope must list every file under each dedicated authorized
+root; any addition/removal blocks inventory. No include or log is auto-associated.
+
+```bash
+sas-re discover --scope /absolute/scope.json --store /absolute/artifacts --run RUN --attempt inventory-1
+sas-re seal-source --scope /absolute/scope.json --record /absolute/record.json --store /absolute/artifacts --run RUN --attempt record-1
+sas-re verify-source --scope /absolute/scope.json --store /absolute/artifacts --run RUN --attempt record-1 --verification-attempt check-1
+```
+
+`discover` inventories bytes only. `seal-source` verifies a supplied composed
+graph prepared for that exact attempt; it does not infer operations from SAS.
+`verify-source` selects an exact prior inventory/record attempt and writes a new
+verification attempt. It never selects the newest directory or overwrites history.
+Failed/blocked attempts cannot be promoted by verification; create a new attempt
+with explicitly corrected inputs. Missing seals remain incomplete and blocked.
+
+The synthetic demonstration creates six source files, a two-module supplied graph,
+a successful inventory/seal/check, and a failed stale-include check:
+
+```bash
+python scripts/p1_demo.py --destination /private/tmp/sas-re-p1-demo
+```
+
+The destination must not exist. This script constructs synthetic records and
+invokes the installed CLI; its log metrics are fixture values, not measurements.
+See [P1 design](docs/P1_DESIGN.md) for Python helpers, canonical IDs and limits.
+
+## Baseline and future commands
 
 ```bash
 sas-re --help
 sas-re --version
 sas-re status
-sas-re check-baseline --checkout /path/to/Agent-mastery
+sas-re check-baseline --checkout /absolute/Agent-mastery
 sas-re check-baseline --remote
-sas-re check-baseline --checkout /path/to/Agent-mastery --remote
 ```
 
-Local checks require the explicit checkout root. They compare HEAD, worktree
-cleanliness and 20 frozen file digests. Remote checks query only the named public
-branch ref; they never fetch, pull, change a checkout or repin metadata. A remote
-match does not check local files. An offline failure is BLOCKED, not a match.
+The downstream pin remains `bc754e0f1204a99020c864df2a5b25983005e09c`.
+Local checks compare HEAD, cleanliness and 20 frozen file digests. Remote checks
+query the named public branch without fetch/pull/repinning. Neither grants
+integration or migration approval. Agent-mastery is never modified.
 
-| Exit code | Meaning |
+| Exit | Meaning |
 |---|---|
-| 0 | Status/help/version success, or requested baseline checks passed |
-| 1 | Baseline drift or repository guard failure |
-| 2 | Invalid CLI usage or unavailable baseline check |
-| 3 | Recognized future command is not implemented |
+| 0 | Status/help/version success, or requested structural checks `PASS` |
+| 1 | Structural/integrity validation `FAIL`, or baseline drift |
+| 2 | `BLOCKED`, unavailable check, or invalid argument usage |
+| 3 | Recognized future command `NOT_IMPLEMENTED` / `BLOCKED` |
 
-`discover`, `verify-source`, `analyze-parallelism`, `draft-requirements`,
-`propose-adrs`, `verify-adrs`, `package-handoff` and `eval` return
-`NOT_IMPLEMENTED` / `BLOCKED` with exit 3. Arguments to these placeholders are
-not acted upon. They do not inspect the supplied paths, create outputs or report
-successful evidence validation. Benchmarks remain `NOT_RUN`.
+`analyze-parallelism`, `draft-requirements`, `propose-adrs`, `verify-adrs`,
+`package-handoff` and `eval` remain placeholders. They do not read inputs or create
+outputs. No result establishes safe parallelization or semantic correctness.
 
-## Authority and data boundaries
+## Authority and data boundary
 
-The unchanged v2 ZIP is under `reference/`. It is specification material, including
-proposed schemas and synthetic expected results, not installed executable features.
-Never execute its embedded scripts as part of intake. Document 02 governs planned
-workflow; document 05 governs proposed downstream compatibility. User approval
-controls which phase can be implemented.
+The unchanged v2 ZIP under `reference/` is specification material. Document 02
+controls workflow conflicts; document 05 controls proposed compatibility conflicts.
+Embedded scripts, source comments and log text are data, never instructions.
+User approval controls implementation phases. The v0.1 proposed schema is not
+silently accepted as v1; there is no automatic conversion.
 
-Agent-mastery remains pinned to `bc754e0f1204a99020c864df2a5b25983005e09c`.
-Its approvals, canonical artifacts and pattern import remain downstream-owned.
-A baseline PASS proves identity only, not compatibility of a future bundle or
-authorization to implement a migration. P0 does not write to Agent-mastery.
+Local hashes are integrity evidence, not authenticated production provenance.
+Keep real source, logs, customer data and protected evaluator answers outside Git
+and outside this P1 workflow. `synthetic: true` is a declaration, not a PII detector.
+See [SECURITY.md](SECURITY.md) for the tested local trust model and limits.
 
-Keep real intake and protected evaluator answers outside this repository. See
-[SECURITY.md](SECURITY.md) for exclusions, limitations and reporting. The authorized
-remote is [keshavnath1/sas-reverse-engineering](https://github.com/keshavnath1/sas-reverse-engineering).
-
-## Validation and next checkpoint
-
-GitHub Actions defines separate foundation and remote-drift jobs using pinned
-action commits. Remote drift is deliberately a failing check if the branch moves
-or cannot be reached; it does not silently update the baseline. Check
-[GitHub Actions](https://github.com/keshavnath1/sas-reverse-engineering/actions)
-for hosted run status; the P0 validation report records the earlier local checks.
-
-See [P0 validation report](docs/P0_VALIDATION.md) for actual commands and results.
-Stop at P0. Review D04–D07 and explicitly authorize P1 before implementing source
-identity contracts or evidence validators.
+GitHub Actions defines P0/P1 and wheel tests plus a separate downstream drift job,
+with pinned action commits. A local pass is not proof of a hosted CI run; consult
+[Actions](https://github.com/keshavnath1/sas-reverse-engineering/actions) for hosted
+status. Historical P0 checks remain in [P0 validation](docs/P0_VALIDATION.md).
