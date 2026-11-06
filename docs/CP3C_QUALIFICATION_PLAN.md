@@ -344,3 +344,50 @@ Changed files: new `docs/CP3C_BOOTSTRAP_DESIGN.md` and
 `docs/APPROVALS.md`, `docs/OPEN_DECISIONS.md` and
 `docs/BEST_PRACTICES_ADOPTION.md`. No implementation or dependency changes.
 Stop after planning for explicit approval; the Windows reader stays BLOCKED.
+
+### Observed hosted regression CI
+
+The unchanged workflow passed for planning commit
+`6343cce966b66b7424d526ef50b93a5d49c10b87` in
+[run 42163128965](https://github.com/keshavnath1/sas-reverse-engineering/actions/runs/42163128965)
+on 2026-11-06 UTC. Both `foundation` and `downstream-drift` completed successfully.
+Observed runner: Ubuntu 24.04.5 x64, image `20261101.360.1`, CPython 3.12.5.
+This is Linux regression evidence, not native Windows qualification.
+
+The following existing workflow commands completed with exit 0:
+
+```sh
+python -m pip install --require-hashes --only-binary=:all: -r requirements.lock
+python -m pip install --no-deps --no-build-isolation -e .
+python -m pip check
+python scripts/check_repository.py
+python -m unittest discover -s tests -v
+python scripts/p1_demo.py --destination "$RUNNER_TEMP/synthetic-p1"
+python scripts/p2a_demo.py --destination "$RUNNER_TEMP/synthetic-p2a"
+python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .
+python -m pip install --no-deps --force-reinstall dist/*.whl
+cd "$RUNNER_TEMP"
+python -c 'import sas_re; assert "site-packages" in sas_re.__file__, sas_re.__file__'
+python -m unittest discover -s "$GITHUB_WORKSPACE/tests" -v
+python "$GITHUB_WORKSPACE/scripts/p2a_demo.py" --destination "$RUNNER_TEMP/synthetic-p2a-wheel"
+sas-re status
+python -m sas_re --version
+```
+
+Development: **596 tests, OK**, 31.658 seconds. Installed wheel: **596 tests,
+OK**, 32.555 seconds. These elapsed test times are not workload benchmarks.
+Existing synthetic POSIX demos also passed. They create disposable synthetic
+artifacts on the hosted Linux runner; no Windows content, publication or store
+operation was enabled or executed. No dependencies or workflow configuration
+were changed; CI installed the existing locked dependencies as it already does.
+
+The separate drift job ran the same locked-dependency install, then
+`python -m pip install --no-deps --no-build-isolation .` and
+`sas-re check-baseline --remote`, all exit 0. Its reported expected and observed
+downstream commit both equal `bc754e0f1204a99020c864df2a5b25983005e09c`,
+with `stage_gate: PASS`. This is a read-only compatibility check, not downstream
+integration or approval. There were no failed CI jobs or test failures in this run.
+
+This section is a documentation-only result record added after that run; the
+referenced run qualifies the exact commit above, not a future revision. All
+proposed CP3C native cases remain NOT_RUN and native qualification remains BLOCKED.
