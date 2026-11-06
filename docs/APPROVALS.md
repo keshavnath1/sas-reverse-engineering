@@ -299,3 +299,12 @@ workstation activation require separate future decisions. All are OPEN. This gra
 covers no key, approved hash, kit, lock or package change, provisioning or
 installation. Windows source access and qualification, B1/P2B execution, P4,
 CP4 and CP5 retain their separate gates.
+
+On 2026-11-06 the user accepted WS-2A as documentation at
+`6e403722d64d15a41b4205cb074bb8d928fad3a2` and authorized MVP-1 as a
+bounded development experiment. One public synthetic workflow may feed a private,
+in-memory [draft architecture preview](../examples/mvp1/ARCHITECTURE.md).
+Authority stays DRAFT; verification UNVERIFIABLE, semantic acceptance BLOCKED,
+benchmarks NOT_RUN. Stop for review of the package. Runtime selection, operational
+P3/P4, P2B evaluation, Windows access, packaging, publication and downstream
+integration require separate decisions.

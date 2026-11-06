@@ -1,6 +1,12 @@
 # Open decisions and compatibility risks
 
-**Current checkpoint, 2026-11-06.** The user accepted WS-1 at
+**Current checkpoint, 2026-11-06.** WS-2A was accepted as planning at
+`6e403722d64d15a41b4205cb074bb8d928fad3a2`. Workstation packaging is deferred.
+MVP-1 is approved only as a private synthetic [draft preview](../examples/mvp1/PRD.md).
+Business purpose, reference population, duplicate/tie policy, numeric tolerance,
+resource budget and runtime selection are OPEN. Stop for product review.
+
+**Historical checkpoint, 2026-11-06.** The user accepted WS-1 at
 `767b2c3154de7fb451c4278e22f25633d9a025d0` within its tested scope and
 approved WS-2A documentation only. The [offline kit plan](WS2A_OFFLINE_KIT_PLAN.md)
 and [installation test plan](WS2A_INSTALLATION_TEST_PLAN.md) define future
@@ -154,6 +160,7 @@ No decision becomes human-approved merely by appearing in these documents.
 | WS-1 launcher and W01–W06 | APPROVED bounded engineering scope | Exactly one of `--help`, `--version` or `status`. Stop after validation for review. Release inventory, authentication and target-native qualification are separate decisions |
 | WS-1 result | ACCEPTED within tested scope | `767b2c3154de7fb451c4278e22f25633d9a025d0`. Historical macOS ARM64 and hosted Linux x64 results only. Native Windows W01–W06 are BLOCKED / NOT_RUN |
 | WS-2A offline kit and installation test plans | APPROVED documentation only | Two plans and necessary ledgers. Stop at documentation review. Future release, implementation and per-target execution decisions are OPEN |
+| MVP-1 synthetic experiment | APPROVED for draft generation only | One public fixture, a private renderer and two untested alternatives. P2B independent semantic acceptance stays BLOCKED; P3/P4 operational work needs separate approval. |
 | Operational P3, P3-A2 and P4 | OPEN, NOT APPROVED | Operational P3 requires independent source/graph acceptance, then draft PRD/module specifications and separate authorization. A1 provides no independence, scheduling or runtime verdict |
 | Broader Windows native qualification | OPEN, NOT APPROVED | Requires separately approved real environment, owners and security evidence |
 | CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |
