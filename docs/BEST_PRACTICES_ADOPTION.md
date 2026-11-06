@@ -388,3 +388,15 @@ diagnostic experiment before P2B. See the [approval](APPROVALS.md),
 
 These checks support public engineering evidence only. Semantic verification is
 UNVERIFIABLE, semantic acceptance BLOCKED, authority DRAFT and benchmarks NOT_RUN.
+
+## P2B-B1 isolation readiness planning
+
+Reviewed at accepted P3-A1 baseline `5e62727b9b8e463cf6c7dd1bc68172801a7868f6`.
+The [isolation design](P2B_B1_ISOLATION_DESIGN.md) and
+[test plan](P2B_B1_TEST_PLAN.md) are specifications for future review.
+
+| Practice | Evidence at this checkpoint | Limit |
+|---|---|---|
+| J2/J5: scope and stop gates | The plan ties one native host/policy tuple to named human admission decisions, an offline stub and a finite sentinel schedule | Host, independent reviewer, retention and budget are OPEN. No deployment, run or isolation verdict |
+| J3: evidence and counterexamples | Every proposed denial needs corroboration outside the role; controls distinguish real denial from an absent object or broken runner. The handoff distinguishes a torn copy, a committed but unacknowledged receipt and receipt substitution | The controls and counterexamples are NOT_RUN; no protected answers, semantic evaluation or cost estimate |
+| J4: separate review | A read-only design review identified the distinction between namespace invisibility and backing permissions, the risk from surviving writable descriptors, and when a fresh-context exclusion check can be observed. These constraints are reflected in the documents | Same-workspace development review is not a real-host witness or independent human security sign-off |

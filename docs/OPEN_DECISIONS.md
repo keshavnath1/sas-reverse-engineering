@@ -1,15 +1,14 @@
 # Open decisions and compatibility risks
 
-**Current checkpoint, 2026-11-06.** The user accepted the
-[post-CP3D roadmap](POST_CP3D_ROADMAP.md) at
-`dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc` and approved RMAP-01 for P3-A1
-only. The development-order exception permits private in-memory dependency and
-blocker diagnostics on supplied public synthetic canonical v2 graphs before
-P2B, with exact A01–A26 tests and preservation of all 667 existing regressions.
-The stopping point is user review of the [design](P3_A1_DESIGN.md) and
-[validation](P3_A1_VALIDATION.md). Operational P3, scheduling, P3-A2, P2B
-execution, P4, CP4/CP5, private SAS intake and downstream changes remain outside
-the grant. Native Windows bootstrap, activation and publication stay BLOCKED.
+**Current checkpoint, 2026-11-06.** The user accepted P3-A1 at
+`5e62727b9b8e463cf6c7dd1bc68172801a7868f6` for its private diagnostics on
+supplied public synthetic graphs and approved P2B-B1 isolation readiness
+planning only. The review covers the [isolation design](P2B_B1_ISOLATION_DESIGN.md),
+[test plan](P2B_B1_TEST_PLAN.md) and necessary ledgers. RMAP-02 and D09-B are
+OPEN. B1 implementation, provisioning and execution require future explicit
+authorization. Operational P3, P3-A2, P4, CP4/CP5, private intake and downstream
+changes remain outside scope. Independent semantic acceptance and native Windows
+qualification stay BLOCKED.
 
 **Accepted CP3D.** The user accepted the private metadata primitives, protocol
 and pure/simulated tests at `d6b25d35a97290bb5c72673b9267c9d6dd3564d7`
@@ -96,7 +95,8 @@ No decision becomes human-approved merely by appearing in these documents.
 | CP3D implementation | APPROVED bounded private subset | Simulated metadata protocol and defensible native primitives only; incomplete native guarantees stay BLOCKED |
 | CP3D result | ACCEPTED only in pure/simulated scope | `d6b25d35a97290bb5c72673b9267c9d6dd3564d7`; no native bootstrap, public access or publication |
 | Post-CP3D roadmap | ACCEPTED by the user | Planning record at `dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc` |
-| P3-A1 development experiment (RMAP-01) | APPROVED engineering scope only | Private synthetic graph diagnostics and A01–A26 before P2B. Stop for review after validation |
+| P3-A1 development experiment (RMAP-01) | ACCEPTED within private engineering scope | Private synthetic graph diagnostics and A01–A26 at `5e62727b9b8e463cf6c7dd1bc68172801a7868f6`. See [design](P3_A1_DESIGN.md) and [validation](P3_A1_VALIDATION.md) |
+| P2B-B1 isolation readiness | APPROVED planning only | Two B1 planning documents and necessary ledger updates. Host selection, deployment and probe execution require a separate decision |
 | Operational P3, P3-A2 and P4 | OPEN, NOT APPROVED | Operational P3 requires independent source/graph acceptance, then draft PRD/module specifications and separate authorization. A1 provides no independence, scheduling or runtime verdict |
 | Broader Windows native qualification | OPEN, NOT APPROVED | Requires separately approved real environment, owners and security evidence |
 | CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |
@@ -168,8 +168,8 @@ native Windows qualification. See the [dated approval](APPROVALS.md).
 
 | ID | Human decision | Boundary / consequence |
 |---|---|---|
-| RMAP-01 | APPROVED for P3-A1 development only | Private, pure synthetic canonical v2 dependency/blocker diagnostics and exact A01–A26. Stop after validation. Independent source/graph acceptance and draft PRD/module specifications still precede operational P3 |
-| RMAP-02 | Assign P2B B1 host/admin/security reviewer, policy, retention and budget | Unblock sentinel-only isolation proof separately. B1 needs no provider or gold. D08-C/D09-A/B/C, B2 preparation and B3 campaign remain separate; P2B acceptance is mandatory but not sufficient for verified parallelism |
+| RMAP-01 | P3-A1 development only, accepted | Private, pure synthetic canonical v2 dependency/blocker diagnostics and exact A01–A26. Independent source/graph acceptance and draft PRD/module specifications still precede operational P3 |
+| RMAP-02 | OPEN. Name the dedicated host, owner, administrator and independent security reviewer. Approve image/runtime, access policy, restricted storage location and custodian, retention and budget ceiling | Planning is authorized. Implementation and the sentinel-only proof each require explicit scope. B2 preparation and the B3 campaign have separate gates. Verified parallelism requires P2B acceptance and further claim-specific evidence |
 | RMAP-03 | Assign native Windows authority/runtime/reviewer/custodian and approve exact qualification scope | Preserve every CP3C/CP3D blocker; do not make private graph engineering wait for missing Windows infrastructure, and do not treat it as Windows evidence |
 | RMAP-04 | Approve later claim-specific semantic/parallelism coverage | Frozen source-subset acceptance does not certify new transformation, scheduling, partition or performance claims. New independent challenge coverage and thresholds need explicit review |
 | RMAP-05 | Supply exact release target/runtime tuples and approve qualification execution | The offline native Windows/macOS requirement is already established; preserve operation without runtime Git/Docker/WSL/VM/cloud/editor/provider requirements. CP4/CP5 qualification and Windows dependency approvals remain OPEN |
@@ -206,7 +206,7 @@ the P2B approval checkpoint. D10–D12 remain future decisions and must not be g
 | D08-B: canonical contract | APPROVED and accepted P2A: canonical v2 numerical/order/state/step facts; reused P1 inventory/citations/IDs; immutable v1 and explicit lineage | Independent verifier judgments remain P2B and must not rewrite candidate seals |
 | D08-C: environment and budgets | New readiness recommendation: frozen deterministic P2A candidate plus separately implemented model reviewer for the first pilot; earlier model-candidate option remains an alternative. Per model role/case: three calls/32k aggregate input/8k aggregate output/five minutes maximum | Approve topology; name actual provider/model revision, endpoint/account/data policy, supported controls, usage accounting and dollar ceiling. No provider or topology selected; no live call authorized |
 | D09-A: gold ownership | SAS domain author plus second reviewer; separate custodian freezes source, source-anchored facts, exact expected gates, evaluator and denominator versions before runs | Named author/reviewer/custodian and private gold store; no maker-generated expected answers or copying public examples into “hidden” gold |
-| D09-B: isolation | First authorize only B1 sentinel probes and trusted handoff on dedicated Linux host/VM, separate identities/process/mount/network boundaries, positive controls and explicit denial tests; gold comes later | Named host/admin/security reviewer, approved image/runtime/policy, location, retention and spending ceiling; no host supplied or tested. Shared-user folders/chats are not an acceptable fallback |
+| D09-B: isolation | Plan sentinel probes and trusted handoff on a proposed dedicated Linux host/VM with separate identity, process, mount and network boundaries, positive controls and explicit denial tests | OPEN. RMAP-02 ownership, runtime, storage, retention and budget decisions precede an explicit implementation/execution grant. Independent human review of actual evidence is required for a B1 isolation finding |
 | D09-C: corpus, metrics and feedback | 12 families × P/N/U = 36 hidden cases; reconstruction and checker-challenge lanes; five fixed attempts per case/lane; all required positive facts correct, exact negative gates, 100% obligation coverage and zero critical false approvals | Approval of strict finite-pilot thresholds, repetition/transport-failure policy and restricted diagnostic release; actual gold-derived assertion denominators frozen before running |
 
 No particular person, model, evaluator host, hidden corpus or semantic test result
@@ -214,6 +214,12 @@ has been supplied/verified by this checkpoint. If those dependencies are absent,
 future implementation/evaluation must report BLOCKED rather than invent them.
 
 ### P2B readiness refinements, proposed only
+
+The B1 plan calls for 10 sentinel families × 2 untrusted principals × 2 fresh
+launches = **40 proposed B1 family-runs**. The later semantic schedule is
+36 cases × 2 lanes × 5 repetitions = **360 scheduled B3 case-attempts**. B1 has
+zero executed family-runs at this checkpoint. B2 preparation and B3 evaluation
+require separate approval after the applicable gates below.
 
 [P2B_READINESS.md](P2B_READINESS.md) assesses D08-C and D09-A/B/C without approving
 them. The minimum next authorization is B1's sentinel-only proof, not the campaign.

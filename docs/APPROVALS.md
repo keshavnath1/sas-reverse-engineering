@@ -217,3 +217,19 @@ require separate approval. Operational P3 still requires independent source and
 graph acceptance followed by draft PRD/module specifications. Keep authority
 DRAFT, verification UNVERIFIABLE, acceptance BLOCKED and benchmarks NOT_RUN.
 Stop after P3-A1 validation for explicit user review.
+
+On 2026-11-06 the user accepted P3-A1 at
+`5e62727b9b8e463cf6c7dd1bc68172801a7868f6` within its documented private,
+in-memory public synthetic diagnostic scope and approved **P2B-B1 isolation
+readiness planning only**. The authorized deliverables are the
+[isolation design](P2B_B1_ISOLATION_DESIGN.md), [test plan](P2B_B1_TEST_PLAN.md)
+and necessary ledger updates. The proposed 40 sentinel family-runs belong to a
+future B1 proof. The 360 scheduled semantic case-attempts belong to B3. Each
+schedule requires its own execution authorization.
+
+RMAP-02 and D09-B are OPEN pending human decisions on the host and owner,
+administrator, independent security reviewer, runtime/image and policy, storage,
+retention and budget. Stop at documentation review. Provisioning, implementing
+or running probes and evaluation work in B2/B3 require further explicit scope.
+Native Windows qualification stays BLOCKED. Authority is DRAFT, semantic
+verification UNVERIFIABLE, independent acceptance BLOCKED and benchmarks NOT_RUN.
