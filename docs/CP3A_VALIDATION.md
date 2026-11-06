@@ -28,8 +28,8 @@ execution, which must be recorded separately when observed.
 | Compilation/status/local downstream check | Exit 0; unchanged statuses, pinned clean downstream and all 20 digests match; read-only |
 | Initial staged preservation/docs/guard | Exit 0; 66 baseline files unchanged, 13 scoped files, 73 local links; guard PASS, whitespace clean |
 
-Fresh-checkout, final staged checks and hosted results are recorded
-below once executed. Test timings are diagnostic, not workload benchmarks,
+Fresh-checkout and final staged checks are recorded below. Hosted results, if
+observed, are reported separately. Test timings are diagnostic, not workload benchmarks,
 productivity measures or independent semantic samples.
 
 ## Observable security evidence
@@ -208,3 +208,80 @@ OPEN_DECISIONS.md and BEST_PRACTICES_ADOPTION.md.
 No legacy persistence/timing change is introduced. Stop after CP3A and await
 explicit further approval. Windows access, CP3B, publication/CP4, CP5, P2B/P3 and
 downstream integration remain outside this implementation.
+
+## Fresh checkout and final local preservation
+
+Implementation commit: `05cd886120e86ca37f16caecbdd89fa311053f74`.
+Subsequent validation-record updates are documentation only.
+A new clean local clone at that exact commit passed **514 tests in 16.035 s**,
+exit 0, no skips. Its repository guard passed. Explicit import-path assertions
+proved use of the fresh checkout, rather than the development tree or wheel.
+
+Commands (clone from development root; remaining commands from the fresh root):
+
+```sh
+git clone --no-hardlinks . /private/tmp/sas-re-cp3a-validation.x41tAG/fresh
+git rev-parse HEAD
+git status --short
+PYTHONPATH=/private/tmp/sas-re-cp3a-validation.x41tAG/fresh/src /Users/divyasreegundaram/Downloads/sas-migration-skill-enhancement-v2/sas-reverse-engineering/.venv/bin/python -c 'import sas_re.preflight; print(sas_re.preflight.__file__); assert sas_re.preflight.__file__.startswith("/private/tmp/sas-re-cp3a-validation.x41tAG/fresh/src/")'
+PYTHONPATH=/private/tmp/sas-re-cp3a-validation.x41tAG/fresh/src /Users/divyasreegundaram/Downloads/sas-migration-skill-enhancement-v2/sas-reverse-engineering/.venv/bin/python -m unittest discover -s tests -v > /private/tmp/sas-re-cp3a-validation.x41tAG/fresh-tests.txt 2>&1
+/Users/divyasreegundaram/Downloads/sas-migration-skill-enhancement-v2/sas-reverse-engineering/.venv/bin/python scripts/check_repository.py
+```
+
+Final local comparison command below exited 0: 66 baseline files unchanged,
+13 scoped changed/new files, 73 existing local Markdown links, UTF-8/LF and
+balanced fences, both 15-file artifact/report comparisons equal, final wheel hash
+matching the table. It reads public development fixtures only; no new artifact
+format or source-workload validator is shipped.
+
+```sh
+.venv/bin/python - <<'PY'
+from pathlib import Path
+import hashlib, json, re, subprocess
+base = '07ddcda5a78a9a2f9f093a94e722532f44e3044b'
+allowed = {'AGENTS.md', 'README.md', 'SECURITY.md', 'docs/APPROVALS.md',
+           'docs/OPEN_DECISIONS.md', 'docs/BEST_PRACTICES_ADOPTION.md'}
+names = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', base], text=True).splitlines()
+for name in set(names) - allowed:
+    assert Path(name).read_bytes() == subprocess.check_output(['git', 'show', base + ':' + name]), name
+changed = subprocess.check_output(['git', 'diff', base, '--name-only'], text=True).splitlines()
+assert len(changed) == 13, changed
+links = 0
+for name in changed:
+    if name.endswith('.md'):
+        raw = Path(name).read_bytes()
+        value = raw.decode('utf-8')
+        assert b'\r' not in raw
+        assert sum(line.lstrip().startswith('```') for line in value.splitlines()) % 2 == 0
+        for target in re.findall(r'\]\(([^)]+)\)', value):
+            if '://' not in target and not target.startswith('#'):
+                assert (Path(name).parent / target.split('#')[0]).exists(), (name, target)
+                links += 1
+print('unchanged baseline files', len(set(names) - allowed), 'scoped files', len(changed), 'links', links)
+root = Path('/private/tmp/sas-re-cp3a-validation.x41tAG')
+for phase in ('p1', 'p2a'):
+    def snapshot(folder):
+        return {str(p.relative_to(folder)): p.read_bytes() for p in folder.rglob('*') if p.is_file()}
+    before = snapshot(root / (phase + '-baseline') / 'artifacts')
+    after = snapshot(root / (phase + '-candidate') / 'artifacts')
+    assert before == after
+    assert json.loads((root / (phase + '-baseline.json')).read_bytes()) == json.loads((root / (phase + '-candidate.json')).read_bytes())
+    manifest = {name: hashlib.sha256(raw).hexdigest() for name, raw in sorted(before.items())}
+    checksum = hashlib.sha256((json.dumps(manifest, sort_keys=True, separators=(',', ':')) + '\n').encode()).hexdigest()
+    print(phase, len(before), 'artifact files and reports identical', checksum)
+print('final wheel', hashlib.sha256((root / 'wheel-final/sas_reverse_engineering-0.3.0-py3-none-any.whl').read_bytes()).hexdigest())
+PY
+```
+
+Repository staging/guard/whitespace commands, exit 0 before implementation commit:
+
+```sh
+git add AGENTS.md README.md SECURITY.md docs/APPROVALS.md docs/OPEN_DECISIONS.md docs/BEST_PRACTICES_ADOPTION.md docs/CP3A_DESIGN.md docs/CP3A_VALIDATION.md src/sas_re/preflight.py src/sas_re/_posix_preflight.py src/sas_re/_posix_filesystem.py tests/test_posix_preflight.py tests/test_posix_filesystem.py
+.venv/bin/python scripts/check_repository.py
+git diff --cached --check
+git diff --check
+git commit -m 'Add CP3A retained POSIX read-only preflight with explicit policy'
+```
+
+These checks are separate from any hosted CI result. A local APFS pass does not
+qualify Linux or Windows, and a repository guard is not comprehensive DLP.
