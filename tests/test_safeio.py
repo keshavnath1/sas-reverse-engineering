@@ -11,7 +11,7 @@ from unittest.mock import patch
 from sas_re.safeio import (Attempt, AttemptStore, EvidenceError, canonical_bytes,
                            ensure_disjoint, enumerate_files, read_json,
                            require_safe_root, safe_relative, secure_read)
-import sas_re.safeio as safeio
+import sas_re._posix_io as safeio
 
 
 def _concurrent_begin(path, ready, start, results):
@@ -52,7 +52,7 @@ def _exit_before_seal(path, directory_identity):
             os._exit(71)
         return original(fd, name, payload)
 
-    with patch("sas_re.safeio._atomic_json", side_effect=crash):
+    with patch("sas_re._posix_io._atomic_json", side_effect=crash):
         attempt.publish({"source_inventory.json": {"synthetic": True}}, {
             "schema_version": "1.0.0", "stage": "DISCOVER", "module_ids": ["module1"],
             "stage_gate": "PASS", "artifact_authority": "DRAFT", "semantic_verification": "UNVERIFIABLE"})
@@ -152,7 +152,7 @@ class SafeIOTests(unittest.TestCase):
                 self.file.write_bytes(b"/* SYNTHETIC CHANGED */")
             return data
 
-        with patch("sas_re.safeio.os.read", side_effect=mutating_read):
+        with patch("sas_re._posix_io.os.read", side_effect=mutating_read):
             self.assert_error("FILE_CHANGED_DURING_READ", secure_read, self.source, "program.sas")
 
     def test_replacement_during_read_rejected(self):
@@ -169,7 +169,7 @@ class SafeIOTests(unittest.TestCase):
                 replacement.replace(self.file)
             return data
 
-        with patch("sas_re.safeio.os.read", side_effect=replacing_read):
+        with patch("sas_re._posix_io.os.read", side_effect=replacing_read):
             self.assert_error("FILE_CHANGED_DURING_READ", secure_read, self.source, "program.sas")
 
     def test_canonical_json_utf8_sorted_and_finite(self):
@@ -259,7 +259,7 @@ class PublicationTests(unittest.TestCase):
                 raise RuntimeError("synthetic crash before seal")
             return original(fd, name, payload)
 
-        with patch("sas_re.safeio._atomic_json", side_effect=interrupted):
+        with patch("sas_re._posix_io._atomic_json", side_effect=interrupted):
             with self.assertRaises(RuntimeError):
                 attempt.publish({"source_inventory.json": {"synthetic": True}}, self.seal_metadata)
         self.assertTrue((attempt.path / "source_inventory.json").is_file())
@@ -283,7 +283,7 @@ class PublicationTests(unittest.TestCase):
                 raise OSError("synthetic private diagnostics")
             return original_write(fd, data[:3])
 
-        with patch("sas_re.safeio.os.write", side_effect=interrupted):
+        with patch("sas_re._posix_io.os.write", side_effect=interrupted):
             error = self.assert_error("PUBLICATION_IO_FAILURE", attempt.publish,
                                       {"source_inventory.json": {"synthetic": True}}, self.seal_metadata)
         self.assertNotIn("private diagnostics", str(error))

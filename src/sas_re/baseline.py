@@ -6,6 +6,8 @@ import subprocess
 from importlib.resources import files
 from pathlib import Path
 
+from .platform_io import filesystem_capabilities
+
 
 def metadata() -> dict:
     return json.loads(files("sas_re").joinpath("data/baseline.json").read_text())
@@ -21,6 +23,9 @@ def _git(*args: str, cwd: Path | None = None) -> str:
 
 def check_checkout(checkout: Path, baseline: dict) -> dict:
     """Compare HEAD, worktree cleanliness and every pinned file's actual bytes."""
+    if filesystem_capabilities()["evidence_io"] != "AVAILABLE":
+        return {"check": "checkout", "stage_gate": "BLOCKED",
+                "reason": "Local checkout traversal is unavailable on this platform."}
     expected = baseline["downstream"]
     try:
         root = checkout.resolve(strict=True)

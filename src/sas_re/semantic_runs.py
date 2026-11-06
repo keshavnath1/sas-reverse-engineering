@@ -6,6 +6,7 @@ from sas_re.contracts import validate_contract
 from sas_re.evidence import build_inventory, digest, validate_record, validate_scope
 from sas_re.runs import _inventory_report
 from sas_re.safeio import AttemptStore, EvidenceError, read_json
+from sas_re.platform_io import require_evidence_io
 
 
 def error_report(error: EvidenceError) -> dict:
@@ -62,6 +63,7 @@ def execute(command: str, scope_path: Path, store_path: Path, run_id: str,
     try:
         if command not in {"reconstruct-source", "check-reconstruction"}:
             raise EvidenceError("UNKNOWN_P2A_COMMAND")
+        require_evidence_io()
         scope = read_json(scope_path)
         roots = validate_scope(scope)
         if scope["run_id"] != run_id:

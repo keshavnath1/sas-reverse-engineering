@@ -6,6 +6,7 @@ from sas_re.contracts import validate_contract
 from sas_re.evidence import (build_inventory, digest, error_report, validate_record,
                              validate_scope, validation_report)
 from sas_re.safeio import AttemptStore, EvidenceError, read_json
+from sas_re.platform_io import require_evidence_io
 
 
 def _inventory_report(inventory: dict) -> dict:
@@ -70,6 +71,7 @@ def execute(command: str, scope_path: Path, store_path: Path, run_id: str,
     try:
         if command not in {"discover", "seal-source", "verify-source"}:
             raise EvidenceError("UNKNOWN_P1_COMMAND")
+        require_evidence_io()
         scope = read_json(scope_path)
         roots = validate_scope(scope)
         if run_id != scope["run_id"]:

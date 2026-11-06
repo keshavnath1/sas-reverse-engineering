@@ -2,6 +2,8 @@
 
 **P2A deterministic reconstruction foundation.** Python 3.12 package for explicitly
 authorized synthetic SAS evidence, canonical graph v2 and append-only attempts.
+CP1 adds import-safe platform selection and explicit filesystem capabilities;
+native Windows evidence I/O remains BLOCKED.
 The closed subset is described in [P2A design](docs/P2A_DESIGN.md). Public regression
 tests demonstrate bounded behavior; independent semantic acceptance remains
 `BLOCKED`, verification `UNVERIFIABLE`, authority `DRAFT`, and benchmarks `NOT_RUN`.
@@ -20,7 +22,8 @@ tests demonstrate bounded behavior; independent semantic acceptance remains
 See [P1 design](docs/P1_DESIGN.md), [P1 validation](docs/P1_VALIDATION.md),
 [approval scope](docs/APPROVALS.md), [plan](docs/IMPLEMENTATION_PLAN.md),
 [open decisions](docs/OPEN_DECISIONS.md), and [compatibility](docs/COMPATIBILITY.md).
-D01–D07 and D08-A/B are approved for their bounded phases. Stop after P2A;
+D01–D07 and D08-A/B are approved for their bounded phases. CP1 is separately
+approved for its capability boundary only; stop after CP1.
 D08-C and D09 remain open for P2B. See [P2A validation](docs/P2A_VALIDATION.md)
 and [public fixture review](docs/P2A_FIXTURE_REVIEW.md).
 
@@ -29,7 +32,16 @@ and [public fixture review](docs/P2A_FIXTURE_REVIEW.md).
 Python 3.12 is required; local validation and CI pin 3.12.5. The complete runtime
 and packaging dependency closure is SHA-256 locked. The lock currently supports
 CPython 3.12 macOS arm64 and manylinux x86_64. Publication uses POSIX filesystem
-APIs; Windows is not supported. No model or runtime engine dependency is included.
+APIs. CP1 keeps pure commands and bundled contract inspection independent of the
+POSIX backend, and rejects Windows evidence I/O before reading inputs. Actual
+native Windows qualification is BLOCKED: no approved Windows environment was
+available, and the lock has not been extended. No model or runtime engine
+dependency is included. Git is needed only for development/repository checks and
+explicit downstream drift checks, not ordinary installed core operations.
+
+See [CP1 design](docs/CP1_DESIGN.md) and [CP1 validation](docs/CP1_VALIDATION.md)
+for exact tested environments and limitations. No new Windows installation is
+authorized by the following existing POSIX installation recipe.
 
 ```bash
 python3.12 -m venv .venv
@@ -142,6 +154,24 @@ The downstream pin remains `bc754e0f1204a99020c864df2a5b25983005e09c`.
 Local checks compare HEAD, cleanliness and 20 frozen file digests. Remote checks
 query the named public branch without fetch/pull/repinning. Neither grants
 integration or migration approval. Agent-mastery is never modified.
+Local checkout checks are BLOCKED on Windows before path resolution or Git;
+remote checks remain separately opt-in and require Git/network availability.
+
+`status` includes `filesystem_capabilities`: backend, platform, required primitive
+availability and denial reason. `AVAILABLE` means implementation prerequisites
+exist; it is not a filesystem qualification or stage PASS. Windows reports
+`WINDOWS_BACKEND_NOT_IMPLEMENTED`. All five evidence commands return their existing
+P1/P2A report shape, fixed `FILESYSTEM_CAPABILITY_UNAVAILABLE` finding and exit 2
+before opening the scope, record, profile or source, or creating a store.
+Missing POSIX primitives and unknown platforms also fail closed; there is no
+force-backend option or ordinary-file-operation fallback.
+
+With an already approved installed Python environment, pure module commands are
+`python -m sas_re --help`, `python -m sas_re --version` and
+`python -m sas_re status`. Bundled schemas can be inspected through
+`sas_re.contracts.load_schema("1.0")` / `load_schema("2.0")`; this reads trusted
+package resources only and grants no semantic authority. No new schema-inspection
+CLI, model, editor, Docker, WSL or cloud requirement is introduced by CP1.
 
 | Exit | Meaning |
 |---|---|

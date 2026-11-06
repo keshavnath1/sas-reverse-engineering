@@ -223,3 +223,20 @@ usage counters, create gold or perform access-isolation tests. Exact current
 documentation checks are recorded in [P2B_READINESS.md](P2B_READINESS.md).
 Readiness plans and a practice ledger are the deliverables; they are not a
 successful P2B evaluation or an effectiveness measurement.
+
+## CP1 bounded update
+
+CP1 is separately authorized at portability baseline
+`1c172fbb79a8ba07bf72f2f40ecf0f5db02b564a`; see [design](CP1_DESIGN.md) and
+[actual validation](CP1_VALIDATION.md). Historical phase entries above are unchanged.
+
+| Practice | CP1 evidence and limit |
+|---|---|
+| J2/J5: bounded scope and durable plan | Explicit CP1 approval, design and validation record; CP2–CP5/P2B/P3 remain unapproved |
+| J3: executable feedback and preserved verification | Original regressions plus capability-denial tests, frozen hashes, unchanged moved-function ASTs and baseline/candidate artifact-byte comparison; exact failures/corrections recorded in validation |
+| J4: focused delegation and central review | Separate read-only boundary/preservation audits and focused-test author; root reconciled findings including missing regex import and insufficient fcntl-member probing. Shared development environment, not protected independent semantics |
+| J3: explicit proof limits | Simulated Windows selection is distinct from actual execution; native Windows qualification remains BLOCKED without an approved environment |
+| J1/J6: efficiency, model choice and cost | NOT_VERIFIED; no provider comparison, usage/cache/billing telemetry or savings claim. Test durations are not workload benchmarks |
+
+These records demonstrate bounded engineering controls, not native Windows
+production readiness, semantic acceptance or a completed portability project.

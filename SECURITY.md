@@ -64,3 +64,25 @@ authenticated provenance and externally enforced immutable storage.
 Report a suspected leak privately to the repository owner. No public issue tracker
 or security contact has been configured yet. Do not attach secrets or raw business
 data to reports. Credential rotation and history remediation require owner handling.
+
+## CP1 capability boundary
+
+Shared serializers, error types and contract/identity logic import without the
+POSIX filesystem backend. Windows and unrecognized platforms are denied; there
+is no unsafe open/pathlib/lock-free fallback or user-selectable backend override.
+Evidence workflows check capabilities before opening even their scope manifest.
+Public I/O helpers and retained attempt/store methods also check the boundary.
+Local downstream checkout checks deny unsupported traversal before resolving
+paths or running Git. Trusted bundled schema/baseline reads remain available.
+
+On macOS/Linux the selector checks required open flags, callables, descriptor and
+no-follow support, and actual fcntl locking members. These checks establish API
+availability only: original POSIX traversal, permissions, mutation detection,
+locking and publication checks still run. CP1 does not resolve the physical alias
+or post-seal durability questions recorded in the portability plan, qualify a
+new filesystem, or strengthen the existing trusted-owner threat model.
+
+Native Windows execution is not verified by simulated platform tests. Windows
+source authorization, handle traversal, ACLs, locking and publication remain
+unimplemented. Qualification is BLOCKED without an approved Windows interpreter
+and dependencies; do not relax the lock or install them without approval.

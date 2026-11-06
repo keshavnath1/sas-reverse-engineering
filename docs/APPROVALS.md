@@ -70,3 +70,22 @@ infrastructure, hidden gold or campaign. D08-C and D09 execution decisions remai
 open; independent semantic acceptance remains BLOCKED. Stop after documentation
 for review. The prior remote-publication authorization remains in effect, without
 granting any later implementation or downstream authority.
+
+On 2026-11-05 the user reviewed portability plan commit
+`1c172fbb79a8ba07bf72f2f40ecf0f5db02b564a` and explicitly approved **CP1 only**:
+import-safe shared code, narrow backend/capability selection, explicit denial
+before source/store I/O, pure CLI/contract access, POSIX regression preservation,
+focused tests, CP1 design/validation documentation and a small practice-ledger
+update. Frozen v1/v2 schemas, identity/byte algorithms, artifact formats and the
+Agent-mastery pin must remain unchanged. Publication authorization remains valid.
+
+Proposed Windows qualification target: Windows 11 x64/NTFS, PowerShell 7 preferred,
+Python 3.12. This is not platform qualification or permission to install Windows
+dependencies/extend lock hashes. If an approved actual environment is absent,
+native Windows qualification is BLOCKED. Existing macOS/Linux checks may run.
+No Git, model/provider, cloud, Docker or WSL runtime prerequisite may be added.
+
+CP2 authorization envelopes, CP3/CP4 Windows reading/publication, CP5 functionality,
+AI adapters, P2B/P3 and downstream modifications remain unapproved. Semantic
+acceptance stays BLOCKED, authority DRAFT and benchmarks NOT_RUN. Stop after CP1
+and report actual platforms, commands, failures/corrections and proof limits.

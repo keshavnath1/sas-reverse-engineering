@@ -13,7 +13,7 @@ from unittest.mock import patch
 from fixture_support import make_graph, make_scope
 from sas_re.cli import main
 from sas_re.evidence import coverage
-from sas_re import safeio
+from sas_re import _posix_io as safeio
 from sas_re.safeio import EvidenceError, canonical_bytes, read_json
 
 
@@ -330,7 +330,7 @@ class RunTests(unittest.TestCase):
                 raise EvidenceError("PUBLICATION_IO_FAILURE", "BLOCKED")
             return original(fd, name, payload)
 
-        with patch("sas_re.safeio._atomic_json", side_effect=interrupt):
+        with patch("sas_re._posix_io._atomic_json", side_effect=interrupt):
             code, result, _ = self.invoke("discover")
         self.assertEqual(code, 2)
         self.assert_finding(result, "PUBLICATION_IO_FAILURE")
