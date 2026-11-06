@@ -12,8 +12,8 @@ benchmarks NOT_RUN remain unchanged.
 Local execution: macOS 26.6.2 build 25G83, Darwin 25.6.0, ARM64, CPython 3.12.5
 (Clang 14.0.0), effective UID 501, APFS. The already approved development and wheel
 environments were reused; no dependency installed. Native NTFS/PowerShell execution
-remains BLOCKED/NOT_RUN. Linux parser injections are distinct from native Linux
-execution, which must be recorded separately when observed.
+remains BLOCKED/NOT_RUN. Linux parser injections are distinct from the native
+hosted Linux execution recorded below.
 
 | Check | Observed result |
 |---|---|
@@ -27,6 +27,7 @@ execution, which must be recorded separately when observed.
 | Existing development/wheel dependency checks | `pip check` exit 0, no broken requirements; pip disabled its unwritable user cache |
 | Compilation/status/local downstream check | Exit 0; unchanged statuses, pinned clean downstream and all 20 digests match; read-only |
 | Initial staged preservation/docs/guard | Exit 0; 66 baseline files unchanged, 13 scoped files, 73 local links; guard PASS, whitespace clean |
+| Hosted Linux at `2f45d7c55b5ecb3eceecdf026443af39046fcaac` | Both jobs PASS; 514 checkout tests (22.565 s) and 514 installed-wheel tests (21.251 s), no skips; remote downstream pin matched |
 
 Fresh-checkout and final staged checks are recorded below. Hosted results, if
 observed, are reported separately. Test timings are diagnostic, not workload benchmarks,
@@ -175,7 +176,8 @@ The comparison records and exact commands are retained in temporary
    observed the same pre-correction 38/39 result, not an additional distinct defect.
 4. Review corrected the observer's initial classification of Linux procfs reads
    as source reads. It now verifies fixed metadata-path/descriptor provenance;
-   unknown reads still fail. Actual native Linux execution must validate that path.
+   unknown reads still fail. Subsequent native Linux checkout/wheel runs passed
+   this metadata/source classification path; they are separate from injected records.
 5. Native API research encountered unavailable Gitiles/guessed-header URLs, then
    used installed SDK and official upstream Linux/glibc definitions. No failed
    source retrieval is treated as implementation evidence.
@@ -285,3 +287,55 @@ git commit -m 'Add CP3A retained POSIX read-only preflight with explicit policy'
 
 These checks are separate from any hosted CI result. A local APFS pass does not
 qualify Linux or Windows, and a repository guard is not comprehensive DLP.
+
+## Observed hosted Linux validation and publication
+
+Implementation commit `05cd886120e86ca37f16caecbdd89fa311053f74` and documentation
+commit `2f45d7c55b5ecb3eceecdf026443af39046fcaac` were published with
+`git push origin main`, exit 0, under the user's standing repository authorization.
+The local tree was clean. Hosted
+[run 42159065336](https://github.com/keshavnath1/sas-reverse-engineering/actions/runs/42159065336)
+completed successfully at the latter exact commit. GitHub run/job metadata and
+decoded logs were inspected through the connector, not inferred from local results.
+
+Actual environment: Ubuntu 24.04.5 x64, runner image `ubuntu-24.04`
+`20261101.360.1`, CPython 3.12.5. Foundation job `127700109686` passed all
+514 tests in checkout and installed-wheel modes, with no skips. This includes
+native Linux preflight positives, actual procfs metadata reads and permission-denial
+cases, in addition to injected mount/ABI failures. The tests establish that their
+fixture filesystem satisfied the implemented allowlist and stable-mount checks;
+the exact native filesystem identity tuple/type was not emitted in CI logs, so
+no specific filesystem name, mount layout or broader deployment qualification is
+invented. Native alternate mounts/admin fixtures, ACL isolation and independent
+kernel tracing remain unqualified.
+
+Downstream job `127700109483` passed, observing the exact frozen
+`bc754e0f1204a99020c864df2a5b25983005e09c` reference. It did not modify downstream
+files or establish integration/semantic/human approval.
+
+The unchanged existing workflow ran these commands; all steps exited 0:
+
+```sh
+python -m pip install --require-hashes --only-binary=:all: -r requirements.lock
+python -m pip install --no-deps --no-build-isolation -e .
+python -m pip check
+python scripts/check_repository.py
+python -m unittest discover -s tests -v
+python scripts/p1_demo.py --destination "$RUNNER_TEMP/synthetic-p1"
+python scripts/p2a_demo.py --destination "$RUNNER_TEMP/synthetic-p2a"
+python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .
+python -m pip install --no-deps --force-reinstall dist/*.whl
+cd "$RUNNER_TEMP"
+python -c 'import sas_re; assert "site-packages" in sas_re.__file__, sas_re.__file__'
+python -m unittest discover -s "$GITHUB_WORKSPACE/tests" -v
+python "$GITHUB_WORKSPACE/scripts/p2a_demo.py" --destination "$RUNNER_TEMP/synthetic-p2a-wheel"
+sas-re status
+python -m sas_re --version
+```
+
+The drift job used the same approved locked dependencies, installed this package
+with `python -m pip install --no-deps --no-build-isolation .`, then ran
+`sas-re check-baseline --remote`, exit 0. These are existing CI installations,
+not new dependencies or a Windows lock extension. Expected negative demo reports
+contain FAIL/BLOCKED; the assertions and job passed. No new workflow/matrix or
+ordinary-use cloud dependency was introduced.
