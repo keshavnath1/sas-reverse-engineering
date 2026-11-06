@@ -1,6 +1,14 @@
 # Open decisions and compatibility risks
 
-**Current checkpoint, 2026-11-06.** The user accepted the workstation plan at
+**Current checkpoint, 2026-11-06.** The user accepted WS-1 at
+`767b2c3154de7fb451c4278e22f25633d9a025d0` within its tested scope and
+approved WS-2A documentation only. The [offline kit plan](WS2A_OFFLINE_KIT_PLAN.md)
+and [installation test plan](WS2A_INSTALLATION_TEST_PLAN.md) define future
+decisions and proposed observations. Every proposed WS-2A installation case is
+NOT_RUN. The repository launcher's approval slots are empty and valid requests stop
+at bootstrap with exit 2. See the [WS-1 validation record](WS1_VALIDATION.md).
+
+**Previous checkpoint, 2026-11-06.** The user accepted the workstation plan at
 `a79b15fefd878f1ecc9c0e4969e1c6a211120a41` and approved only the three-command
 WS-1 Bash launcher, focused W01–W06 tests, documentation and necessary ledgers.
 Workstation release approval is OPEN. An accountable owner, independently
@@ -144,9 +152,28 @@ No decision becomes human-approved merely by appearing in these documents.
 | P2B-B1 approval checklist | APPROVED documentation only | Human decision checklist and necessary decision-ledger updates only |
 | Workstation execution planning | ACCEPTED as documentation only | Execution plan and compatibility matrix at `a79b15fefd878f1ecc9c0e4969e1c6a211120a41` |
 | WS-1 launcher and W01–W06 | APPROVED bounded engineering scope | Exactly one of `--help`, `--version` or `status`. Stop after validation for review. Release inventory, authentication and target-native qualification are separate decisions |
+| WS-1 result | ACCEPTED within tested scope | `767b2c3154de7fb451c4278e22f25633d9a025d0`. Historical macOS ARM64 and hosted Linux x64 results only. Native Windows W01–W06 are BLOCKED / NOT_RUN |
+| WS-2A offline kit and installation test plans | APPROVED documentation only | Two plans and necessary ledgers. Stop at documentation review. Future release, implementation and per-target execution decisions are OPEN |
 | Operational P3, P3-A2 and P4 | OPEN, NOT APPROVED | Operational P3 requires independent source/graph acceptance, then draft PRD/module specifications and separate authorization. A1 provides no independence, scheduling or runtime verdict |
 | Broader Windows native qualification | OPEN, NOT APPROVED | Requires separately approved real environment, owners and security evidence |
 | CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |
+
+## WS-2A decisions requiring separate approval
+
+| Decision | Status | Evidence needed for a future decision |
+|---|---|---|
+| Human release authority | OPEN | Name an accountable release custodian, independent reviewer and target workstation custodian. Record who may approve artifacts, authenticate delivery, revoke a kit and authorize rollback. |
+| External trust and artifact approval | OPEN | Approve the external trust root and delivery channel, custody and offline revocation policy. Independently approve the exact interpreter, bootstrap tools, project wheel and complete locked wheel set per tuple. |
+| Target-specific lock coverage | OPEN | The current lock covers `rpds-py` on macOS ARM64 and Linux x64 CI. Extending it for Windows x64 or Intel Mac requires independent review of the exact artifact bytes and explicit lock-change authorization. |
+| Installer implementation | OPEN | Authorize a bounded implementation scope and its tests after reviewing both WS-2A plans. |
+| Native installation and test execution | OPEN | Approve each exact host/OS/CPU, shell and Python tuple, standard-user destination, offline controls and recovery evidence before authorizing provisioning or a trial. All proposed trials are NOT_RUN. |
+| Kit release and workstation activation | OPEN | Obtain separate release authorization for a concrete kit. An independent custodian must bind each final installation inventory and authenticate the final launcher through the trusted external channel. Activation of that installation requires its own decision. |
+
+These decisions apply to installation only. Native Windows source access and
+qualification are BLOCKED. B1 retains its distinct host and reviewer gates.
+P4, CP4 and CP5 each require separate approval. Artifact authority is DRAFT,
+semantic verification UNVERIFIABLE, independent acceptance BLOCKED and
+benchmarks NOT_RUN.
 
 ## CP3 readiness decisions
 

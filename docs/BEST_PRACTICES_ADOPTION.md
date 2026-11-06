@@ -429,3 +429,20 @@ byte-identical P1/P2A replays, and successful direct/launcher stream comparisons
 using a synthetic approval of an installed project wheel. Review tightened the
 file inventory to refuse unexpected entries before opening their content. This is
 public engineering evidence; no native Windows or release trust claim follows.
+
+## WS-2A offline installation planning
+
+The user accepted the [WS-1 validation record](WS1_VALIDATION.md) at
+`767b2c3154de7fb451c4278e22f25633d9a025d0` within its tested scope. WS-2A
+adds planning evidence only.
+
+| Practice | Attributable evidence and limit |
+|---|---|
+| J2/J5 bounded planning | The [kit plan](WS2A_OFFLINE_KIT_PLAN.md) and [installation test plan](WS2A_INSTALLATION_TEST_PLAN.md) distinguish human artifact and release decisions from future installer work and native trials. The [open decisions](OPEN_DECISIONS.md#ws-2a-decisions-requiring-separate-approval) identify the missing owners, trust anchor and platform-specific closures. |
+| J3 evidence attribution | The accepted WS-1 record attributes three 722-test suites to macOS ARM64 and two 722-test suites to hosted Linux x64 at implementation commit `27ecad95a43d68c991d33c0b3aff44b94cf72696`. Its successful launcher dispatches used synthetic inventories. Native Windows W01–W06 are BLOCKED / NOT_RUN. WS-2A installation tests are proposed and NOT_RUN. |
+
+Read-only design review identified two reproducibility controls: pip's target process
+needs its own verified startup boundary, and generated Windows console wrappers need
+a pinned ZIP timestamp. The kit plan and proposed I10/I12 observations now cover them;
+neither was tested on Windows. WS-2A preservation checks left all 106 baseline files
+outside the three ledger edits unchanged.

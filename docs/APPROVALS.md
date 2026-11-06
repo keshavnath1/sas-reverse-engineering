@@ -280,3 +280,22 @@ qualification is BLOCKED / NOT_RUN. Setup, config, run and report modes, CP4/CP5
 B1/P2B execution, operational P3, private intake and downstream changes each
 require separate approval. Artifact authority is DRAFT, semantic verification
 UNVERIFIABLE, independent acceptance BLOCKED and benchmarks NOT_RUN.
+
+On 2026-11-06 the user accepted WS-1 at
+`767b2c3154de7fb451c4278e22f25633d9a025d0` within its documented, tested
+scope. The [WS-1 validation record](WS1_VALIDATION.md) attributes the launcher
+results to macOS ARM64 development runs and hosted Linux x64 CI. Successful
+dispatch used synthetic approval records. The repository launcher retains empty
+approval slots and returns bootstrap BLOCKED/2 for each valid verb. Native
+Windows W01–W06 are BLOCKED / NOT_RUN.
+
+The user approved **WS-2A planning only**. Deliverables are the
+[offline kit plan](WS2A_OFFLINE_KIT_PLAN.md), the
+[installation test plan](WS2A_INSTALLATION_TEST_PLAN.md) and necessary approval,
+decision and practice ledger updates. Stop at documentation review. Release
+ownership and authentication, approval of exact artifact bytes, installer
+implementation, native installation and test execution, kit release and
+workstation activation require separate future decisions. All are OPEN. This grant
+covers no key, approved hash, kit, lock or package change, provisioning or
+installation. Windows source access and qualification, B1/P2B execution, P4,
+CP4 and CP5 retain their separate gates.
