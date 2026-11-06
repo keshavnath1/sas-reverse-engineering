@@ -352,3 +352,21 @@ Approved baseline `5453a2598bd6da4ee695602f539f3961e70556b7`; see
 
 No native Windows execution, certification, authentic inspection grant, human
 reviewer approval or semantic acceptance follows from these development results.
+
+## Post-CP3D roadmap review evidence
+
+Reviewed accepted baseline `d6b25d35a97290bb5c72673b9267c9d6dd3564d7`;
+see [roadmap and actual checks](POST_CP3D_ROADMAP.md) and
+[current decision boundary](OPEN_DECISIONS.md). This is documentation only.
+
+| Practice | Evidence obtained and limit |
+|---|---|
+| J2/J5: bounded work and durable decisions | Recommended one private synthetic dependency/blocker increment with explicit approval, exclusions, finite analysis bounds and stopping conditions; no P3 implementation |
+| J4: focused independent development review | Separate read-only reviews of canonical graph coverage, normative workflow/P2B gates and CP1–CP3D portability evidence; not human security/semantic certification |
+| J3: evidence and counterevidence | Recorded missing hazard/effect completeness, unversioned dataset overwrite, source-reading validator boundary, state cycles and non-authoritative synthetic timing; no absence-of-edge independence claim |
+| J3: proposed tests versus observed checks | A01–A26 are planned public graph-math obligations, NOT_RUN. Documentation/byte-preservation checks are recorded separately; historical 667 regressions remain attributed to CP3D |
+| J5: separate work and approval dependencies | Core experiment, P2B mandatory semantic gate and native security/release qualification have distinct prerequisites. Review corrected diagram order, graph-only identity/lineage proof limits, bound-specific test assertions and separation of pure diagnostic I/O from existing regression fixtures |
+| J1/J6: efficiency and cost | NOT_VERIFIED; prioritization is a recommendation, not measured productivity, speedup, model/provider performance or cost evidence |
+
+No host, reviewer, provider, native permission, independent acceptance or next-phase
+approval was supplied or inferred by this reassessment.

@@ -1,14 +1,19 @@
 # Open decisions and compatibility risks
 
-Status: CP3C accepted at `5453a2598bd6da4ee695602f539f3961e70556b7`;
-bounded CP3D private implementation approved. Native Windows qualification and
-public source access remain BLOCKED. Updated 2026-11-06.
+Status: CP3D accepted at `d6b25d35a97290bb5c72673b9267c9d6dd3564d7`
+only within its pure/simulated scope. Post-CP3D roadmap reassessment is authorized
+for planning only. Native Windows bootstrap, public source access and publication
+remain BLOCKED. Updated 2026-11-06.
 
-**Current checkpoint authorization:** defensible private metadata primitives,
-typed external expectations, simulated bootstrap/absence protocol and focused tests;
-see [design](CP3D_DESIGN.md) and [validation](CP3D_VALIDATION.md). No native
-qualification, dependency change, Windows source access, publication or store
-creation. Preserve all 596 existing tests and frozen boundaries. Stop after CP3D.
+**Current checkpoint authorization:** create [POST_CP3D_ROADMAP.md](POST_CP3D_ROADMAP.md)
+and update decision/best-practice records only where needed. No code, contract,
+dependency, native qualification, real intake, P3 or P2B implementation. Preserve
+all 667 existing tests and frozen boundaries. Stop after planning for review.
+The proposed P3-A1 development-order exception is RECOMMENDED, NOT APPROVED.
+
+**Accepted CP3D:** [design](CP3D_DESIGN.md) and [validation](CP3D_VALIDATION.md)
+cover private metadata primitives/protocol and pure/simulated tests only; they do
+not establish native bootstrap, absence success or filesystem authority.
 CP3C's [bootstrap design](CP3C_BOOTSTRAP_DESIGN.md) and
 [qualification plan](CP3C_QUALIFICATION_PLAN.md) remain historical planning records.
 
@@ -87,6 +92,9 @@ No decision becomes human-approved merely by appearing in these documents.
 | CP3C planning/security review | APPROVED documentation only | Two planning documents, necessary ledgers and applicable existing checks; no implementation or provisioning |
 | CP3C result | ACCEPTED planning checkpoint | `5453a2598bd6da4ee695602f539f3961e70556b7`; no native assurance |
 | CP3D implementation | APPROVED bounded private subset | Simulated metadata protocol and defensible native primitives only; incomplete native guarantees stay BLOCKED |
+| CP3D result | ACCEPTED only in pure/simulated scope | `d6b25d35a97290bb5c72673b9267c9d6dd3564d7`; no native bootstrap, public access or publication |
+| Post-CP3D roadmap | APPROVED planning only | Roadmap and necessary decision/practice records; no implementation or gate relaxation |
+| P3-A1 development experiment | RECOMMENDED, NOT APPROVED | Private synthetic graph diagnostics only; explicit development-order exception required; runtime P3 and independent acceptance stay gated |
 | Broader Windows native qualification | OPEN, NOT APPROVED | Requires separately approved real environment, owners and security evidence |
 | CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |
 
@@ -148,6 +156,22 @@ runtime decisions. No host owner or independent human reviewer has been supplied
 | CP3D-D05 | OPEN | Any native implementation extension, qualification, public reader activation or publication requires separate explicit approval. Stop after the CP3D report; no CP4/CP5/P2B/P3 |
 
 ## Decision register
+
+### Post-CP3D sequencing decisions
+
+These are OPEN recommendations in [the roadmap](POST_CP3D_ROADMAP.md), not
+implementation authorization. The current planning request does not resolve
+P2B or native Windows owners, approvals or proof obligations.
+
+| ID | Human decision needed | Recommended boundary / consequence |
+|---|---|---|
+| RMAP-01 | Approve the smallest next core-development checkpoint and development order | P3-A1 pure synthetic canonical-v2 dependency/blocker diagnostics and A01–A26 only. No operational P3 transition before independent source/graph acceptance and draft PRD/SPEC; no implementation until explicitly approved |
+| RMAP-02 | Assign P2B B1 host/admin/security reviewer, policy, retention and budget | Unblock sentinel-only isolation proof separately. B1 needs no provider or gold. D08-C/D09-A/B/C, B2 preparation and B3 campaign remain separate; P2B acceptance is mandatory but not sufficient for verified parallelism |
+| RMAP-03 | Assign native Windows authority/runtime/reviewer/custodian and approve exact qualification scope | Preserve every CP3C/CP3D blocker; do not make private graph engineering wait for missing Windows infrastructure, and do not treat it as Windows evidence |
+| RMAP-04 | Approve later claim-specific semantic/parallelism coverage | Frozen source-subset acceptance does not certify new transformation, scheduling, partition or performance claims. New independent challenge coverage and thresholds need explicit review |
+| RMAP-05 | Supply exact release target/runtime tuples and approve qualification execution | The offline native Windows/macOS requirement is already established; preserve operation without runtime Git/Docker/WSL/VM/cloud/editor/provider requirements. CP4/CP5 qualification and Windows dependency approvals remain OPEN |
+
+### Historical product decisions
 
 D01–D07 retain their historical recommendations below; their approval status is
 the ledger above. D08/D09 now have concrete proposals rather than implementation
