@@ -5,6 +5,8 @@ Scope: import-safe shared code, capability reporting/denial and regression
 preservation only. See [CP1 design](CP1_DESIGN.md) and [approval](APPROVALS.md).
 Package version remains 0.3.0; identify this change by Git commit, not a new
 semantic-engine or artifact version. Native Windows qualification is **BLOCKED**.
+Implementation commit: `076f8c4559b9c916065e5e9ae8c2d7a99dd95bb2`.
+Subsequent validation-report updates are documentation only.
 Semantic acceptance stays **BLOCKED**, authority **DRAFT**, verification
 **UNVERIFIABLE** and benchmarks **NOT_RUN**.
 
@@ -15,7 +17,7 @@ Semantic acceptance stays **BLOCKED**, authority **DRAFT**, verification
 | Local native macOS ARM64 | macOS 26.6.2, Darwin 25.6.0, arm64; CPython 3.12.5, Clang 14.0.0; development and installed wheel | Existing local POSIX environment; no new filesystem/alias/power-loss qualification |
 | Simulated Windows selection | Fresh processes on macOS with `sys.platform = "win32"`, forbidden POSIX imports and process/network sentinels; separate metadata-stub tests for `os.name == "nt"` | Tests Python selection/import/denial paths, not a Windows interpreter, paths, ACLs, NTFS or PowerShell |
 | Native Windows 11 x64 / NTFS / PowerShell 7 | **BLOCKED / NOT_RUN**: no approved actual Windows interpreter/dependency host available | No dependency installation or lock extension authorized/performed; not a successful Windows acceptance run |
-| Hosted Linux | Existing unchanged Ubuntu workflow may execute on publication; result recorded separately when observed | Local macOS results do not imply Linux execution; no new Windows/macOS CI matrix |
+| Hosted Linux x64 | Ubuntu 24.04.5, runner image `ubuntu-24.04` / `20261101.360.1`, CPython 3.12.5 x64; checkout and installed wheel at implementation commit | Existing unchanged Ubuntu workflow; no new Windows/macOS CI matrix or filesystem qualification |
 | macOS Intel, Windows ARM64, other OS/filesystem combinations | NOT_RUN | No support extension claimed |
 
 Local environment inventory found no `pwsh`, `powershell`, `wine`, `wine64`,
@@ -44,12 +46,13 @@ created. Ordinary core use does not require Git, editor, provider or network.
 | Local downstream baseline | PASS/0; exact pin, clean checkout and all 20 digests match; read-only |
 | Staged repository guard and whitespace | PASS/0; no guard findings; both working-tree and staged whitespace checks passed |
 | Scope and Markdown check | PASS/0; 18 scoped changed files, 43 other baseline files byte-identical, 38 local links exist, code fences balanced |
+| Hosted Ubuntu implementation CI | Both jobs PASS; 411 checkout tests (26.673 s) and 411 installed-wheel tests (26.300 s), both OK; remote downstream pin matched |
 
 Test durations are diagnostics, not SAS workload benchmarks or productivity/cost
 measurements. Counts are cumulative and repeat the same suite across environments;
 they are not independent semantic samples. The guard checks tracked-file rules
-and selected credential formats, not complete DLP. Hosted results are not
-anticipated as passes here.
+and selected credential formats, not complete DLP. Hosted results below bind the
+exact implementation commit; they are distinct from local runs and later commits.
 
 The new tests cover help/version/status and both bundled schemas without POSIX
 imports; no Git/process/network on pure paths; explicit Windows/unknown-platform
@@ -193,6 +196,41 @@ for name in ('src/sas_re/contracts/v1/evidence.schema.json','src/sas_re/contract
 The compatibility metadata still pins Agent-mastery
 `bc754e0f1204a99020c864df2a5b25983005e09c`. Digest-manifest computation is a local
 comparison check shown above, not a new product artifact/contract format.
+
+## Observed hosted validation
+
+`git push origin main` exited 0, advancing `1c172fb` to implementation commit
+`076f8c4559b9c916065e5e9ae8c2d7a99dd95bb2`. The existing workflow completed
+successfully in [run 42141440804](https://github.com/keshavnath1/sas-reverse-engineering/actions/runs/42141440804).
+Both `foundation` and `downstream-drift` passed. The foundation log records the
+two 411-test runs above, successful P1/P2A synthetic demos, installed site-packages
+validation and status. Expected P2A BLOCKED and stale-source FAIL results remained
+unchanged; demo history checks were true. The remote drift log confirms the exact
+frozen downstream commit. This is Linux regression evidence, not Windows or
+independent semantic qualification.
+
+The unchanged workflow ran its locked binary dependency installation, editable
+package install, `python -m pip check`, `python scripts/check_repository.py`,
+`python -m unittest discover -s tests -v`, both public demos, then wheel build/
+reinstall and the full test suite from outside the checkout. It also ran
+`sas-re status`, `python -m sas_re --version` and the separate
+`sas-re check-baseline --remote` job. All successful commands/steps exited 0;
+demo wrappers explicitly checked expected child exits 0/2/1. Hosted installation
+used the existing approved lock, not a dependency update or Windows setup.
+
+Read-only GitHub verification requests:
+
+```text
+https://api.github.com/repos/keshavnath1/sas-reverse-engineering/actions/runs?head_sha=076f8c4559b9c916065e5e9ae8c2d7a99dd95bb2&per_page=3
+https://api.github.com/repos/keshavnath1/sas-reverse-engineering/actions/runs/42141440804
+https://api.github.com/repos/keshavnath1/sas-reverse-engineering/actions/runs/42141440804/jobs
+fetch_workflow_job_logs(repo_full_name="keshavnath1/sas-reverse-engineering", job_id=127642440409)
+fetch_workflow_job_logs(repo_full_name="keshavnath1/sas-reverse-engineering", job_id=127642439979)
+```
+
+This report update does not change the tested implementation. Its subsequent
+publication may trigger another unchanged hosted run; that later result is
+reported separately rather than assumed from the implementation run.
 
 ## Failures, corrections and review
 
