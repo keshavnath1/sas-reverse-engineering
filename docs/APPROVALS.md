@@ -308,3 +308,9 @@ Authority stays DRAFT; verification UNVERIFIABLE, semantic acceptance BLOCKED,
 benchmarks NOT_RUN. Stop for review of the package. Runtime selection, operational
 P3/P4, P2B evaluation, Windows access, packaging, publication and downstream
 integration require separate decisions.
+
+At `022c672d244a522e25a5aded7f29513f51875b69` the user accepted MVP-1 only
+as a public synthetic demonstration and approved the bounded MVP-2 experiment.
+Its [multi-module draft](../examples/mvp2/ARCHITECTURE.md) and [validation
+report](MVP2_VALIDATION.md) are for review. Independent evaluation, migration,
+publication, native Windows access and runtime selection retain their separate gates.

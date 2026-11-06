@@ -53,11 +53,15 @@ def _names(values):
     return ", ".join(f"`{_name(name)}`" for name in values) or "none listed"
 
 
-def _location(span):
-    key = span["file_key"]
+def _display_file_key(key):
     if not _FILE_KEY.fullmatch(key) or any(p in ("", ".", "..") for p in key.split(":", 1)[1].split("/")):
-        key = "withheld-" + hashlib.sha256(key.encode()).hexdigest()
-    return f"`{key}` lines {span['line_start']}–{span['line_end']}, bytes [{span['start']}, {span['end']})"
+        return "withheld-" + hashlib.sha256(key.encode()).hexdigest()
+    return key
+
+
+def _location(span):
+    return (f"`{_display_file_key(span['file_key'])}` lines {span['line_start']}–{span['line_end']}, "
+            f"bytes [{span['start']}, {span['end']})")
 
 
 def _span_entry(span):
@@ -97,6 +101,25 @@ def _fact_text(fact):
     if kind == "assignment":
         guard = " under a represented condition" if fact["guard"] is not None else ""
         return f"Assignment{guard}: `{_name(fact['target'])} = {_expression(fact['expression'])}`."
+    if kind == "sql":
+        inputs = ", ".join(f"`{_name(x['dataset'])}` as `{_name(x['alias'])}`" for x in fact["inputs"])
+        parts = [f"FROM {inputs}."]
+        join = fact["join"]
+        if join:
+            parts.append(f"{join['kind']} JOIN on `{_expression(join['left'])} = {_expression(join['right'])}`.")
+        where = fact["where"]
+        if where:
+            condition = (f"{_expression(where['left'])} {where['operator']} {_expression(where['right'])}"
+                         if where["kind"] == "comparison" else f"{where['flag']}.{_name(where['key'])}")
+            parts.append(f"WHERE `{condition}`.")
+        selections = [f"`{_name(x['output'])} = {_expression(x['expression'])}`" for x in fact["select"]]
+        parts.append("Project " + ", ".join(selections) + ".")
+        if fact["order_by"]:
+            parts.append(f"ORDER BY {_names(fact['order_by'])}.")
+        return " ".join(parts)
+    if kind == "include":
+        target = "Target unresolved; effects UNKNOWN." if fact["target_file_key"] is None else "Target recorded."
+        return f"INCLUDE literal `{_name(fact['path'])}`. {target}"
     return f"Fact kind `{kind}`. Its semantics require separate review."
 
 
@@ -108,6 +131,11 @@ def _review_test(op):
     if "by" in kinds and "assignment" in kinds:
         return ("Trace first and last rows of each key prefix, equal keys and a group split at a chunk boundary. "
                 "Compare derived values for finite and missing inputs with a separately justified tolerance.")
+    if "sql" in kinds:
+        return ("Compare the projected values, qualifying row multiset and requested order. Challenge duplicate "
+                "and missing keys, tied output rows and the effect of predicate placement.")
+    if "include" in kinds:
+        return "Obtain authorized evidence for the target and its effects before accepting workflow completeness."
     return ("Compare declared input and output schemas, row multiplicities, state transitions and values "
             "against an independently reviewed reference for this operation.")
 
@@ -127,6 +155,8 @@ class _View:
         for col in graph["columns"]:
             self.nodes[col["column_id"]] = self.datasets[col["dataset_id"]] + "." + col["name"]
         self.analysis = diagnostic["analysis"]
+        self.multi = len(graph["module_ids"]) > 1
+        self.owner = {op["operation_id"]: op["module_id"] for op in self.ops}
 
     def ref(self, identifier):
         label = self.labels[identifier]
@@ -134,6 +164,31 @@ class _View:
 
     def refs(self, identifiers):
         return ", ".join(self.ref(identifier) for identifier in identifiers) or "graph-wide"
+
+    def fact_ref(self, op, index):
+        label = self.labels[op["operation_id"]]
+        return f"[{label} fact {index}](EVIDENCE.md#{label.lower()}-fact-{index})"
+
+    def module_handoffs(self):
+        lines = []
+        for edge in self.edges:
+            first, second = edge["from_operation_id"], edge["to_operation_id"]
+            if edge["type"] == "DATA" and self.owner[first] != self.owner[second]:
+                lines.extend([f"**OBSERVATION** `{self.owner[first]}` {self.ref(first)} produces "
+                              f"{self.dataset_names(edge['node_ids'])} for `{self.owner[second]}` "
+                              f"{self.ref(second)} on {self.ref(edge['edge_id'])}.", ""])
+        return lines
+
+    def include_gaps(self):
+        lines = []
+        for op in self.ops:
+            for i, fact in enumerate(op["facts"]):
+                if fact["kind"] == "include" and fact["target_file_key"] is None:
+                    lines.extend([f"**OBSERVATION** {self.fact_ref(op, i)} names `{_name(fact['path'])}` "
+                                  "without a bound target. Its reads, writes and downstream effects are UNKNOWN.",
+                                  "", "**ASSUMPTION** Obtain separately authorized target evidence before "
+                                  "treating the represented outputs as the complete workflow.", ""])
+        return lines
 
     def dataset_names(self, identifiers):
         direct = set(identifiers) & self.datasets.keys()
@@ -151,17 +206,23 @@ class _View:
     def workflow(self):
         lines = []
         for op in self.ops:
-            facts = [f"{_fact_text(f)} (fact {i})" for i, f in enumerate(op["facts"])
-                     if f["kind"] in {"sort", "input", "by", "assignment"}]
-            lines.append(f"**OBSERVATION** {self.ref(op['operation_id'])} ({op['kind']}) "
-                         f"writes {self.dataset_names(op['writes'])}. " + " ".join(facts))
+            kinds = {"sort", "input", "by", "assignment", "sql", "include"}
+            facts = [f"{_fact_text(f)} ({self.fact_ref(op, i) if self.multi else f'fact {i}'})"
+                     for i, f in enumerate(op["facts"]) if f["kind"] in kinds]
+            owner = f", module `{op['module_id']}`" if self.multi else ""
+            outputs = f"writes {self.dataset_names(op['writes'])}."
+            if self.multi and not op["writes"]:
+                outputs = "has no listed output node."
+            lines.append(f"**OBSERVATION** {self.ref(op['operation_id'])} ({op['kind']}{owner}) "
+                         + outputs + " " + " ".join(facts))
             lines.append("")
         return lines
 
     def document(self, title, lines):
+        version = "mvp2-multimodule-preview/1" if self.multi else _VERSION
         header = [f"# {title}", "", "UNVERIFIED · public synthetic draft", "", "```text", _STATUS,
                   "```", "", f"Graph SHA-256 `{self.diagnostic['parent_graph_sha256']}` · "
-                  f"preview `{_VERSION}` · diagnostics `{self.diagnostic['algorithm']}`", ""]
+                  f"preview `{version}` · diagnostics `{self.diagnostic['algorithm']}`", ""]
         return ("\n".join(header + lines).rstrip() + "\n").encode("utf-8")
 
 
@@ -171,11 +232,16 @@ def _prd(v):
              "correctness test for candidate replacements. The business purpose and consumers need an owner.",
              "", "## What the supplied workflow represents", "", *v.workflow(),
              "## Functional requirements for review", ""]
+    if v.multi:
+        lines.extend(v.module_handoffs())
+        lines.extend(v.include_gaps())
     for op in v.ops:
         ref = v.ref(op["operation_id"])
+        reads_writes = f"reads {v.dataset_names(op['reads'])} and writes {v.dataset_names(op['writes'])} at the dataset level."
+        if v.multi and not op["reads"] and not op["writes"]:
+            reads_writes = "has no represented dataset accesses. Its effects require further evidence."
         lines.extend([f"### {v.labels[op['operation_id']]} · {op['kind']}", "",
-                      f"**OBSERVATION** {ref} reads {v.dataset_names(op['reads'])} "
-                      f"and writes {v.dataset_names(op['writes'])} at the dataset level.",
+                      f"**OBSERVATION** {ref} {reads_writes}",
                       "", f"**HYPOTHESIS** Require a candidate to reproduce this boundary. {_review_test(op)}", ""])
     for edge in v.edges:
         if edge["type"] == "DATA":
@@ -195,7 +261,8 @@ def _prd(v):
 
 def _modules(v):
     lines = []
-    for module in v.graph["module_ids"]:
+    # Read modules in first represented operation order, including any declared empty modules.
+    for module in dict.fromkeys([*v.owner.values(), *v.graph["module_ids"]]):
         lines.extend([f"## Module `{_name(module)}`", ""])
         for op in v.ops:
             if op["module_id"] != module:
@@ -209,18 +276,23 @@ def _modules(v):
                           f"{v.dataset_names(op['writes'])}. Incident edge references: {v.refs(incident) if incident else 'none listed'}.",
                           "", "**OBSERVATION** The graph records the following facts, in fact-index order.", ""])
             for i, fact in enumerate(op["facts"]):
-                lines.append(f"- Fact {i} · {_fact_text(fact)} ({_location(fact['span'])})")
-            lines.extend(["", f"**OBSERVATION** Order `{order['kind']}`, keys {_names(order['keys'])}, "
+                ref = v.fact_ref(op, i) if v.multi else f"Fact {i}"
+                lines.append(f"- {ref} · {_fact_text(fact)} ({_location(fact['span'])})")
+            source = v.ref(oid) + " · " if v.multi else ""
+            lines.extend(["", f"**OBSERVATION** {source}Order `{order['kind']}`, keys {_names(order['keys'])}, "
                           f"input precondition `{order['precondition']}`, tie order `{order['tie_order']}`. "
                           f"Cardinality rule `{op['cardinality']}`.", "",
-                          f"**OBSERVATION** Numeric representation `{policy['storage']}`, missing order "
+                          f"**OBSERVATION** {source}Numeric representation `{policy['storage']}`, missing order "
                           f"`{policy['missing_order']}`, arithmetic `{policy['missing_arithmetic']}`, "
                           f"expression order `{policy['expression_order']}`. Runtime equivalence "
                           f"`{policy['runtime_equivalence']}`."])
             for effect in op["state_effects"]:
-                lines.extend(["", f"**OBSERVATION** Fact {effect['fact_index']} records {effect['kind']} state, "
+                ref = v.fact_ref(op, effect["fact_index"]) if v.multi else f"Fact {effect['fact_index']}"
+                lines.extend(["", f"**OBSERVATION** {ref} records {effect['kind']} state, "
                               f"initialization `{effect['initialization']}`, persistence `{effect['persistence']}` "
                               f"and reset `{effect['reset']}`."])
+            if v.multi:
+                lines.extend(_lineage_rows(v, op))
             lines.extend(["", f"**HYPOTHESIS** Candidate validation: {_review_test(op)}", ""])
         issues = [i for i in v.graph["unknowns"] + v.graph["contradictions"]
                   if not i["operation_ids"] or any(op["module_id"] == module and op["operation_id"] in
@@ -232,6 +304,37 @@ def _modules(v):
     return v.document("Draft module specifications", lines)
 
 
+def _lineage_rows(v, op):
+    if not op["lineage"] and not op["control_lineage"]:
+        return []
+    detail = ""
+    if op["kind"] == "PROC_SQL":
+        detail = (f" Value rows may include ON and WHERE inputs. The SELECT expression identifies the "
+                  f"arithmetic operands. The numeric missing-key policy is `{op['numeric_policy']['missing_join']}`.")
+    lines = ["", f"**OBSERVATION** {v.ref(op['operation_id'])} records these value and control inputs." + detail, "",
+             "| Output or control | Input columns | Earlier facts | Input phase | Source fact |",
+             "|---|---|---|---|---|"]
+    for item in [*op["lineage"], *op["control_lineage"]]:
+        target = v.nodes[item["output_column_id"]] if "output_column_id" in item else item["role"]
+        prior = ", ".join(v.fact_ref(op, i) for i in item["input_fact_indices"]) or "none listed"
+        inputs = _names(v.nodes[i] for i in item["input_column_ids"])
+        lines.append(f"| `{_name(target)}` | {inputs} | {prior} | `{item['input_phase']}` | "
+                     f"{v.fact_ref(op, item['fact_index'])} |")
+    if any(effect["kind"] == "BY" for effect in op["state_effects"]):
+        lines.extend(["", f"**INFERENCE** The BY annotation at {v.ref(op['operation_id'])} models group flags. "
+                      "It does not establish that an assigned value depends on a previous row. Review the "
+                      "assignment's value lineage separately before proposing any partition boundary."])
+    for index, fact in enumerate(op["facts"]):
+        if fact["kind"] == "sql" and fact["join"]:
+            lines.extend(["", f"**INFERENCE** At {v.fact_ref(op, index)}, multiple rows matching a join key "
+                          "may yield multiple result rows before the WHERE filter, if present. Confirm "
+                          "multiplicity with duplicate and missing keys; no runtime count is available here."])
+            if fact["order_by"] and op["order_contract"]["tie_order"] == "UNSPECIFIED":
+                lines.append(f"**INFERENCE** {v.fact_ref(op, index)} orders by {_names(fact['order_by'])}. "
+                             "Relative order within a tied key remains unspecified.")
+    return lines
+
+
 def _architecture(v):
     lines = ["## As-is computational flow", "", *v.workflow(),
              "**OBSERVATION** Each box is an original operation ID. Edge labels identify original "
@@ -239,11 +342,15 @@ def _architecture(v):
              "when present, are dotted. Arrows describe the supplied model.", "", "```mermaid", "flowchart LR"]
     for op in v.ops:
         oid = op["operation_id"]
-        lines.append(f'    {oid}["{v.labels[oid]} {op["kind"]}"]')
+        owner = f" · {op['module_id']}" if v.multi else ""
+        lines.append(f'    {oid}["{v.labels[oid]} {op["kind"]}{owner}"]')
     for e in v.edges:
         arrow = "-.->" if e["type"] == "RESOURCE" else "-->"
         lines.append(f"    {e['from_operation_id']} {arrow}|{v.labels[e['edge_id']]} {e['type']}| {e['to_operation_id']}")
     lines.extend(["```", "", "## Dependencies and missing proof", ""])
+    if v.multi:
+        lines.extend(v.module_handoffs())
+        lines.extend(v.include_gaps())
     for e in v.edges:
         first, second = e["from_operation_id"], e["to_operation_id"]
         lines.append(f"**OBSERVATION** {v.ref(e['edge_id'])} records {e['type']} from {v.ref(first)} "
@@ -254,6 +361,9 @@ def _architecture(v):
             state = any(e["type"] == "STATE" and e["edge_id"] in c["edge_ids"] for e in v.edges)
             proof = ("Test state continuity across successive rows and group boundaries."
                      if state else "Resolve the feedback before considering an acyclic execution plan.")
+            if state and v.multi:
+                proof = ("Treat the STATE annotation as conservative. No independently demonstrated cross-row "
+                         "value dependence follows from this edge; test the specific grouping and value lineage.")
             lines.extend([f"**INFERENCE** Represented cycle at {v.refs(c['operation_ids'])} via {v.refs(c['edge_ids'])}. "
                           + proof, ""])
     for c in v.analysis["conflicts"]:
@@ -262,9 +372,19 @@ def _architecture(v):
         lines.extend([f"**INFERENCE** {c['kind']} conflict between {v.ref(c['earlier_operation_id'])} and "
                       f"{v.ref(c['later_operation_id'])}, including {v.dataset_names(c['dataset_ids'])}. "
                       + coverage + "Physical versions and access isolation require evidence.", ""])
-    for p in v.analysis["no_path_pairs"]:
-        lines.extend([f"**INFERENCE** {v.ref(p['from_operation_id'])} → {v.ref(p['to_operation_id'])}: "
-                      "no represented dependency path; independence unproved.", ""])
+    pairs = v.analysis["no_path_pairs"]
+    if v.multi and pairs:
+        lines.extend(["**INFERENCE** For the pairs below there is no represented dependency path; "
+                      "independence unproved.", "", "| From | To |", "|---|---|"])
+        absent = {}
+        for pair in pairs:
+            absent.setdefault(pair["from_operation_id"], []).append(pair["to_operation_id"])
+        lines.extend(f"| {v.ref(first)} | {v.refs(targets)} |" for first, targets in absent.items())
+        lines.append("")
+    else:
+        for p in pairs:
+            lines.extend([f"**INFERENCE** {v.ref(p['from_operation_id'])} → {v.ref(p['to_operation_id'])}: "
+                          "no represented dependency path; independence unproved.", ""])
     lines.extend(["## To-be alternatives", "",
                   "**HYPOTHESIS** The [native Python candidate](ADR_NATIVE.md) keeps a local intermediate so "
                   "order and per-row state can be inspected. The [Spark candidate](ADR_SPARK.md) would need "
@@ -291,6 +411,8 @@ def _adr(v, spark):
                   "", "**HYPOTHESIS** A local representation may simplify tie-out and avoid transfer costs. "
                   "Row objects, sorting scratch space and the intermediate may exceed workstation memory. "
                   "Bound input plus sort workspace before any trial."]
+    if v.multi:
+        lines.extend(_decision_matrix(v))
     lines.extend(["", "## Source-to-candidate mapping", ""])
     for op in v.ops:
         kind = op["kind"]
@@ -300,6 +422,13 @@ def _adr(v, spark):
         elif kind == "DATA_STEP":
             design = ("Test row expressions and ordered state across partition boundaries." if spark else
                       "Test a row-by-row reference with explicit missing values and group reset rules.")
+        elif kind == "PROC_SQL":
+            design = ("Test key redistribution, predicate placement and the output ordering contract." if spark else
+                      "Test a local keyed join retaining every matching row before applying the filter.")
+            if not any(f["kind"] == "sql" and f["join"] for f in op["facts"]):
+                design = "Test the projection and each represented predicate on the same input rows."
+        elif kind == "INCLUDE":
+            design = "Keep effects outside the supplied graph open for source review."
         else:
             design = "Defer this operation until its effects have a reviewed translation and tie-out test."
         lines.extend([f"**HYPOTHESIS** {v.ref(op['operation_id'])} ({kind}). {design} {_review_test(op)}", ""])
@@ -318,14 +447,26 @@ def _adr(v, spark):
         else:
             continue
         lines.extend([f"**HYPOTHESIS** For {v.ref(e['edge_id'])} ({e['type']}): {proof}", ""])
+    tie_out = ("Use the same hashed cases for both candidates. Compare row counts, "
+               "multisets per composite key, missing-value placement, order across groups and arithmetic "
+               "at rounding boundaries. Report discrepancy rows and maximum absolute/relative error. "
+               "Review unresolved ties separately; avoid manufacturing a tie-breaker.")
+    if v.multi:
+        tie_out = ("Use the same hashed cases for both candidates. Use only keys and columns present at "
+                   "each boundary. Report missing rows, unexpected duplicates, discrepancies in tied "
+                   "groups and maximum absolute/relative error at rounding boundaries.")
+        for op in v.ops:
+            keys = op["order_contract"]["keys"]
+            if not keys:
+                continue
+            lines.extend([f"**HYPOTHESIS** At {v.ref(op['operation_id'])} compare {v.dataset_names(op['writes'])} "
+                          f"by {_names(keys)}. Check the multiset of projected rows within each tied group "
+                          "and the order between groups.", ""])
     lines.extend(["## Common tie-out and benchmark proposal", "",
                   "**ASSUMPTION** An owner must supply the input population, versioned output reference, "
                   "key/duplicate policy, treatment of tied rows and numerical tolerance. P2B semantic "
                   "review and human selection are outstanding.",
-                  "", "**HYPOTHESIS** Use the same hashed cases for both candidates. Compare row counts, "
-                  "multisets per composite key, missing-value placement, order across groups and arithmetic "
-                  "at rounding boundaries. Report discrepancy rows and maximum absolute/relative error. "
-                  "Review unresolved ties separately; avoid manufacturing a tie-breaker.",
+                  "", "**HYPOTHESIS** " + tie_out,
                   "", "**HYPOTHESIS** After correctness review and separate benchmark approval, pin versions "
                   "and hardware; record input bytes, skew, memory budget and cache state. Run one cold and "
                   "five warm trials per agreed size. Collect end-to-end elapsed time, CPU time and peak "
@@ -337,6 +478,44 @@ def _adr(v, spark):
     lines.append(f"**HYPOTHESIS** {reason} On a tie-out failure, retain the existing boundary and its "
                  "reference output; reopen the disputed operation. Neither candidate has a measured result.")
     return v.document(f"Candidate ADR · {runtime}", lines)
+
+
+def _decision_matrix(v):
+    """Contrast hypotheses against the relevant canonical subjects, without ranking engines."""
+    def edge_refs(kind):
+        ids = [e["edge_id"] for e in v.edges if e["type"] == kind]
+        return v.refs(ids) if ids else "no such edge recorded"
+
+    ops = v.refs(op["operation_id"] for op in v.ops)
+    sql = [v.fact_ref(op, i) for op in v.ops for i, f in enumerate(op["facts"]) if f["kind"] == "sql"]
+    sql_orders = [f"{v.fact_ref(op, i)} by {_names(f['order_by'])}" for op in v.ops
+                  for i, f in enumerate(op["facts"]) if f["kind"] == "sql" and f["order_by"]]
+    output_order = " SQL output: " + ", ".join(sql_orders) + "." if sql_orders else ""
+    rows = [
+        ("Workload size", f"{ops}. Production rows, bytes and skew: UNKNOWN.",
+         "Size a single-host trial including the intermediate.", "Consider distribution only if measured scale warrants it."),
+        ("Ordering", f"ORDER: {edge_refs('ORDER')}.{output_order} Acceptable order among ties: UNKNOWN.",
+         "Check the full key comparator and missing-key placement.", "Check ordering after exchanges and at consumption."),
+        ("Partition boundaries", f"STATE: {edge_refs('STATE')}. Safe split keys: UNKNOWN.",
+         "Compare chunk boundaries with one continuous scan.", "Vary partition count and split a tied group; compare boundary rows."),
+        ("Memory", f"DATA: {edge_refs('DATA')}. Peak bytes, headroom and spill: UNKNOWN.",
+         "Budget input, sort scratch and join multiplicity.", "Budget per-worker skew, shuffle buffers and spill."),
+        ("Data movement", f"Logical handoffs: {edge_refs('DATA')}. Physical transfers: UNKNOWN.",
+         "Measure local intermediate materialization.", "Measure repartition and serialization bytes before proposing reuse."),
+        ("Operations", f"Workflow: {ops}. Operator capacity, recovery budget and supported deployment: UNKNOWN.",
+         "Test local restart at the intermediate.", "Test retry and duplicate-output handling; identify a runtime owner."),
+        ("Validation obligations", f"Review {', '.join(sql) or ops} and the [proof obligations](EVIDENCE.md#proof-obligations). "
+         "Independent reference and tolerances: UNKNOWN.",
+         "Trace duplicates, missing keys and filtering against an independent reference.",
+         "Use the same reference across partitions and retries; reconcile row multisets before timing."),
+    ]
+    lines = ["", "## Decision matrix", "", "**HYPOTHESIS** Both candidates require the same correctness "
+             "reference. UNKNOWN marks evidence still needed to compare them.", "",
+             "| Criterion | Evidence and open question | Native Python hypothesis | Spark hypothesis |",
+             "|---|---|---|---|"]
+    lines.extend("| " + " | ".join(row) + " |" for row in rows)
+    lines.extend(["", *v.include_gaps()])
+    return lines
 
 
 def _evidence(v):
@@ -362,7 +541,11 @@ def _evidence(v):
                       "Read nodes: " + _names(op["reads"]) + ".",
                       "Write nodes: " + _names(op["writes"]) + ".", ""])
         for index, fact in enumerate(op["facts"]):
-            lines.append(f"- **OBSERVATION** Fact {index} · `{fact['kind']}` · {_span_entry(fact['span'])}")
+            if v.multi:
+                lines.extend([f"#### {v.labels[oid]} fact {index}", "",
+                              f"**OBSERVATION** {v.ref(oid)} · `{fact['kind']}` · {_span_entry(fact['span'])}", ""])
+            else:
+                lines.append(f"- **OBSERVATION** Fact {index} · `{fact['kind']}` · {_span_entry(fact['span'])}")
         lines.append("")
     lines.extend(["## Edge register", ""])
     for e in v.edges:
@@ -387,6 +570,15 @@ def _evidence(v):
         if "edge_id" in block:
             extra.append(v.ref(block["edge_id"]))
         lines.append(f"- `{block['code']}` ({', '.join([refs, *extra])}): {block['missing_proof']}")
+    if v.multi:
+        lines.extend(["", "### Unresolved records and bindings", "", *v.include_gaps()])
+        for issue in g["unknowns"] + g["contradictions"]:
+            binding = v.refs(issue["operation_ids"]) if issue["operation_ids"] else "no bound operation"
+            keys = ", ".join(f"`{_display_file_key(key)}`" for key in issue["file_keys"]) or "none listed"
+            lines.extend([f"**OBSERVATION** `{issue['issue_id']}` · {issue['kind']} · {binding}. "
+                          f"Declared file keys: {keys}.", ""])
+            for span in issue["spans"]:
+                lines.extend([_span_entry(span), ""])
     lines.extend(["", "**ASSUMPTION** Independent review must establish original scope, effects and "
                   "source semantics. Dataset identities alone do not establish physical versions or "
                   "safe partitioning. Caller-supplied comments and issue prose have no decision authority."])

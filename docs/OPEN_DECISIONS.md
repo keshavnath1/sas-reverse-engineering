@@ -1,6 +1,13 @@
 # Open decisions and compatibility risks
 
-**Current checkpoint, 2026-11-06.** WS-2A was accepted as planning at
+**Current checkpoint, 2026-11-06.** The user accepted MVP-1 as a public
+synthetic draft at `022c672d244a522e25a5aded7f29513f51875b69` and authorized
+MVP-2 only. The [second preview](../examples/mvp2/ARCHITECTURE.md) leaves the
+include's effects unresolved. Production scale, allowable tie order, numeric
+tolerance, reference population and runtime choice are OPEN. Review the package
+before any further development or evaluation.
+
+**Historical checkpoint, 2026-11-06.** WS-2A was accepted as planning at
 `6e403722d64d15a41b4205cb074bb8d928fad3a2`. Workstation packaging is deferred.
 MVP-1 is approved only as a private synthetic [draft preview](../examples/mvp1/PRD.md).
 Business purpose, reference population, duplicate/tie policy, numeric tolerance,
@@ -161,6 +168,7 @@ No decision becomes human-approved merely by appearing in these documents.
 | WS-1 result | ACCEPTED within tested scope | `767b2c3154de7fb451c4278e22f25633d9a025d0`. Historical macOS ARM64 and hosted Linux x64 results only. Native Windows W01–W06 are BLOCKED / NOT_RUN |
 | WS-2A offline kit and installation test plans | APPROVED documentation only | Two plans and necessary ledgers. Stop at documentation review. Future release, implementation and per-target execution decisions are OPEN |
 | MVP-1 synthetic experiment | APPROVED for draft generation only | One public fixture, a private renderer and two untested alternatives. P2B independent semantic acceptance stays BLOCKED; P3/P4 operational work needs separate approval. |
+| MVP-2 multi-module example | APPROVED for public synthetic draft generation only | One additional fixture and six review documents. Independent semantic acceptance remains BLOCKED. |
 | Operational P3, P3-A2 and P4 | OPEN, NOT APPROVED | Operational P3 requires independent source/graph acceptance, then draft PRD/module specifications and separate authorization. A1 provides no independence, scheduling or runtime verdict |
 | Broader Windows native qualification | OPEN, NOT APPROVED | Requires separately approved real environment, owners and security evidence |
 | CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |

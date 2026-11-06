@@ -24,18 +24,31 @@ FIXTURE_GRAPH_SHA256 = "385423530208b08635de832bed57698b7278490f2cb7a43f08fd754b
 FILES = ("ADR_NATIVE.md", "ADR_SPARK.md", "ARCHITECTURE.md", "EVIDENCE.md", "MODULES.md", "PRD.md")
 
 
-def scratch_destination(argument):
+def scratch_destination(argument, checkpoint="mvp1"):
     # Only a new direct child of system scratch. Never descend through a
     # caller-selected tree: an evidence store or sealed attempt can have any name.
     parent, leaf = os.path.split(argument)
     scratch = Path("/private/tmp" if sys.platform == "darwin" else "/tmp")
-    if parent not in {"/tmp", str(scratch)} or not re.fullmatch(r"sas-re-mvp1-[A-Za-z0-9_-]{1,64}", leaf):
-        raise ValueError("choose a new /tmp/sas-re-mvp1-<label> directory")
+    prefix = f"sas-re-{checkpoint}-"
+    if parent not in {"/tmp", str(scratch)} or not re.fullmatch(re.escape(prefix) + r"[A-Za-z0-9_-]{1,64}", leaf):
+        raise ValueError(f"choose a new /tmp/{prefix}<label> directory")
     require_safe_root(scratch)
     info = scratch.stat()
     if info.st_uid != 0 or not info.st_mode & stat.S_ISVTX:
         raise ValueError("system scratch must be a root-owned sticky directory")
     return scratch, leaf
+
+
+def render_case(case, fixture, expected_graph_sha256, profile_key, *, additional_status=()):
+    """Validate the reconstruction and bind this fixed example to its observed graph."""
+    scope, inventory, profile, graph = case
+    report = validate_v2(scope, inventory, graph, profile, profile_file_key=profile_key)
+    diagnostics = diagnose(graph, expected_graph_sha256)
+    files = generate_preview(graph, diagnostics)
+    fields = ("artifact_authority", "semantic_verification", "semantic_acceptance",
+              "benchmark_execution", *additional_status)
+    return files, {"status": "UNVERIFIED", "fixture": fixture, "graph_sha256": diagnostics["parent_graph_sha256"],
+                   **{field: report[field] for field in fields}}
 
 
 def synthetic_preview(scratch):
@@ -45,13 +58,8 @@ def synthetic_preview(scratch):
     from p2a_support import PROFILE_KEY, make_case
 
     with TemporaryDirectory(prefix="sas-re-mvp1-fixture-", dir=scratch) as temporary:
-        scope, inventory, profile, graph = make_case(temporary, PUBLIC_CASES[FIXTURE], attempt="reconstruct-1")
-        report = validate_v2(scope, inventory, graph, profile, profile_file_key=PROFILE_KEY)
-        diagnostics = diagnose(graph, FIXTURE_GRAPH_SHA256)
-        files = generate_preview(graph, diagnostics)
-    return files, {"status": "UNVERIFIED", "fixture": FIXTURE, "graph_sha256": diagnostics["parent_graph_sha256"],
-                   **{field: report[field] for field in ("artifact_authority", "semantic_verification",
-                                                         "semantic_acceptance", "benchmark_execution")}}
+        case = make_case(temporary, PUBLIC_CASES[FIXTURE], attempt="reconstruct-1")
+        return render_case(case, FIXTURE, FIXTURE_GRAPH_SHA256, PROFILE_KEY)
 
 
 def write_bundle(scratch, leaf, files):
@@ -85,14 +93,14 @@ def write_bundle(scratch, leaf, files):
             for name in FILES]
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--destination", required=True, help="new /tmp/sas-re-mvp1-<label> directory")
+def run_demo(checkpoint, description, preview):
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("--destination", required=True, help=f"new /tmp/sas-re-{checkpoint}-<label> directory")
     args = parser.parse_args()
     try:
         require_evidence_io()  # Deny unsupported platforms before any fixture or destination I/O.
-        scratch, leaf = scratch_destination(args.destination)
-        files, manifest = synthetic_preview(scratch)
+        scratch, leaf = scratch_destination(args.destination, checkpoint)
+        files, manifest = preview(scratch)
         manifest["files"] = write_bundle(scratch, leaf, files)
     except EvidenceError as error:
         parser.exit(2, f"{error.gate}: {error.code}\n")
@@ -101,6 +109,10 @@ def main():
     except (OSError, ValueError) as error:
         parser.exit(2, f"preview failed: {error}\n")
     print(json.dumps(manifest, indent=2))
+
+
+def main():
+    run_demo("mvp1", __doc__, synthetic_preview)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,17 @@
 # SAS Reverse Engineering and Computation Architecture Planner
 
+## Follow a dataset across two SAS modules
+
+The [MVP-2 architecture preview](examples/mvp2/ARCHITECTURE.md) follows
+`work.ordered` from a sort in `prepare` through a BY-group DATA step and an
+SQL join in `enrich`. The [module specifications](examples/mvp2/MODULES.md)
+trace individual columns to original source spans. A missing include leaves the
+reconstruction partial. The [native Python](examples/mvp2/ADR_NATIVE.md) and
+[conditional Spark](examples/mvp2/ADR_SPARK.md) proposals compare both
+candidates against the same per-dataset tie-out obligations. See the
+[draft PRD](examples/mvp2/PRD.md), [evidence index](examples/mvp2/EVIDENCE.md)
+and [validation report and offline run command](docs/MVP2_VALIDATION.md).
+
 ## Review the synthetic architecture preview
 
 Start with the [draft PRD](examples/mvp1/PRD.md). The public workflow sorts
