@@ -9,6 +9,10 @@ and an exact legacy identity projection; it grants no filesystem access.
 CP3A adds a separate POSIX read-only preflight API for explicitly scoped synthetic
 sources, with retained handles and physical disjointness inside a dedicated
 inspection anchor. Existing evidence CLI/persistence behavior is unchanged.
+CP3B adds a private Windows retained-handle protocol and native API adapter with
+unit-only synthetic coverage. Public Windows read-only access remains BLOCKED:
+approved physical-volume bootstrap and actual native qualification are missing.
+See [CP3B design](docs/CP3B_DESIGN.md) and [validation](docs/CP3B_VALIDATION.md).
 The closed subset is described in [P2A design](docs/P2A_DESIGN.md). Public regression
 tests demonstrate bounded behavior; independent semantic acceptance remains
 `BLOCKED`, verification `UNVERIFIABLE`, authority `DRAFT`, and benchmarks `NOT_RUN`.
@@ -30,7 +34,8 @@ See [P1 design](docs/P1_DESIGN.md), [P1 validation](docs/P1_VALIDATION.md),
 D01–D07 and D08-A/B are approved for their bounded phases. CP1 is separately
 approved for its capability boundary. CP2 is separately approved for pure local
 declarations and identity compatibility only. CP3A is separately approved for
-bounded POSIX preflight; stop after CP3A, with no automatic CP3B approval.
+bounded POSIX preflight. CP3B is separately approved for its defensible reader
+subset; stop after CP3B, with no automatic CP4/CP5/P2B/P3 approval.
 D08-C and D09 remain open for P2B. See [P2A validation](docs/P2A_VALIDATION.md)
 and [public fixture review](docs/P2A_FIXTURE_REVIEW.md).
 
@@ -129,7 +134,11 @@ required; mode checks are not an ACL audit or hostile-writer snapshot guarantee.
 This additive Python API is not integrated into the legacy commands below.
 Their existing append-only failure timing remains unchanged. Future publication
 integration needs separate review; a completed preflight is not a reusable create
-permission. No Windows reader, new dependency or broader filesystem claim is added.
+permission. CP3B adds only a private Windows protocol: `sas-re status` reports
+`read_only_preflight_capabilities` separately from full evidence capabilities.
+Windows has no public preflight factory or override. Even the private subset
+blocks absent store prefixes because a missing long name is not proof of physical
+absence. No dependency, native support or broader filesystem claim is added.
 
 ## P1 CLI
 

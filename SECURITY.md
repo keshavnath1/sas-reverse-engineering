@@ -131,3 +131,25 @@ publication redesign, dependency/lock change, private intake or new approval
 claim is introduced. [Validation](docs/CP3A_VALIDATION.md) records actual native
 tests separately from simulated cases, in-process observers and unresolved
 independent security/native-tracing qualification.
+
+## CP3B blocked Windows protocol
+
+[CP3B](docs/CP3B_DESIGN.md) adds private existing-only relative-handle primitives
+and a reader protocol. It does not provide an approved physical-volume bootstrap,
+locality proof or public Windows source access. The existing public capability
+gate denies before caller-path inspection/DLL loading/content/output; no override
+is exposed. The new status field distinguishes this partial implementation.
+
+Only simulated/unit tests exercise Windows operations. Named native host owner,
+independent security reviewer, observer and approved offline runtime are OPEN.
+No native Windows qualification, ACL isolation, hostile-writer snapshot or bounded
+kernel-call cancellation claim follows from test results. Full Windows evidence
+commands and publication remain BLOCKED. Earlier 'unimplemented Windows reader'
+statements above describe the historical boundary; current public access remains
+unavailable despite the private CP3B implementation.
+
+The private subset requires a preexisting disjoint store location for metadata
+inspection; absent/aliased prefixes block rather than asserting unsafe absence.
+No store is created. All source read handles must be acquired before content;
+original bytes remain unchanged and cleanup uncertainty prevents a successful
+result. No frozen evidence schema, canonical ID, POSIX behavior or history changes.

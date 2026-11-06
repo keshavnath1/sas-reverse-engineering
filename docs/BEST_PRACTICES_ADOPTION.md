@@ -297,3 +297,21 @@ Approved baseline `07ddcda5a78a9a2f9f093a94e722532f44e3044b`; see
 
 This evidence supports the bounded CP3A engineering claims only. It does not
 resolve the named independent reviewer/host decisions or grant downstream approval.
+
+## CP3B bounded implementation evidence
+
+Approved baseline `f841ca25d511230d77ab1c3eded3f59602a79f5d`; see
+[design](CP3B_DESIGN.md), [actual validation](CP3B_VALIDATION.md) and
+[approval](APPROVALS.md). Earlier phase records are unchanged.
+
+| Practice | Evidence obtained and limit |
+|---|---|
+| J2/J5: bounded scope and durable decisions | Private read-only protocol/native layer, separate status, explicit missing bootstrap/native qualification, no public override or publication change |
+| J3: executable feedback | Independent memory-only handle/object fixtures, rights/parser injections, zero-read barriers, source/store snapshots and cleanup faults. Unit-only Windows evidence, not native security qualification |
+| J4: delegated authorship and separate review | Separate native-layer author, adversarial fixture author and read-only security audit. Root integrated and corrected ancestor enumeration, unsafe absence conclusions, cleanup and alias limits; shared development environment is not independent human security acceptance |
+| J3: preserved evidence | Original tests and frozen schema/identity/history comparisons; exact commands, failures/corrections and results are recorded in validation |
+| J3: explicit uncertainty | Missing Windows host/owner/observer/bootstrap stay OPEN/BLOCKED; no successful skips substitute for native hostile-fixture obligations |
+| J1/J6: efficiency, provider choice and cost | NOT_VERIFIED; no token/cache/billing, productivity, model comparison or SAS benchmark measurements |
+
+This demonstrates bounded development controls only. It does not grant semantic
+acceptance, native support or permission to start CP4/CP5/P2B/P3.

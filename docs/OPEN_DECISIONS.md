@@ -1,13 +1,17 @@
 # Open decisions and compatibility risks
 
-Status: CP3A bounded POSIX implementation approved at `07ddcda5a78a9a2f9f093a94e722532f44e3044b`.
-Broader CP3/CP3B, Windows access and D08-C/D09 execution decisions remain OPEN.
+Status: CP3B bounded implementation approved at `f841ca25d511230d77ab1c3eded3f59602a79f5d`.
+Native Windows qualification and public source access remain BLOCKED.
 Updated 2026-11-05.
 
-**Current checkpoint authorization:** the user approved only [CP3A](CP3A_DESIGN.md),
-its focused synthetic tests and [validation](CP3A_VALIDATION.md). This is a separate
-POSIX read-only path; no silent legacy-persistence changes, Windows access,
-publication redesign, dependency changes or later phases. Stop after CP3A.
+**Current checkpoint authorization:** [CP3B](CP3B_DESIGN.md) implements the
+private retained-handle reader subset with [unit-only Windows validation](CP3B_VALIDATION.md).
+The user explicitly permits a defensible subset if critical native assumptions
+remain unresolved. No public override, volume bootstrap, native qualification,
+publication, dependency expansion or later phase is enabled. Stop after CP3B.
+
+**Accepted CP3A:** the user accepted the separate POSIX preflight within its tested
+scope at the baseline above. Its behavior and all 514 tests are preserved.
 
 **Historical CP3 readiness authorization:** the user accepted CP2 at
 `fe3bbe98704fd33fb9516b53e8786e516dce9e1e` and authorized only
@@ -71,12 +75,13 @@ No decision becomes human-approved merely by appearing in these documents.
 | CP2 result | ACCEPTED by the user | `fe3bbe98704fd33fb9516b53e8786e516dce9e1e`; declarations/projection only, no physical authorization |
 | CP3 readiness documentation | APPROVED for current checkpoint | Design, proposed tests/instructions and factual ledger updates only |
 | CP3A implementation | APPROVED bounded subset | Separate POSIX preflight, physical alias checks and synthetic verification only; no legacy failure-timing change |
-| Broader CP3/CP3B implementation | OPEN, NOT APPROVED | Windows source access and broader qualification are not implied by CP3A |
+| CP3B implementation | APPROVED bounded subset | Private read-only native layer/protocol; public Windows access BLOCKED until physical bootstrap and qualification |
+| Broader Windows native qualification | OPEN, NOT APPROVED | Requires separately approved real environment, owners and security evidence |
 | CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |
 
 ## CP3 readiness decisions
 
-Rows remain **OPEN** except CP3-R10's explicitly approved CP3A subset below.
+Rows remain **OPEN** except CP3-R10's explicitly approved CP3A/CP3B implementation subsets below.
 Recommendations define review questions, not authenticated
 approval or installed controls. [APPROVALS.md](APPROVALS.md) records the actual user
 scope. The Windows owner and independent reviewer have not been supplied; do not
@@ -93,10 +98,15 @@ infer either from a GitHub account, workstation username or development subagent
 | CP3-R07 | Fixture custodian, privileged setup, independent observer and retention | Approve disposable fixtures, observation coverage/positive controls and local trace retention; ordinary application runs remain unelevated. Required cases without trustworthy observation remain BLOCKED |
 | CP3-R08 | Approved Windows interpreter and offline dependency artifacts | Existing lock lacks Windows artifacts. Obtain separate installation/hash-extension approval; do not add dependencies or install anything during readiness |
 | CP3-R09 | Earlier-denial compatibility and native diagnostics | Review stricter directory/alias policy and pre-store preflight integration: current POSIX workflows begin attempts before complete scope checks. Preserve historical attempts, successful compatible bytes, old FAIL/BLOCKED conventions; freeze exact new codes before implementation |
-| CP3-R10 | CP3A subset APPROVED; remaining CP3 scope OPEN | User approved additive POSIX preflight and synthetic tests at the baseline above. This does not approve Windows access, CP3B, CP4 locks/publication, CP5, P2B/P3 or downstream integration |
+| CP3-R10 | CP3A/CP3B bounded subsets APPROVED | CP3B private implementation and synthetic unit coverage are approved; native environment/qualification, CP4/CP5/P2B/P3 and downstream integration remain separate |
 
-Current next action: review CP3A design/validation and remaining limits before
-any additional authorization. CP3A chooses a dedicated owned inspection anchor,
+Current next action: review CP3B design/validation and its defensible subset.
+CP3-R03/R04 now explicitly include the unimplemented secure local-volume bootstrap,
+unqualified directory/reparse API combination, ancestor alias mapping and native
+OS-call cancellation. Windows absent-store inspection is BLOCKED until an alias-safe
+physical absence proof is separately reviewed. No host owner or human security
+reviewer is inferred from development-agent review. Any further implementation or
+native qualification requires explicit scope and environment approval. CP3A chooses a dedicated owned inspection anchor,
 same qualified filesystem beneath it and explicit quiescent/trusted-writer policy;
 it does not resolve generalized mount/ACL/snapshot guarantees in CP3-R05–R07.
 CP3-R09 publication integration remains OPEN: no legacy workflow timing changed.

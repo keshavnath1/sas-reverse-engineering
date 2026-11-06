@@ -7,7 +7,7 @@ from pathlib import Path
 
 from sas_re.baseline import metadata, report
 from sas_re.runs import execute
-from sas_re.platform_io import filesystem_capabilities
+from sas_re.platform_io import filesystem_capabilities, preflight_capabilities
 
 PLANNED = (
     "analyze-parallelism", "draft-requirements",
@@ -66,6 +66,7 @@ def main(argv: list[str] | None = None) -> int:
                       "semantic_verification": "UNVERIFIABLE", "artifact_authority": "DRAFT",
                       "semantic_acceptance": "BLOCKED", "independent_evaluation": "NOT_IMPLEMENTED",
                       "filesystem_capabilities": filesystem_capabilities(),
+                      "read_only_preflight_capabilities": preflight_capabilities(),
                       "note": "Status does not execute validation or advance a workflow."}
             code = 0
         elif args.command == "check-baseline":

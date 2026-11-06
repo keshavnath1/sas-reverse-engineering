@@ -75,6 +75,27 @@ def require_evidence_io() -> None:
         raise EvidenceError("FILESYSTEM_CAPABILITY_UNAVAILABLE", "BLOCKED")
 
 
+def preflight_capabilities() -> dict:
+    """CP3B reader status only; never probes paths or loads a native DLL.
+
+    No environment variable, injected handle or declaration can override this
+    public gate. The private Windows protocol is not a qualified public reader.
+    Preserve the existing full-evidence capability/exit-code contract separately.
+    """
+    if sys.platform == "win32" or os.name == "nt":
+        return {"backend": "windows", "read_only_preflight": "BLOCKED",
+                "private_protocol": "IMPLEMENTED_UNQUALIFIED",
+                "volume_bootstrap": "NOT_IMPLEMENTED",
+                "native_qualification": "BLOCKED",
+                "reason": "WINDOWS_VOLUME_BINDING_AND_QUALIFICATION_UNAVAILABLE",
+                "publication": "BLOCKED"}
+    current = filesystem_capabilities()
+    return {"backend": current["backend"],
+            "read_only_preflight": current["evidence_io"],
+            "reason": current["reason"],
+            "qualification": "Per-operation filesystem checks and explicit local policy remain required."}
+
+
 def get_backend() -> ModuleType:
     """Load only the existing POSIX implementation after the capability gate."""
     require_evidence_io()

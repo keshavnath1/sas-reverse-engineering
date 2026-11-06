@@ -1,26 +1,28 @@
-# CP3A operating boundary
+# CP3B operating boundary
 
-Read README.md and docs/APPROVALS.md before changes. CP3A is approved at
-`07ddcda5a78a9a2f9f093a94e722532f44e3044b` for bounded POSIX physical authorization
-and read-only preflight only. Read docs/CP3A_DESIGN.md, docs/CP3A_VALIDATION.md,
-docs/CP3_READINESS.md and docs/CP3_SECURITY_TEST_PLAN.md.
-Read docs/CP2_DESIGN.md, docs/CP1_DESIGN.md and
-docs/CROSS_PLATFORM_PORTABILITY_PLAN.md. Preserve the
-existing P2A deterministic synthetic subset. D01–D07 and D08-A/B are approved for
-their bounded phases; D08-C and D09 remain open for P2B. Stop after CP3A;
-CP3B and broader CP3 work require explicit further approval.
+Read README.md, SECURITY.md and docs/APPROVALS.md before changes. CP3B is approved
+at `f841ca25d511230d77ab1c3eded3f59602a79f5d` for a bounded Windows read-only
+preflight backend and synthetic tests, with defensible subset/BLOCKED limits.
+Read docs/CP3B_DESIGN.md, docs/CP3B_VALIDATION.md, CP3_READINESS.md,
+CP3_SECURITY_TEST_PLAN.md, CP3A_DESIGN.md, CP2_DESIGN.md, CP1_DESIGN.md and
+CROSS_PLATFORM_PORTABILITY_PLAN.md under docs/. Preserve the accepted POSIX
+behavior and all identity/history boundaries. Stop after CP3B; CP4, CP5, P2B and
+P3 require separate user approval.
 Read docs/P1_DESIGN.md and docs/P2_READINESS.md for proof and trust boundaries.
 
-Preserve all 456 baseline tests, frozen v1/v2 and CP2 schemas, canonical byte/identity
+Preserve all 514 baseline tests, frozen v1/v2 and CP2 schemas, canonical byte/identity
 rules, historical artifacts, dependencies and lockfiles. New focused tests and an
-additive POSIX path are approved. Do not silently change legacy persistence/failure
+additive private Windows reader protocol are approved. Do not silently change legacy persistence/failure
 timing; preserve old records and stop for review if integration conflicts with it.
 Windows evidence I/O must remain BLOCKED before input access or store creation.
-Validated native strings never grant physical authorization. Only the CP3A
-separately scoped POSIX consumer is approved. No Windows I/O, CP4 publication,
-CP5 dependencies or
-new platform CI matrix is approved. Native Windows qualification needs an actual
-approved interpreter/dependency environment; simulation is not qualification.
+Validated native strings never grant physical authorization. CP3B permits only the
+defensible reader subset described in docs/CP3B_DESIGN.md. Public Windows access
+remains BLOCKED because approved volume bootstrap and native qualification are
+missing. No private protocol/test injection may become a public override. No CP4
+publication, CP5 dependencies or new platform CI matrix is approved. Native
+qualification needs a separately approved real Windows environment; simulation
+is not qualification. Missing stores in the private Windows protocol remain
+BLOCKED until alias-safe physical absence can be established.
 Missing Windows host owner, independent security reviewer and broader filesystem
 assurances remain OPEN. Synthetic local tests are approved; do not install
 privileged observers or run private intake. Practice-ledger updates need actual

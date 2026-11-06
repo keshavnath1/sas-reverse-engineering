@@ -144,3 +144,20 @@ No Windows source access, CP4 publication redesign, CP5 packaging/release
 qualification, private intake, SAS execution, dependency/provider change,
 Agent-mastery modification, P2B or P3 is authorized. Existing publication permission
 for this repository continues. Stop after CP3A; do not begin CP3B automatically.
+
+The user accepted CP3A within its tested POSIX scope at
+`f841ca25d511230d77ab1c3eded3f59602a79f5d` and approved **CP3B implementation only**:
+an import-safe, fail-closed Windows read-only synthetic preflight backend, narrow
+native APIs, focused independent test vectors and design/validation/ledger updates.
+If critical native assumptions cannot be established, implement only the defensible
+subset and report the rest BLOCKED. All 514 regressions and frozen contracts,
+identities, artifacts, POSIX behavior and downstream pin must be preserved.
+
+Actual native Windows qualification requires a separately approved real Windows
+environment. No host/owner/dependency environment or native bootstrap approval was
+provided by this implementation authorization. Simulations cannot qualify native
+support. Public Windows evidence/publication stays BLOCKED. No new dependency,
+lock change, private intake, SAS execution, Agent-mastery modification, CP4, CP5,
+P2B or P3 is approved. DRAFT/UNVERIFIABLE/BLOCKED/NOT_RUN authority and verification
+conventions remain. Stop after CP3B. Existing remote-publication authorization
+continues; it does not grant later runtime or human security approval.
