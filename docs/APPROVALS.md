@@ -178,3 +178,20 @@ provisioning and authorization remain OPEN; native guarantees remain BLOCKED.
 Repository publication authorization persists for the documentation checkpoint;
 it does not authorize a Windows environment or native test execution. Stop after
 planning for explicit further approval.
+
+On 2026-11-06 the user accepted CP3C planning at
+`5453a2598bd6da4ee695602f539f3961e70556b7` and authorized **CP3D only**:
+bounded private import-safe Windows bootstrap/absent-store primitives, typed
+independently supplied host/volume expectations, retained metadata identity checks,
+defensible locality/mapping queries, typed lookup outcomes, simulated/fault tests,
+design/validation documents and necessary ledgers. Unsupported API/completion
+guarantees must remain BLOCKED rather than acquire a weaker fallback.
+
+Preserve all 596 historical tests, frozen contracts/identities/history, existing
+POSIX behavior and Agent-mastery pin; repeat artifact/hash comparisons. This is
+not native qualification, public Windows reader/workflow activation, deployment,
+CP4 publication, source-content access or permission to create/modify a source or
+store. No private inputs/SAS, dependency/lock changes, self-approved inspection
+grant, drive scan or new runtime service/provider requirement. Host/reviewer,
+provisioning and native authority remain OPEN. Stop after CP3D; CP4/CP5/P2B/P3
+need separate approval. Existing repository-push authorization remains valid.

@@ -1,18 +1,20 @@
 # Open decisions and compatibility risks
 
-Status: CP3C planning/security review approved at `a29af0ec024945b15d31435e7041d45e92278c68`.
-CP3B is accepted only within its limited simulated-test scope. Native Windows
-qualification and public source access remain BLOCKED. Updated 2026-11-05.
+Status: CP3C accepted at `5453a2598bd6da4ee695602f539f3961e70556b7`;
+bounded CP3D private implementation approved. Native Windows qualification and
+public source access remain BLOCKED. Updated 2026-11-06.
 
-**Current checkpoint authorization:** documentation only:
-[bootstrap design](CP3C_BOOTSTRAP_DESIGN.md) and
-[qualification plan](CP3C_QUALIFICATION_PLAN.md), with necessary decision/practice
-updates and applicable existing checks. No implementation, dependency, Windows
-source access, publication or output-store creation. All 596 tests and frozen
-boundaries are preserved. Stop after CP3C planning for explicit approval.
+**Current checkpoint authorization:** defensible private metadata primitives,
+typed external expectations, simulated bootstrap/absence protocol and focused tests;
+see [design](CP3D_DESIGN.md) and [validation](CP3D_VALIDATION.md). No native
+qualification, dependency change, Windows source access, publication or store
+creation. Preserve all 596 existing tests and frozen boundaries. Stop after CP3D.
+CP3C's [bootstrap design](CP3C_BOOTSTRAP_DESIGN.md) and
+[qualification plan](CP3C_QUALIFICATION_PLAN.md) remain historical planning records.
 
 **Accepted CP3B:** private retained-handle implementation and simulated/unit tests
-at the baseline above; [design](CP3B_DESIGN.md) and [validation](CP3B_VALIDATION.md).
+at `a29af0ec024945b15d31435e7041d45e92278c68`;
+[design](CP3B_DESIGN.md) and [validation](CP3B_VALIDATION.md).
 No approved volume bootstrap, native qualification or public override exists.
 
 **Accepted CP3A:** the user accepted the separate POSIX preflight within its tested
@@ -83,6 +85,8 @@ No decision becomes human-approved merely by appearing in these documents.
 | CP3B implementation | APPROVED bounded subset | Private read-only native layer/protocol; public Windows access BLOCKED until physical bootstrap and qualification |
 | CP3B result | ACCEPTED within limited simulated-test scope | `a29af0ec024945b15d31435e7041d45e92278c68`; not native security qualification |
 | CP3C planning/security review | APPROVED documentation only | Two planning documents, necessary ledgers and applicable existing checks; no implementation or provisioning |
+| CP3C result | ACCEPTED planning checkpoint | `5453a2598bd6da4ee695602f539f3961e70556b7`; no native assurance |
+| CP3D implementation | APPROVED bounded private subset | Simulated metadata protocol and defensible native primitives only; incomplete native guarantees stay BLOCKED |
 | Broader Windows native qualification | OPEN, NOT APPROVED | Requires separately approved real environment, owners and security evidence |
 | CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |
 
@@ -107,10 +111,11 @@ infer either from a GitHub account, workstation username or development subagent
 | CP3-R09 | Earlier-denial compatibility and native diagnostics | Review stricter directory/alias policy and pre-store preflight integration: current POSIX workflows begin attempts before complete scope checks. Preserve historical attempts, successful compatible bytes, old FAIL/BLOCKED conventions; freeze exact new codes before implementation |
 | CP3-R10 | CP3A/CP3B bounded subsets APPROVED | CP3B private implementation and synthetic unit coverage are approved; native environment/qualification, CP4/CP5/P2B/P3 and downstream integration remain separate |
 
-Current next action: review the CP3C design/qualification documents and resolve
+Historical next action after CP3C: review the design/qualification documents and resolve
 required inputs below. No proposed mechanism is an approved or qualified control.
 CP3A's existing POSIX behavior and legacy publication timing stay unchanged.
-Missing native prerequisites remain OPEN/BLOCKED. Stop after CP3C planning.
+Missing native prerequisites remain OPEN/BLOCKED. The user's CP3D approval now
+permits only the bounded implementation above; it does not approve qualification.
 
 ## CP3C review decisions
 
@@ -128,6 +133,19 @@ schema, identity, native harness or bootstrap API.
 | CP3C-D06 | Named independent reviewer, custodian and observer | Approve ordinary-user lane, separately provisioned hostile fixtures, observer positive controls and trace retention. No inferred owner, privileged setup or successful skipped obligation |
 | CP3C-D07 | Finite native qualification manifest and limits | Freeze individual C01–C20/T01–T26 cases, exact diagnostics, counts, independent expected facts, native deadlines and proof exclusions before execution. Missing cases BLOCKED, no simulated/native denominator mixing |
 | CP3C-D08 | Separate implementation, execution and activation approvals | Review plan first; then explicitly approve narrowly scoped implementation/provisioning/metadata tests. Synthetic content-read qualification and public-reader activation require their own explicit scopes; CP4/CP5/P2B/P3 remain separate |
+
+## CP3D remaining gates
+
+The CP3D scope implements the defensible subset, not approval of CP3C's OPEN
+runtime decisions. No host owner or independent human reviewer has been supplied.
+
+| ID | Status | Evidence and next requirement |
+|---|---|---|
+| CP3D-D01 | OPEN / native BLOCKED | Host/token, inspection and backing references are typed external comparison data. Authentic source, protection, issuer, expiry/revocation and exact native execution grant remain missing; no automatic approval loader |
+| CP3D-D02 | OPEN / native BLOCKED | Nt root-open flags, exact handle-bound long-name/alias semantics, native device/case queries and synchronous completion/buffer lifetime require review and actual negative fixtures. No Nt filesystem call is bound in CP3D |
+| CP3D-D03 | OPEN / native BLOCKED | Simulated repeated absence observations rely on quiescent namespace writers, do not detect every ABA and never reserve a name. No native absent-store success, receipt serialization or CP4 authorization |
+| CP3D-D04 | OPEN | Named Windows 11 x64/NTFS owner, independent reviewer, custodian, observer and approved Python/PowerShell/offline artifacts; no provisioning or native execution authorized |
+| CP3D-D05 | OPEN | Any native implementation extension, qualification, public reader activation or publication requires separate explicit approval. Stop after the CP3D report; no CP4/CP5/P2B/P3 |
 
 ## Decision register
 

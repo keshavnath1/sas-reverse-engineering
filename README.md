@@ -265,3 +265,9 @@ GitHub Actions defines P0/P1/P2A and wheel tests plus a separate downstream drif
 with pinned action commits. A local pass is not proof of a hosted CI run; consult
 [Actions](https://github.com/keshavnath1/sas-reverse-engineering/actions) for hosted
 status. Historical P0 checks remain in [P0 validation](docs/P0_VALIDATION.md).
+
+CP3D adds a private metadata protocol and bounded DOS-mapping primitives, tested
+with synthetic in-memory/fault fixtures. Native root acquisition, alias-safe
+absence and all public Windows evidence workflows remain **BLOCKED**. There is
+no new CLI, native qualification, source access or publication capability. See
+[CP3D design](docs/CP3D_DESIGN.md) and [validation](docs/CP3D_VALIDATION.md).

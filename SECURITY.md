@@ -153,3 +153,26 @@ inspection; absent/aliased prefixes block rather than asserting unsafe absence.
 No store is created. All source read handles must be acquired before content;
 original bytes remain unchanged and cleanup uncertainty prevents a successful
 result. No frozen evidence schema, canonical ID, POSIX behavior or history changes.
+
+## CP3D private metadata subset
+
+[CP3D](docs/CP3D_DESIGN.md) adds typed external comparison records and a private
+metadata-only bootstrap/absence protocol. It is exercised by independent memory
+fixtures only, not wired into the public gate or CP3B reader. References and
+matching object IDs do not authenticate an inspection grant, prove physical
+backing or approve a host. Local identities never enter portable evidence hashes.
+
+The new native adapter binds only bounded, explicitly named DOS mapping queries;
+even these have not been executed on an approved Windows host. It binds no Nt
+filesystem call. Context/root/lookup/metadata/close methods unconditionally BLOCK
+before filesystem access: native authority, reparse/alias and completion guarantees
+are unresolved. There is no qualification boolean, source read or creation method.
+
+Only a completed successful lookup transfers a handle to the simulated protocol.
+An inconsistent pending/failed result leaves resources with its adapter; the
+protocol cannot cancel, close or free them safely. Native acquisition is disabled
+so this is not a claim to implement native pending-I/O cleanup. Absence observations
+are temporary, under quiescent trusted writers, and never reservations or creation
+permissions. No snapshot/ABA, ACL isolation or native certification is claimed.
+All public Windows access remains BLOCKED/exit 2. See
+[actual checks and unresolved gates](docs/CP3D_VALIDATION.md).

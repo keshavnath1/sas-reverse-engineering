@@ -334,3 +334,21 @@ Reviewed accepted baseline `a29af0ec024945b15d31435e7041d45e92278c68`; see
 
 These observations justify review prerequisites, not native platform support,
 semantic acceptance, output publication or any later-phase approval.
+
+## CP3D bounded private implementation evidence
+
+Approved baseline `5453a2598bd6da4ee695602f539f3961e70556b7`; see
+[design](CP3D_DESIGN.md), [actual validation](CP3D_VALIDATION.md) and
+[scope approval](APPROVALS.md). Earlier records remain historical.
+
+| Practice | Evidence obtained and limit |
+|---|---|
+| J2/J5: narrow scope and durable decisions | Private metadata protocol/typed expectations and bounded mapping primitive; all native filesystem/context methods blocked without an enabling flag; no public integration |
+| J4: independent authorship and review | Separate native primitive author, simulated-test author and read-only preservation/security reviewer. Shared development environment, not independent human acceptance |
+| J3: executable feedback | 71 new pure/mocked/simulated cases plus 596 unchanged regressions; alias/collision, identity/race, limits, before-I/O denial and exact-once ownership oracles |
+| J3: counterevidence and corrections | Pending-status ownership transfer, malformed metadata comparison and OSError diagnostics tightened; native completion/authority gaps explicitly left blocked |
+| J3: historical evidence preservation | Independent baseline/candidate P1/P2A full-byte and complete-report comparisons; frozen schemas/vectors/lock/pin unchanged. Commands and results in validation |
+| J1/J6: efficiency, providers and cost | NOT_VERIFIED; no token/cache/billing, productivity, provider comparison or workload benchmark measurements |
+
+No native Windows execution, certification, authentic inspection grant, human
+reviewer approval or semantic acceptance follows from these development results.
