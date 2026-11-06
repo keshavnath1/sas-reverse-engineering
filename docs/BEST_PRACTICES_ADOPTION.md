@@ -315,3 +315,22 @@ Approved baseline `f841ca25d511230d77ab1c3eded3f59602a79f5d`; see
 
 This demonstrates bounded development controls only. It does not grant semantic
 acceptance, native support or permission to start CP4/CP5/P2B/P3.
+
+## CP3C planning and security-review evidence
+
+Reviewed accepted baseline `a29af0ec024945b15d31435e7041d45e92278c68`; see
+[bootstrap design](CP3C_BOOTSTRAP_DESIGN.md),
+[qualification plan and actual checks](CP3C_QUALIFICATION_PLAN.md) and
+[scope approval](APPROVALS.md). Historical phase evidence above is unchanged.
+
+| Practice | Evidence obtained and limit |
+|---|---|
+| J2/J5: bounded scope and durable decisions | Documentation-only conditional bootstrap/absence design, OPEN ownership/provisioning decisions and explicit stop gates; no deployed native assurance |
+| J4: focused delegation and separate review | Three read-only reviews covered volume authority/locality, native absence/alias semantics and qualification/ACL/completion evidence. Shared development environment; no independent human security sign-off |
+| J3: counterevidence and proof limits | Distinguished root locator from approved physical binding; identified typed-status gap, temporal absence limits, enumeration documentation ambiguity, ACL trust assumptions and unresolved pending-I/O buffer lifetime |
+| J3: executable preservation feedback | Existing documentation/guard/preservation checks and attributable CI results are recorded in the qualification plan. New native fixture execution remains NOT_RUN/BLOCKED |
+| J3: proposed independent tests | Positive observer controls, ordinary/provisioned lanes and finite native case families specified; a planned matrix is not executed evidence or a passing denominator |
+| J1/J6: efficiency, provider choice and cost | NOT_VERIFIED; no token/cache/billing, productivity, model-comparison or workload performance evidence |
+
+These observations justify review prerequisites, not native platform support,
+semantic acceptance, output publication or any later-phase approval.

@@ -1,31 +1,32 @@
-# CP3B operating boundary
+# CP3C planning and security-review boundary
 
-Read README.md, SECURITY.md and docs/APPROVALS.md before changes. CP3B is approved
-at `f841ca25d511230d77ab1c3eded3f59602a79f5d` for a bounded Windows read-only
-preflight backend and synthetic tests, with defensible subset/BLOCKED limits.
-Read docs/CP3B_DESIGN.md, docs/CP3B_VALIDATION.md, CP3_READINESS.md,
-CP3_SECURITY_TEST_PLAN.md, CP3A_DESIGN.md, CP2_DESIGN.md, CP1_DESIGN.md and
-CROSS_PLATFORM_PORTABILITY_PLAN.md under docs/. Preserve the accepted POSIX
-behavior and all identity/history boundaries. Stop after CP3B; CP4, CP5, P2B and
-P3 require separate user approval.
+Read README.md, SECURITY.md and docs/APPROVALS.md. Also read CP3B_DESIGN.md,
+CP3B_VALIDATION.md, CP3_READINESS.md and CP3_SECURITY_TEST_PLAN.md under docs/.
+The user accepted CP3B at `a29af0ec024945b15d31435e7041d45e92278c68` only within
+its limited simulated-test scope and approved CP3C planning/security review only.
+Read docs/CP3C_BOOTSTRAP_DESIGN.md and docs/CP3C_QUALIFICATION_PLAN.md.
+
+Create/update only the two CP3C planning documents and necessary decision,
+approval/operating-boundary and best-practices records. No implementation or test-code changes,
+dependency/lock changes, Windows source-content access, public reader enablement,
+publication or new output store. Preserve all 596 tests and frozen contract,
+identity, historical-artifact and downstream-pin bytes. Run applicable existing
+documentation/preservation/CI checks and identify actual versus historical results.
+Stop after planning for explicit approval; no CP4, CP5, P2B or P3.
+
 Read docs/P1_DESIGN.md and docs/P2_READINESS.md for proof and trust boundaries.
 
-Preserve all 514 baseline tests, frozen v1/v2 and CP2 schemas, canonical byte/identity
-rules, historical artifacts, dependencies and lockfiles. New focused tests and an
-additive private Windows reader protocol are approved. Do not silently change legacy persistence/failure
-timing; preserve old records and stop for review if integration conflicts with it.
-Windows evidence I/O must remain BLOCKED before input access or store creation.
-Validated native strings never grant physical authorization. CP3B permits only the
-defensible reader subset described in docs/CP3B_DESIGN.md. Public Windows access
-remains BLOCKED because approved volume bootstrap and native qualification are
-missing. No private protocol/test injection may become a public override. No CP4
-publication, CP5 dependencies or new platform CI matrix is approved. Native
-qualification needs a separately approved real Windows environment; simulation
-is not qualification. Missing stores in the private Windows protocol remain
-BLOCKED until alias-safe physical absence can be established.
+The accepted CP3B private protocol stays unqualified; it has no approved volume
+bootstrap or alias-safe absent-store proof. Keep public Windows access BLOCKED
+before supplied-path access and store creation. Validated CP2 strings do not grant
+physical authority. No test-only injection becomes a public override. Missing
+native guarantees, including completion/buffer lifetime, remain BLOCKED.
+Native qualification needs a separately approved real Windows environment;
+simulation and documentation are not qualification. No provisioning or new
+platform CI matrix is authorized here.
 Missing Windows host owner, independent security reviewer and broader filesystem
-assurances remain OPEN. Synthetic local tests are approved; do not install
-privileged observers or run private intake. Practice-ledger updates need actual
+assurances remain OPEN. Existing regression checks do not authorize new native
+fixtures; do not install privileged observers or run private intake. Practice-ledger updates need actual
 attributable evidence; proposed tests are not executed results.
 Public fixtures need independent review; they do not establish independent
 semantic acceptance. Keep semantic acceptance BLOCKED, verification UNVERIFIABLE.

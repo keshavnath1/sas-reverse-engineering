@@ -161,3 +161,20 @@ lock change, private intake, SAS execution, Agent-mastery modification, CP4, CP5
 P2B or P3 is approved. DRAFT/UNVERIFIABLE/BLOCKED/NOT_RUN authority and verification
 conventions remain. Stop after CP3B. Existing remote-publication authorization
 continues; it does not grant later runtime or human security approval.
+
+The user accepted CP3B at `a29af0ec024945b15d31435e7041d45e92278c68`
+within its limited simulated-test scope and authorized **CP3C planning and
+security review only**. Approved deliverables: Windows volume-bootstrap design,
+absent-store proof design, native API assumption review, actual-environment and
+offline dependency prerequisites, ordinary-versus-provisioned qualification cases,
+independent evidence/acceptance criteria, necessary decision/practice records and
+applicable existing documentation/preservation/CI checks.
+
+No implementation, dependency/lock change, Windows source-content access, public
+reader enablement, publication or new output-store creation is approved. No private
+SAS intake/execution, Agent-mastery change, CP4, CP5, P2B or P3. Preserve all 596
+tests and frozen contracts/identities/history. Missing host owners, human reviewers,
+provisioning and authorization remain OPEN; native guarantees remain BLOCKED.
+Repository publication authorization persists for the documentation checkpoint;
+it does not authorize a Windows environment or native test execution. Stop after
+planning for explicit further approval.

@@ -1,17 +1,22 @@
 # Open decisions and compatibility risks
 
-Status: CP3B bounded implementation approved at `f841ca25d511230d77ab1c3eded3f59602a79f5d`.
-Native Windows qualification and public source access remain BLOCKED.
-Updated 2026-11-05.
+Status: CP3C planning/security review approved at `a29af0ec024945b15d31435e7041d45e92278c68`.
+CP3B is accepted only within its limited simulated-test scope. Native Windows
+qualification and public source access remain BLOCKED. Updated 2026-11-05.
 
-**Current checkpoint authorization:** [CP3B](CP3B_DESIGN.md) implements the
-private retained-handle reader subset with [unit-only Windows validation](CP3B_VALIDATION.md).
-The user explicitly permits a defensible subset if critical native assumptions
-remain unresolved. No public override, volume bootstrap, native qualification,
-publication, dependency expansion or later phase is enabled. Stop after CP3B.
+**Current checkpoint authorization:** documentation only:
+[bootstrap design](CP3C_BOOTSTRAP_DESIGN.md) and
+[qualification plan](CP3C_QUALIFICATION_PLAN.md), with necessary decision/practice
+updates and applicable existing checks. No implementation, dependency, Windows
+source access, publication or output-store creation. All 596 tests and frozen
+boundaries are preserved. Stop after CP3C planning for explicit approval.
+
+**Accepted CP3B:** private retained-handle implementation and simulated/unit tests
+at the baseline above; [design](CP3B_DESIGN.md) and [validation](CP3B_VALIDATION.md).
+No approved volume bootstrap, native qualification or public override exists.
 
 **Accepted CP3A:** the user accepted the separate POSIX preflight within its tested
-scope at the baseline above. Its behavior and all 514 tests are preserved.
+scope at `f841ca25d511230d77ab1c3eded3f59602a79f5d`. Its behavior and original tests are preserved.
 
 **Historical CP3 readiness authorization:** the user accepted CP2 at
 `fe3bbe98704fd33fb9516b53e8786e516dce9e1e` and authorized only
@@ -76,6 +81,8 @@ No decision becomes human-approved merely by appearing in these documents.
 | CP3 readiness documentation | APPROVED for current checkpoint | Design, proposed tests/instructions and factual ledger updates only |
 | CP3A implementation | APPROVED bounded subset | Separate POSIX preflight, physical alias checks and synthetic verification only; no legacy failure-timing change |
 | CP3B implementation | APPROVED bounded subset | Private read-only native layer/protocol; public Windows access BLOCKED until physical bootstrap and qualification |
+| CP3B result | ACCEPTED within limited simulated-test scope | `a29af0ec024945b15d31435e7041d45e92278c68`; not native security qualification |
+| CP3C planning/security review | APPROVED documentation only | Two planning documents, necessary ledgers and applicable existing checks; no implementation or provisioning |
 | Broader Windows native qualification | OPEN, NOT APPROVED | Requires separately approved real environment, owners and security evidence |
 | CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |
 
@@ -100,17 +107,27 @@ infer either from a GitHub account, workstation username or development subagent
 | CP3-R09 | Earlier-denial compatibility and native diagnostics | Review stricter directory/alias policy and pre-store preflight integration: current POSIX workflows begin attempts before complete scope checks. Preserve historical attempts, successful compatible bytes, old FAIL/BLOCKED conventions; freeze exact new codes before implementation |
 | CP3-R10 | CP3A/CP3B bounded subsets APPROVED | CP3B private implementation and synthetic unit coverage are approved; native environment/qualification, CP4/CP5/P2B/P3 and downstream integration remain separate |
 
-Current next action: review CP3B design/validation and its defensible subset.
-CP3-R03/R04 now explicitly include the unimplemented secure local-volume bootstrap,
-unqualified directory/reparse API combination, ancestor alias mapping and native
-OS-call cancellation. Windows absent-store inspection is BLOCKED until an alias-safe
-physical absence proof is separately reviewed. No host owner or human security
-reviewer is inferred from development-agent review. Any further implementation or
-native qualification requires explicit scope and environment approval. CP3A chooses a dedicated owned inspection anchor,
-same qualified filesystem beneath it and explicit quiescent/trusted-writer policy;
-it does not resolve generalized mount/ACL/snapshot guarantees in CP3-R05–R07.
-CP3-R09 publication integration remains OPEN: no legacy workflow timing changed.
-Missing native qualification prerequisites stay BLOCKED. Stop after CP3A now.
+Current next action: review the CP3C design/qualification documents and resolve
+required inputs below. No proposed mechanism is an approved or qualified control.
+CP3A's existing POSIX behavior and legacy publication timing stay unchanged.
+Missing native prerequisites remain OPEN/BLOCKED. Stop after CP3C planning.
+
+## CP3C review decisions
+
+All rows are **OPEN**. Recommendations below describe conditions for later approval,
+not human decisions or permission to execute. CP3C does not implement a new grant,
+schema, identity, native harness or bootstrap API.
+
+| ID | Required accountable decision | Recommendation / consequence if unresolved |
+|---|---|---|
+| CP3C-D01 | Host owner and authentic initial metadata-inspection authority | Independently provisioned host-local grant for one root-only candidate, exact token/anchor/source/store scope and quiescent policy; issuer, authenticity, ACL protection, expiry/revocation OPEN. CP2 or OS access alone cannot approve lookup |
+| CP3C-D02 | Physical-volume binding and native lookup/API review | Approve host/storage inventory, root/volume identity method, bounded DOS observations, retained-handle locality query and exact native namespace/reparse protocol. Serial/GUID/path alone insufficient; unprovable backing or clone ambiguity BLOCKED |
+| CP3C-D03 | Alias-safe absent-store proof | Review typed single-component metadata lookup/status, case-mode query, exact existing-parent/long-name binding and temporal validity. All missing-store acceptance stays BLOCKED pending implementation/native proof; no creation authority |
+| CP3C-D04 | Pending I/O, completion lifetime and cancellation | Prove synchronous completion of qualified calls or separately design completion/cancellation and retained buffer/status/handle ownership. BLOCKED/close alone is not proof pending I/O ended; deadline/observer obligations OPEN |
+| CP3C-D05 | Exact native host/runtime and offline artifacts | Supply Windows11 client x64 build, local fixed NTFS configuration/backing, CPython3.12 and PowerShell versions/hashes, all Windows wheel hashes and explicit provisioning approval. No lock extension/install authorized here |
+| CP3C-D06 | Named independent reviewer, custodian and observer | Approve ordinary-user lane, separately provisioned hostile fixtures, observer positive controls and trace retention. No inferred owner, privileged setup or successful skipped obligation |
+| CP3C-D07 | Finite native qualification manifest and limits | Freeze individual C01–C20/T01–T26 cases, exact diagnostics, counts, independent expected facts, native deadlines and proof exclusions before execution. Missing cases BLOCKED, no simulated/native denominator mixing |
+| CP3C-D08 | Separate implementation, execution and activation approvals | Review plan first; then explicitly approve narrowly scoped implementation/provisioning/metadata tests. Synthetic content-read qualification and public-reader activation require their own explicit scopes; CP4/CP5/P2B/P3 remain separate |
 
 ## Decision register
 
