@@ -233,3 +233,16 @@ retention and budget. Stop at documentation review. Provisioning, implementing
 or running probes and evaluation work in B2/B3 require further explicit scope.
 Native Windows qualification stays BLOCKED. Authority is DRAFT, semantic
 verification UNVERIFIABLE, independent acceptance BLOCKED and benchmarks NOT_RUN.
+
+On 2026-11-06 the user accepted the B1 planning checkpoint at
+`fd9dc0194da9f15ff99805dd5ab6dea38815e684` as documentation only and authorized
+the [B1 approval checklist](P2B_B1_APPROVAL_CHECKLIST.md) and necessary
+decision-ledger updates. The host, owners, runtime/policy, custody, retention
+and budget are OPEN under RMAP-02 and D09-B. Implementation, host provisioning,
+sentinel execution and later semantic evaluation each require a separate
+explicit authorization. All four decisions are OPEN. B2 preparation and B3
+campaign execution each require their own grant.
+
+B1 execution is BLOCKED, with zero sentinel launches and zero B3 semantic
+case-attempts. Artifact authority is DRAFT, semantic verification UNVERIFIABLE,
+independent semantic acceptance BLOCKED and benchmarks NOT_RUN.
