@@ -124,3 +124,23 @@ Windows qualification remains BLOCKED; semantic acceptance stays BLOCKED,
 verification UNVERIFIABLE, authority DRAFT and benchmarks NOT_RUN. Prior repository
 publication authorization remains in effect. Stop after documentation and wait
 for explicit CP3 implementation approval.
+
+The user subsequently approved **CP3A implementation only** at
+`07ddcda5a78a9a2f9f093a94e722532f44e3044b`: bounded macOS/Linux physical
+source/store disjointness, a separate read-only authorization/preflight boundary,
+declared-prefix membership, all-file read readiness, retained-handle mutation/
+replacement checks, BLOCKED diagnostics, synthetic adversarial tests, development/
+fresh-checkout/wheel verification and design/validation/ledger updates.
+
+Preserve all 456 baseline tests, original-byte/graph/citation identities, frozen
+schemas, prior seals, append-only history and the downstream pin. This does not
+approve silent changes to legacy persistence/failure timing. If integration
+conflicts with those behaviors, preserve old records and stop for explicit review.
+The implemented CP3A path is additive and creates no output; legacy workflows are
+not rewritten. Run-specific local inspection remains separate from this project
+implementation approval and from unverified CP2 caller metadata.
+
+No Windows source access, CP4 publication redesign, CP5 packaging/release
+qualification, private intake, SAS execution, dependency/provider change,
+Agent-mastery modification, P2B or P3 is authorized. Existing publication permission
+for this repository continues. Stop after CP3A; do not begin CP3B automatically.

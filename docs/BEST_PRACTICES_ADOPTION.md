@@ -279,3 +279,21 @@ All proposed native tests remain NOT_RUN, and native Windows qualification remai
 BLOCKED. Development-agent review does not resolve CP3-R02 or establish semantic
 acceptance. This ledger records obtained evidence only; it does not approve CP3
 implementation or any later phase.
+
+## CP3A bounded implementation evidence
+
+Approved baseline `07ddcda5a78a9a2f9f093a94e722532f44e3044b`; see
+[design](CP3A_DESIGN.md), [actual validation](CP3A_VALIDATION.md) and
+[scope approval](APPROVALS.md). The historical CP3 planning record above is unchanged.
+
+| Practice | Evidence and limit |
+|---|---|
+| J2/J5: bounded plan and compatibility gates | Separate read-only API, exact local policy and dedicated anchor; legacy publisher/failure timing untouched. CP3B/Windows/CP4/later phases remain unapproved |
+| J3: executable security feedback | Native synthetic alias/permission/race tests, all-read-handles barrier and source/store mutation tripwires; mode checks and in-process observation do not prove ACL isolation or native trace completeness |
+| J3: evidence/identity preservation | Original 456 tests retained; independent baseline/candidate sealed-byte/full-report comparisons and frozen vectors. Exact commands, failures, counts and hashes in validation |
+| J4: focused delegation and review | Separate filesystem implementation, adversarial-test author, read-only security review and baseline comparison; root integrated policy/session and corrected test capability classification and writer-policy denial. Shared environment, not independent semantic certification |
+| J3: honest unresolved guarantees | Unsupported mounts/ABIs fail BLOCKED; explicit quiescent/trusted-writer assumptions. Native Windows, comprehensive ACL/observer and hostile-writer guarantees remain unqualified |
+| J1/J6: efficiency and cost | NOT_VERIFIED; no provider, token/cache/billing or productivity measurements. Test timings are not SAS benchmarks; quadratic rechecks are disclosed |
+
+This evidence supports the bounded CP3A engineering claims only. It does not
+resolve the named independent reviewer/host decisions or grant downstream approval.

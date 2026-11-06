@@ -6,6 +6,9 @@ CP1 adds import-safe platform selection and explicit filesystem capabilities;
 native Windows evidence I/O remains BLOCKED.
 CP2 adds pure validation of separately versioned local authorization declarations
 and an exact legacy identity projection; it grants no filesystem access.
+CP3A adds a separate POSIX read-only preflight API for explicitly scoped synthetic
+sources, with retained handles and physical disjointness inside a dedicated
+inspection anchor. Existing evidence CLI/persistence behavior is unchanged.
 The closed subset is described in [P2A design](docs/P2A_DESIGN.md). Public regression
 tests demonstrate bounded behavior; independent semantic acceptance remains
 `BLOCKED`, verification `UNVERIFIABLE`, authority `DRAFT`, and benchmarks `NOT_RUN`.
@@ -26,7 +29,8 @@ See [P1 design](docs/P1_DESIGN.md), [P1 validation](docs/P1_VALIDATION.md),
 [open decisions](docs/OPEN_DECISIONS.md), and [compatibility](docs/COMPATIBILITY.md).
 D01–D07 and D08-A/B are approved for their bounded phases. CP1 is separately
 approved for its capability boundary. CP2 is separately approved for pure local
-declarations and identity compatibility only; stop after CP2.
+declarations and identity compatibility only. CP3A is separately approved for
+bounded POSIX preflight; stop after CP3A, with no automatic CP3B approval.
 D08-C and D09 remain open for P2B. See [P2A validation](docs/P2A_VALIDATION.md)
 and [public fixture review](docs/P2A_FIXTURE_REVIEW.md).
 
@@ -106,6 +110,26 @@ physical authorization is not established, and Windows evidence I/O stays BLOCKE
 Store actual envelopes outside Git, for example under the already ignored `local/`.
 The API works without Git, Docker, cloud services or any AI provider; native Windows
 execution remains unqualified until an approved actual environment is tested.
+
+## CP3A read-only POSIX preflight
+
+See [CP3A design](docs/CP3A_DESIGN.md) for the `LocalInspectionPolicy` and
+`open_preflight(envelope, policy=...)` API, and [actual validation](docs/CP3A_VALIDATION.md)
+for qualified environments and limits. A trusted caller supplies the independent
+exact inspection policy; validated CP2 strings never become human approval.
+
+The new path retains directory/file handles, checks physical root/store
+disjointness on a qualified filesystem beneath an explicit owned anchor, rejects
+undeclared directories before descent, and acquires every read handle before
+reading any source byte. It returns original bytes only; no output store is
+created, even on success. Unsupported mounts, missing rights or uncertain bindings
+are BLOCKED. Quiescent synthetic fixtures and trusted effective writers are
+required; mode checks are not an ACL audit or hostile-writer snapshot guarantee.
+
+This additive Python API is not integrated into the legacy commands below.
+Their existing append-only failure timing remains unchanged. Future publication
+integration needs separate review; a completed preflight is not a reusable create
+permission. No Windows reader, new dependency or broader filesystem claim is added.
 
 ## P1 CLI
 

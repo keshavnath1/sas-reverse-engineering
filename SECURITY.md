@@ -108,3 +108,26 @@ actual envelopes outside Git (the existing ignored `local/` is suitable). CP2 us
 only synthetic declarations in public tests. See [CP2 design](docs/CP2_DESIGN.md)
 for the deliberately restricted path profile and proof limits. Native Windows
 qualification and independent semantic acceptance remain BLOCKED.
+
+## CP3A additive POSIX boundary
+
+The separately invoked [CP3A API](docs/CP3A_DESIGN.md) consumes a CP2 envelope
+only with an independent exact local inspection policy. It confines roots/store
+inspection beneath an existing dedicated owned anchor on a qualified filesystem,
+retains and rechecks descriptor/name identities, rejects unexpected directories
+before descent, and obtains all read handles before source content. It creates
+no output. Existing commands/publishers and their persisted failure timing remain
+unchanged; CP3A success does not authorize publication or later reuse.
+
+Synthetic/quiescent scope and trusted writers, ACL principals, administrators and
+mount namespace are explicit preconditions. Ownership/mode checks are not a full
+ACL audit or authentication service. Repeated metadata/byte checks are not an
+atomic hostile-writer snapshot; unavailable required guarantees block. Linux
+procfs metadata inspection is fixed-path/no-follow/bounded and distinct from source
+content. Native paths/IDs and policy data stay outside portable artifacts/hashes.
+
+Windows remains BLOCKED before caller-path I/O. No native Windows access,
+publication redesign, dependency/lock change, private intake or new approval
+claim is introduced. [Validation](docs/CP3A_VALIDATION.md) records actual native
+tests separately from simulated cases, in-process observers and unresolved
+independent security/native-tracing qualification.
