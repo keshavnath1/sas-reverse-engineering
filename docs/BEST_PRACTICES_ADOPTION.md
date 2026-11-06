@@ -370,3 +370,20 @@ see [roadmap and actual checks](POST_CP3D_ROADMAP.md) and
 
 No host, reviewer, provider, native permission, independent acceptance or next-phase
 approval was supplied or inferred by this reassessment.
+
+## P3-A1 engineering evidence
+
+The user accepted the [roadmap](POST_CP3D_ROADMAP.md) at
+`dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc` and approved only the private
+diagnostic experiment before P2B. See the [approval](APPROVALS.md),
+[design](P3_A1_DESIGN.md) and [validation](P3_A1_VALIDATION.md).
+
+| Practice | Evidence and limit |
+|---|---|
+| J2/J5 bounded scope | The roadmap fixes the input, finite bounds, A01–A26 obligations and review gate. RMAP-01 authorizes engineering only. Independent source/graph acceptance and draft PRD/module specifications still precede operational P3 |
+| J4 separate expectation author | A separate author froze [public vectors](../tests/dependency_vectors.py) with literal graph answers and standard-library identity preimages before candidate implementation, at `0e1b80fe60c412ddbf19a0c93c4291f4fe3bfd95`. The authors share the development environment. Protected P2B evaluation and independent human semantic review remain outstanding |
+| J3 observable baseline | The accepted roadmap checkout passed its 667 regressions on macOS ARM64. Its synthetic P1 and P2A replays each matched all 15 historical artifact files byte for byte and the complete parsed reports. The validation record distinguishes this baseline from candidate runs |
+| J1/J6 efficiency and cost | NOT_VERIFIED. No provider, token/cache, billing, productivity or workload performance measurements |
+
+These checks support public engineering evidence only. Semantic verification is
+UNVERIFIABLE, semantic acceptance BLOCKED, authority DRAFT and benchmarks NOT_RUN.

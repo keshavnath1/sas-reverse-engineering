@@ -195,3 +195,25 @@ store. No private inputs/SAS, dependency/lock changes, self-approved inspection
 grant, drive scan or new runtime service/provider requirement. Host/reviewer,
 provisioning and native authority remain OPEN. Stop after CP3D; CP4/CP5/P2B/P3
 need separate approval. Existing repository-push authorization remains valid.
+
+On 2026-11-06 the user accepted the [post-CP3D roadmap](POST_CP3D_ROADMAP.md)
+at `dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc` and approved **P3-A1 only**.
+The explicit development-order exception allows one private, pure dependency
+and blocker diagnostic over supplied in-memory public synthetic canonical v2
+graphs before P2B. Scope includes independent public vectors, exact A01–A26
+obligations, preservation checks, the [design](P3_A1_DESIGN.md),
+[validation](P3_A1_VALIDATION.md) and necessary ledger updates.
+
+Keep the 667 baseline tests, frozen contracts, identity and sealed bytes, POSIX
+behavior, dependency lock and downstream pin. Only existing synthetic regression
+and preservation fixtures may use source/store I/O for their original purposes.
+The diagnostic accepts no caller path and publishes nothing. Native Windows
+activation and qualification stay BLOCKED. Private intake, SAS execution,
+dependency/provider changes and downstream modifications are outside this grant.
+
+The experiment grants no operational P3 transition, independence finding,
+schedule or runtime recommendation. P2B execution, P3-A2, P4, CP4 and CP5
+require separate approval. Operational P3 still requires independent source and
+graph acceptance followed by draft PRD/module specifications. Keep authority
+DRAFT, verification UNVERIFIABLE, acceptance BLOCKED and benchmarks NOT_RUN.
+Stop after P3-A1 validation for explicit user review.

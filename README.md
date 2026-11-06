@@ -13,6 +13,11 @@ CP3B adds a private Windows retained-handle protocol and native API adapter with
 unit-only synthetic coverage. Public Windows read-only access remains BLOCKED:
 approved physical-volume bootstrap and actual native qualification are missing.
 See [CP3B design](docs/CP3B_DESIGN.md) and [validation](docs/CP3B_VALIDATION.md).
+CP3C documented native qualification requirements. CP3D added a private
+metadata protocol and bounded DOS-mapping primitives tested with synthetic
+in-memory fixtures. Native bootstrap, public Windows source access and Windows
+publication are still BLOCKED. See [CP3D design](docs/CP3D_DESIGN.md) and
+[validation](docs/CP3D_VALIDATION.md).
 The closed subset is described in [P2A design](docs/P2A_DESIGN.md). Public regression
 tests demonstrate bounded behavior; independent semantic acceptance remains
 `BLOCKED`, verification `UNVERIFIABLE`, authority `DRAFT`, and benchmarks `NOT_RUN`.
@@ -34,10 +39,27 @@ See [P1 design](docs/P1_DESIGN.md), [P1 validation](docs/P1_VALIDATION.md),
 D01–D07 and D08-A/B are approved for their bounded phases. CP1 is separately
 approved for its capability boundary. CP2 is separately approved for pure local
 declarations and identity compatibility only. CP3A is separately approved for
-bounded POSIX preflight. CP3B is separately approved for its defensible reader
-subset; stop after CP3B, with no automatic CP4/CP5/P2B/P3 approval.
+bounded POSIX preflight. CP3B and CP3D have separate, limited approvals for
+private Windows work. The user accepted the [post-CP3D roadmap](docs/POST_CP3D_ROADMAP.md)
+at `dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc` and approved P3-A1 alone as a
+private engineering experiment before P2B.
 D08-C and D09 remain open for P2B. See [P2A validation](docs/P2A_VALIDATION.md)
 and [public fixture review](docs/P2A_FIXTURE_REVIEW.md).
+
+## P3-A1 private dependency and blocker diagnostics
+
+P3-A1 binds a supplied public synthetic canonical v2 graph to its expected digest
+and reports represented dependency paths, cycles, conservative read/write
+conflicts and missing proof. A missing path leaves independence unproved.
+Diagnostics operate in memory. The public `analyze-parallelism` command stays a
+placeholder (exit 3). See the [private design](docs/P3_A1_DESIGN.md) and
+[validation of the roadmap's A01–A26 obligations](docs/P3_A1_VALIDATION.md).
+
+The result carries DRAFT authority, UNVERIFIABLE verification, BLOCKED semantic
+acceptance and NOT_RUN benchmarks. Operational P3 requires independent source
+and graph acceptance followed by draft PRD/module specifications and separate
+approval. Scheduling, P3-A2, P4, P2B execution, CP4/CP5, private SAS intake
+and downstream changes are outside P3-A1. Stop after validation for user review.
 
 ## Install and validate
 
@@ -265,9 +287,3 @@ GitHub Actions defines P0/P1/P2A and wheel tests plus a separate downstream drif
 with pinned action commits. A local pass is not proof of a hosted CI run; consult
 [Actions](https://github.com/keshavnath1/sas-reverse-engineering/actions) for hosted
 status. Historical P0 checks remain in [P0 validation](docs/P0_VALIDATION.md).
-
-CP3D adds a private metadata protocol and bounded DOS-mapping primitives, tested
-with synthetic in-memory/fault fixtures. Native root acquisition, alias-safe
-absence and all public Windows evidence workflows remain **BLOCKED**. There is
-no new CLI, native qualification, source access or publication capability. See
-[CP3D design](docs/CP3D_DESIGN.md) and [validation](docs/CP3D_VALIDATION.md).
