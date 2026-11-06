@@ -1,6 +1,12 @@
 # Open decisions and compatibility risks
 
-**Current checkpoint, 2026-11-06.** The user accepted MVP-1 as a public
+**Current checkpoint, 2026-11-06.** The user accepted MVP-2 as an engineering
+demonstration at `a82ff2b1f0ae26e545f1e1640eb4ed697f33e56b` and approved the
+[MVP-3 public behavioral oracle](MVP3_VALIDATION.md) for its represented
+SORT, DATA and SQL subset. Actual SAS runtime settings, wider numeric behavior,
+the unresolved include and independent semantic acceptance remain open.
+
+**Historical checkpoint, 2026-11-06.** The user accepted MVP-1 as a public
 synthetic draft at `022c672d244a522e25a5aded7f29513f51875b69` and authorized
 MVP-2 only. The [second preview](../examples/mvp2/ARCHITECTURE.md) leaves the
 include's effects unresolved. Production scale, allowable tie order, numeric
@@ -169,6 +175,7 @@ No decision becomes human-approved merely by appearing in these documents.
 | WS-2A offline kit and installation test plans | APPROVED documentation only | Two plans and necessary ledgers. Stop at documentation review. Future release, implementation and per-target execution decisions are OPEN |
 | MVP-1 synthetic experiment | APPROVED for draft generation only | One public fixture, a private renderer and two untested alternatives. P2B independent semantic acceptance stays BLOCKED; P3/P4 operational work needs separate approval. |
 | MVP-2 multi-module example | APPROVED for public synthetic draft generation only | One additional fixture and six review documents. Independent semantic acceptance remains BLOCKED. |
+| MVP-3 behavioral tie-out | APPROVED for public synthetic development only | Fixed cases for O1–O3, O4 unresolved. Complete-workflow acceptance BLOCKED. |
 | Operational P3, P3-A2 and P4 | OPEN, NOT APPROVED | Operational P3 requires independent source/graph acceptance, then draft PRD/module specifications and separate authorization. A1 provides no independence, scheduling or runtime verdict |
 | Broader Windows native qualification | OPEN, NOT APPROVED | Requires separately approved real environment, owners and security evidence |
 | CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |

@@ -314,3 +314,9 @@ as a public synthetic demonstration and approved the bounded MVP-2 experiment.
 Its [multi-module draft](../examples/mvp2/ARCHITECTURE.md) and [validation
 report](MVP2_VALIDATION.md) are for review. Independent evaluation, migration,
 publication, native Windows access and runtime selection retain their separate gates.
+
+At `a82ff2b1f0ae26e545f1e1640eb4ed697f33e56b` the user accepted MVP-2 as an
+engineering demonstration and authorized the [MVP-3 behavioral tie-out](MVP3_VALIDATION.md).
+Its authority covers a public standard-library reference, frozen synthetic cases and
+local candidate checks. The unresolved include, full-workflow acceptance, B1 and
+runtime selection retain their separate gates. Stop at MVP-3 for review.

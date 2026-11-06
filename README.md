@@ -1,5 +1,14 @@
 # SAS Reverse Engineering and Computation Architecture Planner
 
+## Check the synthetic workflow's behavior
+
+The [MVP-3 tie-out report](docs/MVP3_VALIDATION.md) compares fixed Python
+candidates with independently frozen expected rows at the SORT, DATA and SQL
+boundaries. Its 17 cases show which changes lose duplicates, break input order
+or incorrectly reject a legal SQL tie permutation. Inspect one discrepancy
+offline with `python3.12 -IBS scripts/mvp3_tieout.py --case B09-lost-duplicate-match`.
+The missing include keeps full-workflow acceptance BLOCKED.
+
 ## Follow a dataset across two SAS modules
 
 The [MVP-2 architecture preview](examples/mvp2/ARCHITECTURE.md) follows
