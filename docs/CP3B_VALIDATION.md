@@ -236,3 +236,40 @@ qualification. Stop after CP3B; no automatic CP4/CP5/P2B/P3 progression.
 
 No native Windows result is implied. Fresh-checkout and final repository checks
 follow in the record below.
+
+## Fresh checkout and final staged checks
+
+Implementation commit: `94502b35595a085b32a851605787c140542d8837`.
+Fresh local clone of that commit: **596 tests passed**, exit 0, 16.802 s, no skips.
+Development, fresh and installed-wheel suites therefore all preserve the original
+514 tests with the 82 added unit/simulated tests. Code was unchanged after these
+runs; subsequent changes record results in this document only.
+
+```sh
+git clone --no-hardlinks . /private/tmp/sas-re-cp3b-validation.nUVriN/fresh
+git -C /private/tmp/sas-re-cp3b-validation.nUVriN/fresh rev-parse HEAD
+PYTHONPATH=/private/tmp/sas-re-cp3b-validation.nUVriN/fresh/src .venv/bin/python -m unittest discover -s /private/tmp/sas-re-cp3b-validation.nUVriN/fresh/tests -v > /private/tmp/sas-re-cp3b-validation.nUVriN/fresh-tests.log 2>&1
+.venv/bin/python -m compileall -q src tests scripts
+.venv/bin/python /private/tmp/sas-re-cp3b-validation.nUVriN/check_preserved.py
+.venv/bin/python scripts/check_repository.py
+git diff --cached --check
+```
+
+All exited 0. The staged guard reported PASS, no errors; it is a tracked-file and
+selected-secret check, not complete DLP. The staged list contained exactly the
+15 files above. A local link check walked Markdown links in changed documents,
+ignored URLs/anchors, and asserted target existence: 75 links, exit 0. No source,
+test or schema was modified to obtain these results. Git commits are local
+repository bookkeeping, not a runtime dependency or human security acceptance.
+
+An additional pure Windows-status demonstration exited 0:
+
+```sh
+.venv/bin/python -c 'from unittest.mock import patch; from sas_re.cli import main; import sas_re.platform_io as p; from sas_re.preflight import open_preflight; from sas_re._io_common import EvidenceError; from contextlib import ExitStack; stack=ExitStack(); stack.enter_context(patch.object(p.sys,"platform","win32")); assert main(["status"])==0; stack.close()' > /private/tmp/sas-re-cp3b-validation.nUVriN/windows-status-simulated.json
+```
+
+It reported the private protocol IMPLEMENTED_UNQUALIFIED, volume bootstrap
+NOT_IMPLEMENTED, reader/native qualification/publication BLOCKED, and unchanged
+DRAFT/UNVERIFIABLE/BLOCKED/NOT_RUN authority statuses. This is simulated platform
+selection on macOS, not Windows execution. Hosted CI, if subsequently reported,
+is separate from these local results and cannot qualify NTFS.
