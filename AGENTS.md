@@ -1,4 +1,25 @@
-# P3-A1 private diagnostic implementation boundary
+# WS-1 workstation launcher boundary
+
+The user accepted the workstation plan at
+`a79b15fefd878f1ecc9c0e4969e1c6a211120a41` and approved WS-1 only. Limit work
+to `scripts/workstation.sh`, focused W01–W06 tests, usage/validation documentation
+and necessary ledgers. Accept exactly one of `--help`, `--version` or `status`.
+Reject other argv before interpreter discovery or supplied-path access. Keep the
+repository launcher's inventory path and pin empty. A release owner must
+authenticate any kit that carries those values. Valid requests to the shipped
+launcher stop at bootstrap with exit 2. An environment variable or historical
+developer wheel cannot authorize dispatch. Read the [WS-1 design](docs/WS1_DESIGN.md) and
+[validation record](docs/WS1_VALIDATION.md).
+
+Preserve all 693 existing regressions, original P1/P2A artifact bytes and
+complete reports, frozen hashes, P3-A1 identities and downstream pin. Attribute
+each run to its actual environment and distinguish synthetic controls from a
+qualified installation. Native Windows qualification is BLOCKED / NOT_RUN.
+Stop at WS-1 review. Setup, configuration, evidence runs or report export
+through the launcher, native Windows work, CP4/CP5, B1/P2B execution,
+operational P3, private intake and downstream changes require separate approval.
+
+## Historical P3-A1 private diagnostic implementation boundary
 
 Read [README](README.md), [SECURITY](SECURITY.md), [approvals](docs/APPROVALS.md)
 and the [post-CP3D roadmap](docs/POST_CP3D_ROADMAP.md). The user accepted the

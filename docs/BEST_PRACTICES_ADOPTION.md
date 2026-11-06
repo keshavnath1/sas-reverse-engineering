@@ -410,3 +410,16 @@ Planning baseline `13a82fdb48248215548a57463aafc075edeb7e41`, 2026-11-06.
 | J2/J5 bounded planning | The [execution plan](WORKSTATION_EXECUTION_PLAN.md) and [compatibility matrix](WORKSTATION_COMPATIBILITY_MATRIX.md) record the two shell targets, offline Python prerequisite and separate approval gate for workstation scripts. This demonstrates planning only. |
 | J3 evidence attribution | The [P3-A1 validation record](P3_A1_VALIDATION.md) distinguishes historical macOS arm64 and hosted Linux regressions from simulated Windows denial checks. The [B1 checklist](P2B_B1_APPROVAL_CHECKLIST.md) records zero sentinel launches. No workstation qualification test ran in this checkpoint. |
 | J3 direct observation | The existing macOS wheel answered help, version and status from outside the checkout with an empty executable search path; 29 installed Python/JSON files matched the baseline. No proposed launcher or native Windows test ran. |
+
+## WS-1 engineering checkpoint
+
+The user accepted the workstation plan at
+`a79b15fefd878f1ecc9c0e4969e1c6a211120a41` and approved the W01–W06 scope.
+The detached baseline below precedes candidate validation. See the
+[WS-1 design](WS1_DESIGN.md) and [validation record](WS1_VALIDATION.md).
+
+| Practice | Attributable evidence and limit |
+|---|---|
+| J2/J5 scope and approval | Approval covers three read-only launcher arguments. The shipped launcher leaves the inventory path and pin empty. Positive development fixtures cannot authorize workstation installation or native Windows access. |
+| J3 baseline preservation | The detached planning commit passed all 693 original tests on macOS arm64 with CPython 3.12.5. Its P1/P2A demos matched 30 historical artifact files and both complete reports. The audit also checked eight frozen hashes and three P3-A1 hashes. |
+| J3 provenance | All 29 package Python/JSON files matched across the detached baseline, historical wheel and existing local site-packages. This comparison establishes development provenance. Workstation release approval is OPEN and native Windows qualification is BLOCKED / NOT_RUN. |

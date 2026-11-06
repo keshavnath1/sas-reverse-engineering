@@ -46,6 +46,34 @@ private engineering experiment before P2B.
 D08-C and D09 remain open for P2B. See [P2A validation](docs/P2A_VALIDATION.md)
 and [public fixture review](docs/P2A_FIXTURE_REVIEW.md).
 
+## Inspect an installed workstation package (WS-1)
+
+The launcher accepts one argument on macOS Terminal/Bash or Windows Git Bash.
+`KIT` denotes the absolute directory containing the externally authenticated
+`workstation.sh`. Start it with a trusted Bash and parent environment with
+`BASH_ENV` unset. Verify the launcher's original bytes through the trusted
+delivery channel before Bash reads it.
+
+```bash
+bash "$KIT/workstation.sh" --help
+bash "$KIT/workstation.sh" --version
+bash "$KIT/workstation.sh" status
+```
+
+The [repository launcher](scripts/workstation.sh) ships with empty approval fields.
+A valid argument therefore exits 2 with a bootstrap `BLOCKED` diagnostic on
+stderr. Dispatch requires an independently authenticated kit that pins the
+installation inventory and binds the exact native interpreter and installed package.
+`SAS_RE_PYTHON` may match the approved executable. Setting it cannot approve
+an installation. Extra arguments, paths and unsupported commands produce a
+usage diagnostic on stderr and exit 2 before interpreter selection.
+
+After a successful bootstrap, the installed module supplies the output and exit
+status. Help and version are text. Status reports capabilities as JSON. The
+historical macOS wheel supplies development comparison data. Workstation release
+approval is open, and native Windows qualification is `BLOCKED / NOT_RUN`. See
+the [WS-1 design](docs/WS1_DESIGN.md) and [validation record](docs/WS1_VALIDATION.md).
+
 ## P3-A1 private dependency and blocker diagnostics
 
 P3-A1 binds a supplied public synthetic canonical v2 graph to its expected digest

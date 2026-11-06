@@ -1,6 +1,23 @@
 # Open decisions and compatibility risks
 
-**Current checkpoint, 2026-11-06.** The user authorized workstation planning at
+**Current checkpoint, 2026-11-06.** The user accepted the workstation plan at
+`a79b15fefd878f1ecc9c0e4969e1c6a211120a41` and approved only the three-command
+WS-1 Bash launcher, focused W01–W06 tests, documentation and necessary ledgers.
+Workstation release approval is OPEN. An accountable owner, independently
+authenticated installation inventory and launcher delivery pin are outstanding.
+The shipped approval fields are empty. Each valid request returns bootstrap
+BLOCKED/2 until an authenticated kit binds the installation. A caller setting
+`SAS_RE_PYTHON` cannot grant that authority. The historical wheel provides local
+development evidence. See the [WS-1 design](WS1_DESIGN.md) and
+[validation record](WS1_VALIDATION.md).
+
+Native Windows qualification is BLOCKED / NOT_RUN. Setup, configuration,
+evidence execution and report export through the launcher await separate human
+decisions. RMAP-02 and D09-B are OPEN, and B1 execution is BLOCKED. Artifact
+authority is DRAFT, semantic verification UNVERIFIABLE, independent acceptance
+BLOCKED and benchmarks NOT_RUN.
+
+**Previous checkpoint, 2026-11-06.** The user authorized workstation planning at
 `13a82fdb48248215548a57463aafc075edeb7e41`. Ordinary use must work from macOS
 Terminal/Bash or Windows Git Bash with Python 3.12 from an existing installation
 or an approved offline bundle. It must be possible without Git commands, AI
@@ -125,7 +142,8 @@ No decision becomes human-approved merely by appearing in these documents.
 | P3-A1 development experiment (RMAP-01) | ACCEPTED within private engineering scope | Private synthetic graph diagnostics and A01–A26 at `5e62727b9b8e463cf6c7dd1bc68172801a7868f6`. See [design](P3_A1_DESIGN.md) and [validation](P3_A1_VALIDATION.md) |
 | P2B-B1 isolation readiness | ACCEPTED as documentation only | Isolation design and test plan at `fd9dc0194da9f15ff99805dd5ab6dea38815e684` |
 | P2B-B1 approval checklist | APPROVED documentation only | Human decision checklist and necessary decision-ledger updates only |
-| Workstation execution planning | APPROVED documentation only | Two workstation planning documents and necessary ledger updates. WS-1 launcher implementation and tests require separate approval |
+| Workstation execution planning | ACCEPTED as documentation only | Execution plan and compatibility matrix at `a79b15fefd878f1ecc9c0e4969e1c6a211120a41` |
+| WS-1 launcher and W01–W06 | APPROVED bounded engineering scope | Exactly one of `--help`, `--version` or `status`. Stop after validation for review. Release inventory, authentication and target-native qualification are separate decisions |
 | Operational P3, P3-A2 and P4 | OPEN, NOT APPROVED | Operational P3 requires independent source/graph acceptance, then draft PRD/module specifications and separate authorization. A1 provides no independence, scheduling or runtime verdict |
 | Broader Windows native qualification | OPEN, NOT APPROVED | Requires separately approved real environment, owners and security evidence |
 | CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |

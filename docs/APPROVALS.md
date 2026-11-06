@@ -263,3 +263,20 @@ report workflows are design topics only. Stop at documentation review. CP4/CP5,
 P2B execution and operational P3 each require separate authorization. B1
 execution is BLOCKED by the dedicated-host requirement and native Windows
 evidence I/O is BLOCKED pending separate qualification.
+
+On 2026-11-06 the user accepted the workstation plan at
+`a79b15fefd878f1ecc9c0e4969e1c6a211120a41` and approved **WS-1 only**.
+This covers one read-only Bash launcher for exactly one of `--help`, `--version`
+or `status`, the six W01–W06 test families, usage/validation documentation and
+necessary ledger updates. Preserve all 693 existing regressions and historical
+synthetic evidence. Stop at WS-1 review. See the [design](WS1_DESIGN.md) and
+[validation record](WS1_VALIDATION.md).
+
+The production installation inventory and its independently authenticated pin
+are outstanding. The shipped launcher leaves both fields empty and returns
+bootstrap BLOCKED/2 for each valid request. A historical wheel or a caller's
+`SAS_RE_PYTHON` setting cannot supply release authority. Native Windows
+qualification is BLOCKED / NOT_RUN. Setup, config, run and report modes, CP4/CP5,
+B1/P2B execution, operational P3, private intake and downstream changes each
+require separate approval. Artifact authority is DRAFT, semantic verification
+UNVERIFIABLE, independent acceptance BLOCKED and benchmarks NOT_RUN.
