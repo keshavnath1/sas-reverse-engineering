@@ -400,3 +400,13 @@ The [isolation design](P2B_B1_ISOLATION_DESIGN.md) and
 | J2/J5: scope and stop gates | The plan ties one native host/policy tuple to named human admission decisions, an offline stub and a finite sentinel schedule | Host, independent reviewer, retention and budget are OPEN. No deployment, run or isolation verdict |
 | J3: evidence and counterexamples | Every proposed denial needs corroboration outside the role; controls distinguish real denial from an absent object or broken runner. The handoff distinguishes a torn copy, a committed but unacknowledged receipt and receipt substitution | The controls and counterexamples are NOT_RUN; no protected answers, semantic evaluation or cost estimate |
 | J4: separate review | A read-only design review identified the distinction between namespace invisibility and backing permissions, the risk from surviving writable descriptors, and when a fresh-context exclusion check can be observed. These constraints are reflected in the documents | Same-workspace development review is not a real-host witness or independent human security sign-off |
+
+## Workstation execution planning
+
+Planning baseline `13a82fdb48248215548a57463aafc075edeb7e41`, 2026-11-06.
+
+| Practice | Attributable evidence and limit |
+|---|---|
+| J2/J5 bounded planning | The [execution plan](WORKSTATION_EXECUTION_PLAN.md) and [compatibility matrix](WORKSTATION_COMPATIBILITY_MATRIX.md) record the two shell targets, offline Python prerequisite and separate approval gate for workstation scripts. This demonstrates planning only. |
+| J3 evidence attribution | The [P3-A1 validation record](P3_A1_VALIDATION.md) distinguishes historical macOS arm64 and hosted Linux regressions from simulated Windows denial checks. The [B1 checklist](P2B_B1_APPROVAL_CHECKLIST.md) records zero sentinel launches. No workstation qualification test ran in this checkpoint. |
+| J3 direct observation | The existing macOS wheel answered help, version and status from outside the checkout with an empty executable search path; 29 installed Python/JSON files matched the baseline. No proposed launcher or native Windows test ran. |

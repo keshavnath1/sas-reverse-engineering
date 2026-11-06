@@ -246,3 +246,20 @@ campaign execution each require their own grant.
 B1 execution is BLOCKED, with zero sentinel launches and zero B3 semantic
 case-attempts. Artifact authority is DRAFT, semantic verification UNVERIFIABLE,
 independent semantic acceptance BLOCKED and benchmarks NOT_RUN.
+
+On 2026-11-06 the user authorized a **documentation-only workstation planning
+checkpoint** at `13a82fdb48248215548a57463aafc075edeb7e41`. The deliverables
+are the [workstation execution plan](WORKSTATION_EXECUTION_PLAN.md),
+[compatibility matrix](WORKSTATION_COMPATIBILITY_MATRIX.md) and necessary ledger
+updates. The targets for ordinary use are macOS Terminal/Bash and Windows Git
+Bash with an existing Python 3.12 installation or an approved offline bundle.
+Git commands, AI services, a dedicated host, VMs, Docker, WSL and cloud services
+are excluded as ordinary-use prerequisites.
+
+WS-1, the proposed next checkpoint, needs separate approval for one Bash
+launcher limited to `--help`, `--version` and `status` in an already approved
+installed Python environment, plus focused tests. Setup, configuration, run and
+report workflows are design topics only. Stop at documentation review. CP4/CP5,
+P2B execution and operational P3 each require separate authorization. B1
+execution is BLOCKED by the dedicated-host requirement and native Windows
+evidence I/O is BLOCKED pending separate qualification.

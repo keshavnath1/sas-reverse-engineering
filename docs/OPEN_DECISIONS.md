@@ -1,8 +1,28 @@
 # Open decisions and compatibility risks
 
-**Current checkpoint, 2026-11-06.** The user accepted the B1 isolation design and
+**Current checkpoint, 2026-11-06.** The user authorized workstation planning at
+`13a82fdb48248215548a57463aafc075edeb7e41`. Ordinary use must work from macOS
+Terminal/Bash or Windows Git Bash with Python 3.12 from an existing installation
+or an approved offline bundle. It must be possible without Git commands, AI
+services, a dedicated Linux host, a VM, Docker, WSL or cloud infrastructure.
+The current deliverables are the [execution plan](WORKSTATION_EXECUTION_PLAN.md),
+[compatibility matrix](WORKSTATION_COMPATIBILITY_MATRIX.md) and necessary
+ledger updates. The proposed WS-1 checkpoint would add one Bash launcher for
+`--help`, `--version` and `status` in an already approved installed Python
+environment, with focused tests. WS-1 requires separate approval. Setup,
+configuration, run and report workflows are design topics at this checkpoint.
+
+The dedicated host assumed by the [B1 checklist](P2B_B1_APPROVAL_CHECKLIST.md)
+is unavailable under these constraints. RMAP-02 and D09-B stay OPEN and B1
+execution is BLOCKED. Zero sentinel launches and zero B3 semantic case-attempts
+have run. Native Windows evidence I/O and qualification are BLOCKED. The
+workstation plan confers no authority for CP4/CP5, P2B execution or operational P3.
+Authority is DRAFT, semantic verification UNVERIFIABLE, independent semantic
+acceptance BLOCKED and benchmarks NOT_RUN.
+
+**Previous checkpoint, 2026-11-06.** The user accepted the B1 isolation design and
 test plan at `fd9dc0194da9f15ff99805dd5ab6dea38815e684` as documentation only.
-The current scope covers the [B1 approval checklist](P2B_B1_APPROVAL_CHECKLIST.md)
+That checkpoint covered the [B1 approval checklist](P2B_B1_APPROVAL_CHECKLIST.md)
 and necessary decision-ledger updates. RMAP-02 and D09-B are OPEN. The host,
 owners, policy, custody, retention and budget await human decisions. B1 execution
 is BLOCKED, with zero sentinel launches and zero B3 semantic case-attempts.
@@ -105,6 +125,7 @@ No decision becomes human-approved merely by appearing in these documents.
 | P3-A1 development experiment (RMAP-01) | ACCEPTED within private engineering scope | Private synthetic graph diagnostics and A01–A26 at `5e62727b9b8e463cf6c7dd1bc68172801a7868f6`. See [design](P3_A1_DESIGN.md) and [validation](P3_A1_VALIDATION.md) |
 | P2B-B1 isolation readiness | ACCEPTED as documentation only | Isolation design and test plan at `fd9dc0194da9f15ff99805dd5ab6dea38815e684` |
 | P2B-B1 approval checklist | APPROVED documentation only | Human decision checklist and necessary decision-ledger updates only |
+| Workstation execution planning | APPROVED documentation only | Two workstation planning documents and necessary ledger updates. WS-1 launcher implementation and tests require separate approval |
 | Operational P3, P3-A2 and P4 | OPEN, NOT APPROVED | Operational P3 requires independent source/graph acceptance, then draft PRD/module specifications and separate authorization. A1 provides no independence, scheduling or runtime verdict |
 | Broader Windows native qualification | OPEN, NOT APPROVED | Requires separately approved real environment, owners and security evidence |
 | CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |
@@ -177,7 +198,7 @@ native Windows qualification. See the [dated approval](APPROVALS.md).
 | ID | Human decision | Boundary / consequence |
 |---|---|---|
 | RMAP-01 | P3-A1 development only, accepted | Private, pure synthetic canonical v2 dependency/blocker diagnostics and exact A01–A26. Independent source/graph acceptance and draft PRD/module specifications still precede operational P3 |
-| RMAP-02 | OPEN. Name the dedicated host, owner, administrator and independent security reviewer. Approve image/runtime, access policy, restricted storage location and custodian, retention and budget ceiling | The [checklist](P2B_B1_APPROVAL_CHECKLIST.md) records implementation, host provisioning, sentinel execution and later semantic evaluation as four separate OPEN authorizations. B2 preparation and B3 campaign execution have separate gates. Verified parallelism requires P2B acceptance and further claim-specific evidence |
+| RMAP-02 | OPEN. The dedicated host is unavailable under the workstation constraint. Host ownership, administration, independent review, runtime/policy, custody, retention and budget decisions are outstanding | B1 proof is BLOCKED. The [checklist](P2B_B1_APPROVAL_CHECKLIST.md) records implementation, provisioning, sentinel execution and later semantic evaluation as separate OPEN authorizations. B2 preparation and B3 campaign execution have separate gates. Verified parallelism requires P2B acceptance and further claim-specific evidence |
 | RMAP-03 | Assign native Windows authority/runtime/reviewer/custodian and approve exact qualification scope | Preserve every CP3C/CP3D blocker; do not make private graph engineering wait for missing Windows infrastructure, and do not treat it as Windows evidence |
 | RMAP-04 | Approve later claim-specific semantic/parallelism coverage | Frozen source-subset acceptance does not certify new transformation, scheduling, partition or performance claims. New independent challenge coverage and thresholds need explicit review |
 | RMAP-05 | Supply exact release target/runtime tuples and approve qualification execution | The offline native Windows/macOS requirement is already established; preserve operation without runtime Git/Docker/WSL/VM/cloud/editor/provider requirements. CP4/CP5 qualification and Windows dependency approvals remain OPEN |
@@ -214,7 +235,7 @@ the P2B approval checkpoint. D10–D12 remain future decisions and must not be g
 | D08-B: canonical contract | APPROVED and accepted P2A: canonical v2 numerical/order/state/step facts; reused P1 inventory/citations/IDs; immutable v1 and explicit lineage | Independent verifier judgments remain P2B and must not rewrite candidate seals |
 | D08-C: environment and budgets | New readiness recommendation: frozen deterministic P2A candidate plus separately implemented model reviewer for the first pilot; earlier model-candidate option remains an alternative. Per model role/case: three calls/32k aggregate input/8k aggregate output/five minutes maximum | Approve topology; name actual provider/model revision, endpoint/account/data policy, supported controls, usage accounting and dollar ceiling. No provider or topology selected; no live call authorized |
 | D09-A: gold ownership | SAS domain author plus second reviewer; separate custodian freezes source, source-anchored facts, exact expected gates, evaluator and denominator versions before runs | Named author/reviewer/custodian and private gold store; no maker-generated expected answers or copying public examples into “hidden” gold |
-| D09-B: isolation | Plan sentinel probes and trusted handoff on a proposed dedicated Linux host/VM with separate identity, process, mount and network boundaries, positive controls and explicit denial tests | OPEN. RMAP-02 ownership, runtime, storage, retention and budget decisions are outstanding. Implementation, host provisioning and sentinel execution each require explicit authorization. Independent human review of actual evidence is required for a B1 isolation finding |
+| D09-B: isolation | The accepted B1 plan calls for sentinel probes and trusted handoff on a dedicated Linux host/VM with separate identity, process, mount and network boundaries, positive controls and denial tests | OPEN. That host is unavailable. Workstation checks cannot meet the B1 proof obligations. RMAP-02 prerequisites and separate implementation, provisioning and execution grants are outstanding. An isolation finding also requires independent human review of actual evidence |
 | D09-C: corpus, metrics and feedback | 12 families × P/N/U = 36 hidden cases; reconstruction and checker-challenge lanes; five fixed attempts per case/lane; all required positive facts correct, exact negative gates, 100% obligation coverage and zero critical false approvals | Approval of strict finite-pilot thresholds, repetition/transport-failure policy and restricted diagnostic release; actual gold-derived assertion denominators frozen before running |
 
 No particular person, model, evaluator host, hidden corpus or semantic test result
