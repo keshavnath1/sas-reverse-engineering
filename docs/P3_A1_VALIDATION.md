@@ -3,6 +3,10 @@
 Scope: private diagnostics over caller-supplied public synthetic graph values.
 Baseline `dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc`; see the [design](P3_A1_DESIGN.md)
 and [approved obligations](POST_CP3D_ROADMAP.md#proposed-exact-tests-and-acceptance).
+All 693 tests passed in the final macOS development, fresh-clone and installed-wheel
+runs and in both hosted Linux installation modes. The 26 new methods exercised
+133 explicit subtests. All 30 historical artifacts and eight frozen hashes matched.
+
 The results below describe engineering behavior only. Each positive result is
 DRAFT / UNVERIFIABLE / BLOCKED / NOT_RUN. The P2B gate was not run.
 
@@ -216,3 +220,75 @@ artifacts, reports, all 90 protected files and the eight hashes above.
 | Private diagnostic implementation | `d6e7ea9d70b1ae4aa10ad2fcf5488dda5a30a6b17c256ad3ab393b8d365041a7` |
 | A01–A26 tests | `1800fbb734a0bc0b7f5248d6d782ce88b594b06ff14a237897bff8f41d0f3251` |
 | Pre-candidate vectors | `7e8e5f6d3c37bf3ef7553abb3511446c23a22562f460398cb7e5344b95b6a90b` |
+
+## Final local installation matrix
+
+All three modes ran the **same 693 methods**, with no failures or skips. Local
+environment: macOS 26.6.2 build 25G83, arm64, CPython 3.12.5. The isolated fresh
+clone and wheel bind implementation commit `927410103a8b458ea690f6b5dfcac4e070814c0c`.
+
+| Mode | Verified package origin | Test result |
+|---|---|---|
+| Development, final attribution fix | Existing development checkout | Exit 0, 693 in 18.078 s |
+| Fresh local clone | `fresh/src/sas_re/_dependency_diagnostics.py` | Exit 0, 693 in 17.506 s |
+| Installed wheel, outside the checkout | Existing separate environment's `lib/python3.12/site-packages/sas_re/_dependency_diagnostics.py`, contents hash checked | Exit 0, 693 in 17.556 s |
+
+```sh
+# From P; T and PY are as defined above. No new dependency downloaded.
+git clone --no-hardlinks --quiet . "$T/fresh"
+git -C "$T/fresh" rev-parse HEAD
+# From T/fresh:
+export PYTHONDONTWRITEBYTECODE=1 PYTHONPATH="$T/fresh/src"
+"$PY" -c 'from pathlib import Path; import sas_re._dependency_diagnostics as d; assert Path(d.__file__).resolve().is_relative_to(Path.cwd() / "src"); print(d.__file__)'
+"$PY" -m unittest discover -s tests -v
+"$PY" -m pip wheel --no-index --no-deps --no-build-isolation --no-cache-dir --wheel-dir "$T/wheels" .
+W=/private/tmp/sas-re-p2a-wheel-env/bin/python
+"$W" -m pip install --no-index --no-deps --no-cache-dir --force-reinstall "$T"/wheels/*.whl
+"$W" -m pip check
+# From T:
+unset PYTHONPATH
+"$W" -I -c 'from pathlib import Path; import hashlib, sysconfig, sas_re._dependency_diagnostics as d; p=Path(d.__file__); assert p.is_relative_to(sysconfig.get_path("purelib")); assert hashlib.sha256(p.read_bytes()).hexdigest()=="d6e7ea9d70b1ae4aa10ad2fcf5488dda5a30a6b17c256ad3ab393b8d365041a7"; print(p)'
+"$W" -m unittest discover -s "$T/fresh/tests" -v
+PYTHONPATH="$P/tests" "$PY" -c 'import json, dependency_vectors as v; print(json.dumps([v.topology("chain"),v.FROZEN_GRAPH_SHA256["chain"]]))' | PATH='' "$W" -I -c 'import json,sys; from sas_re._dependency_diagnostics import diagnose,witness; g,h=json.load(sys.stdin); r=diagnose(g,h); path=witness(r,g["operations"][0]["operation_id"],g["operations"][2]["operation_id"]); assert path==[e["edge_id"] for e in g["edges"]]; print(r["parent_graph_sha256"],len(path),r["semantic_acceptance"])'
+```
+
+All commands above returned 0. The final pipeline used stdin only in the caller's
+harness: the private function takes the decoded in-memory graph and digest. It
+returned the exact frozen chain digest, two original edge IDs and acceptance
+BLOCKED without an executable on PATH. The wheel
+`sas_reverse_engineering-0.3.0-py3-none-any.whl` weighed 113,117 bytes, SHA-256
+`1813c48e397952297ef0417db8c7f54a25d7fbce12af39431b3dc7d2d005292b` for this
+build. Only this project wheel was replaced in the existing disposable wheel
+environment. `pip check` found no broken requirements. The dependency lock and
+packaging version were not changed; no Windows installation was attempted.
+
+```sh
+git add -- AGENTS.md README.md docs/APPROVALS.md docs/BEST_PRACTICES_ADOPTION.md docs/OPEN_DECISIONS.md docs/P3_A1_DESIGN.md docs/P3_A1_VALIDATION.md src/sas_re/_dependency_diagnostics.py tests/test_dependency_diagnostics.py
+git diff --cached --check
+.venv/bin/python scripts/check_repository.py
+.venv/bin/python "$T/check_docs.py"
+git -C "$T/fresh" status --porcelain
+```
+
+Staged guard PASS (exit 0, no errors); scope/fence/link/method check passed, with
+10 authorized paths and all 26 roadmap methods in code and report. The guard
+checks selected tracked-path and credential patterns only, not complete DLP.
+Whitespace and clean-clone checks returned 0; no tracked or untracked changes in
+the fresh clone. Test times describe suite executions, not SAS benchmarks.
+
+## Hosted Linux verification
+
+[GitHub Actions run 42299912385](https://github.com/keshavnath1/sas-reverse-engineering/actions/runs/42299912385)
+completed **success** at implementation commit `927410103a8b458ea690f6b5dfcac4e070814c0c`.
+The foundation job used Ubuntu 24.04.5 x64 and CPython 3.12.5. In that clean CI
+checkout, `python -m unittest discover -s tests -v` ran **693 tests in 24.047 s**;
+after wheel installation, from `$RUNNER_TEMP`, `python -m unittest discover -s
+"$GITHUB_WORKSPACE/tests" -v` ran **693 tests in 25.668 s**. Both passed. The
+repository guard, dependency check, synthetic demos, packaging and installed
+commands also succeeded in the unchanged [workflow](../.github/workflows/foundation.yml).
+The separate downstream-drift job's `sas-re check-baseline --remote` returned
+PASS at exactly `bc754e0f1204a99020c864df2a5b25983005e09c`. CI logs were read via
+`GET /repos/keshavnath1/sas-reverse-engineering/actions/runs/42299912385/jobs` and
+job logs for foundation `128174703856` and drift `128174704215`. This is hosted
+Linux regression evidence, not Windows qualification, workstation release
+qualification or independent SAS semantic evaluation.
