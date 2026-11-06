@@ -1,9 +1,18 @@
 # Open decisions and compatibility risks
 
-Status: P2A accepted; P2B readiness documentation authorized; D08-C and D09
-execution decisions remain OPEN. Updated 2026-11-05.
+Status: CP2 accepted; CP3 readiness and implementation-design documentation only
+authorized. CP3 implementation and D08-C/D09 execution decisions remain OPEN.
+Updated 2026-11-05.
 
-**Current checkpoint authorization:** the user accepted P2A at
+**Current checkpoint authorization:** the user accepted CP2 at
+`fe3bbe98704fd33fb9516b53e8786e516dce9e1e` and authorized only
+[CP3 readiness](CP3_READINESS.md), [security test planning](CP3_SECURITY_TEST_PLAN.md),
+proposed native qualification instructions and necessary ledger updates. No native
+source reading, publication, locks, schema/history changes, dependencies, private
+intake or P2B/P3 execution is approved. CP3-R01–R10 below identify missing decisions;
+none is approved merely by being recommended. Stop for explicit implementation approval.
+
+**Historical P2B checkpoint authorization:** the user accepted P2A at
 `56154dd75a0149043c36081da9704b0a939230e1` and approved only a read-only P2B
 assessment and documentation checkpoint. Deliverables are
 [P2B_READINESS.md](P2B_READINESS.md),
@@ -12,7 +21,7 @@ updates. No code/tests, isolated runner, provider adapter, grader, gold or campa
 is authorized. This supersedes the older stop wording only for documentation;
 P2B execution and independent semantic acceptance remain BLOCKED.
 
-**Current P2A authorization:** the user reviewed planning commit
+**Historical P2A authorization:** the user reviewed planning commit
 `e13705c67c5984b2cb6bc8d4c797a188fd6421e2` and approved D08-A/B for deterministic
 synthetic reconstruction, canonical v2, reviewed public fixtures, CLI/CI and
 validation only. [P2A_DESIGN.md](P2A_DESIGN.md) records implementation choices;
@@ -53,6 +62,36 @@ No decision becomes human-approved merely by appearing in these documents.
 | P2B readiness documentation | APPROVED for this checkpoint | Two readiness/practice documents and necessary decision-ledger updates only; preserve code, tests, hashes and downstream pin |
 | D08-C and D09-A/B/C below | RECOMMENDED, NOT APPROVED for P2B | No provider selection, protected-gold grader, isolation deployment or independent acceptance |
 | D10–D12 | OPEN | Business/oracle/runtime/downstream choices remain later human decisions |
+| CP1 result | ACCEPTED by the user | `0061b7bf038f7b36add830912258232f174af197`; native Windows qualification still BLOCKED |
+| CP2 result | ACCEPTED by the user | `fe3bbe98704fd33fb9516b53e8786e516dce9e1e`; declarations/projection only, no physical authorization |
+| CP3 readiness documentation | APPROVED for current checkpoint | Design, proposed tests/instructions and factual ledger updates only |
+| CP3 implementation | OPEN, NOT APPROVED | No native source access; resolve reviewed scope and missing prerequisites before implementation |
+| CP4/CP5 implementation | OPEN, NOT APPROVED | No publication/locks or dependency/qualification expansion implied by CP3 planning |
+
+## CP3 readiness decisions
+
+All rows are **OPEN**. Recommendations define review questions, not authenticated
+approval or installed controls. [APPROVALS.md](APPROVALS.md) records the actual user
+scope. The Windows owner and independent reviewer have not been supplied; do not
+infer either from a GitHub account, workstation username or development subagent.
+
+| ID | Missing decision / accountable input | Proposed resolution and consequence if unresolved |
+|---|---|---|
+| CP3-R01 | Named Windows host owner; exact supported host tuple | Propose Windows 11 x64, fixed local NTFS, Python 3.12 and PowerShell 7; record exact builds/configuration. Native qualification BLOCKED until owner/environment supplied |
+| CP3-R02 | Named independent security reviewer | Human-owned review of API protocol, threat model and native evidence; separate development-agent review does not satisfy this role. Security acceptance remains BLOCKED |
+| CP3-R03 | Native API/ABI and finite resource policy | Review narrow stdlib FFI, single-component relative opens, reparse rejection and object-type checks; resolve NtCreateFile/OBJ_DONT_REPARSE contract uncertainty and buffer/handle/call/deadline bounds. No implementation fallback if guarantees unavailable |
+| CP3-R04 | Physical bootstrap and run inspection authority | Host-owned scoped policy and independently approved volume expectation; exact provisioning/authentication OPEN. CP2 has no store field: approve a separate explicit local store-ancestor inspection request, with no create grant. No persistent receipt or new evidence schema assumed |
+| CP3-R05 | Filesystem, writer and ACL trust assumptions | Initial dedicated quiescent synthetic scope on one approved local NTFS volume; trusted host administrators/writers, cloud/network/device aliases excluded. Review enforceable preconditions and residual race limits; no arbitrary hostile-writer snapshot claim |
+| CP3-R06 | macOS/Linux physical equivalence and supported filesystems | Qualify retained descriptors, ancestry, case/Unicode aliases and mount identities on exact APFS/Linux configurations; preserve normal macOS bootstrap transitions. Intel and untested mount arrangements remain unqualified |
+| CP3-R07 | Fixture custodian, privileged setup, independent observer and retention | Approve disposable fixtures, observation coverage/positive controls and local trace retention; ordinary application runs remain unelevated. Required cases without trustworthy observation remain BLOCKED |
+| CP3-R08 | Approved Windows interpreter and offline dependency artifacts | Existing lock lacks Windows artifacts. Obtain separate installation/hash-extension approval; do not add dependencies or install anything during readiness |
+| CP3-R09 | Earlier-denial compatibility and native diagnostics | Review stricter directory/alias policy and pre-store preflight integration: current POSIX workflows begin attempts before complete scope checks. Preserve historical attempts, successful compatible bytes, old FAIL/BLOCKED conventions; freeze exact new codes before implementation |
+| CP3-R10 | Explicit CP3 implementation authorization | User reviews design/test obligations and grants a bounded native read-only/POSIX alias implementation scope. Planning is not approval; CP4 locks/publication, CP5, P2B/P3 and downstream integration need separate gates |
+
+Current next action: review these documents and resolve the implementation-critical
+items, then explicitly authorize a bounded CP3 implementation. Missing native
+qualification prerequisites must remain reported BLOCKED even if development
+work is later authorized. Stop after planning now.
 
 ## Decision register
 
@@ -182,9 +221,9 @@ questions. The old audit's smoke tests were not rerun at this checkpoint.
 Neither the pack's expected outcomes nor these designs prove semantic reconstruction,
 gold isolation or safe parallelism.
 
-## Approval boundary and recommended next action
+## Historical P2B approval boundary and recommended next action
 
-Review the P2B readiness and practice ledger, then separately authorize B1 only
+For any later P2B work, review the P2B readiness and practice ledger, then separately authorize B1 only
 with its named host, administrator/security reviewer, image/policy, retention and
 budget. B1 would implement and test deterministic sentinel probes and trusted
 handoff, with no agents, provider calls, semantic grader or hidden gold. Review

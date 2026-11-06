@@ -258,3 +258,24 @@ Historical phase records above are unchanged.
 
 These controls demonstrate bounded identity compatibility and unchanged evidence
 boundaries. They do not establish native Windows readiness or benchmark results.
+
+## CP3 readiness evidence update
+
+This is a documentation-only review of accepted CP2 baseline
+`fe3bbe98704fd33fb9516b53e8786e516dce9e1e`. See [readiness](CP3_READINESS.md),
+[proposed tests](CP3_SECURITY_TEST_PLAN.md) and [actual approval](APPROVALS.md).
+Historical implementation/test results above are unchanged.
+
+| Practice | Evidence obtained in this checkpoint and limit |
+|---|---|
+| J2/J5: scope and durable decisions | Readiness design, finite test families, proposed native instructions and OPEN ownership/implementation gates. Documents demonstrate planning, not deployed native controls |
+| J4: focused delegation and central review | Three read-only reviews covered Windows API design, POSIX alias/order gaps and qualification/governance. Root reconciled shared-environment findings; no named independent security reviewer or protected evaluator is supplied |
+| J3: explicit counterevidence and proof limits | Inspected baseline shows lexical overlap checks, reopened roots, undeclared-directory descent and attempt creation before complete inventory checks. Design distinguishes these gaps from retained no-follow/read-only controls and proposes tests rather than claiming fixes |
+| J3: review corrections | Clarified directory-traversal versus file-execution rights, insufficient non-directory type evidence, all-file read readiness and earlier-denial compatibility. Corrected an empty-scope test proposal and qualified which identities change with source bytes. Primary API documentation is not native qualification |
+| J3: preserved evidence | Documentation/static preservation checks and any separately identified hosted regression result are recorded in readiness. No new local native security test, alias probe, source intake or Windows execution was performed |
+| J1/J6: efficiency, provider choice and costs | NOT_VERIFIED; no usage, cache, billing, productivity or benchmark measurement. Reviewer count and document completeness imply no effectiveness gain |
+
+All proposed native tests remain NOT_RUN, and native Windows qualification remains
+BLOCKED. Development-agent review does not resolve CP3-R02 or establish semantic
+acceptance. This ledger records obtained evidence only; it does not approve CP3
+implementation or any later phase.

@@ -106,3 +106,21 @@ source permission. No private workload, SAS execution, provider, Windows depende
 installation or lock extension is authorized. Native Windows qualification remains
 BLOCKED unless actually executed in an approved environment. Semantic acceptance
 stays BLOCKED, authority DRAFT and benchmarks NOT_RUN. Stop after CP2 for review.
+
+On 2026-11-05 the user accepted CP2 within its approved scope at
+`fe3bbe98704fd33fb9516b53e8786e516dce9e1e` and authorized **CP3 readiness and
+implementation design only**. Approved: read-only review of CP1/CP2 bindings,
+native Windows security design, proposed POSIX physical-alias strengthening,
+fail-closed outcomes, adversarial tests/qualification instructions, and necessary
+decision/practice-ledger updates. Deliverables are `CP3_READINESS.md` and
+`CP3_SECURITY_TEST_PLAN.md`. Missing host owner, independent security reviewer,
+filesystem assumptions and approval requirements must remain OPEN.
+
+This does not authorize CP3 source reading, CP4 publication/locks, schema or
+historical-artifact changes, dependency installation/lock changes, Agent-mastery
+modifications, private intake, SAS execution, P2B, P3 or architecture generation.
+Proposed tests are not execution permission or qualification evidence. Native
+Windows qualification remains BLOCKED; semantic acceptance stays BLOCKED,
+verification UNVERIFIABLE, authority DRAFT and benchmarks NOT_RUN. Prior repository
+publication authorization remains in effect. Stop after documentation and wait
+for explicit CP3 implementation approval.
