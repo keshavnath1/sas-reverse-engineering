@@ -423,3 +423,9 @@ The detached baseline below precedes candidate validation. See the
 | J2/J5 scope and approval | Approval covers three read-only launcher arguments. The shipped launcher leaves the inventory path and pin empty. Positive development fixtures cannot authorize workstation installation or native Windows access. |
 | J3 baseline preservation | The detached planning commit passed all 693 original tests on macOS arm64 with CPython 3.12.5. Its P1/P2A demos matched 30 historical artifact files and both complete reports. The audit also checked eight frozen hashes and three P3-A1 hashes. |
 | J3 provenance | All 29 package Python/JSON files matched across the detached baseline, historical wheel and existing local site-packages. This comparison establishes development provenance. Workstation release approval is OPEN and native Windows qualification is BLOCKED / NOT_RUN. |
+
+WS-1 validation now records 29 focused tests, three macOS runs of all 722 tests,
+byte-identical P1/P2A replays, and successful direct/launcher stream comparisons
+using a synthetic approval of an installed project wheel. Review tightened the
+file inventory to refuse unexpected entries before opening their content. This is
+public engineering evidence; no native Windows or release trust claim follows.

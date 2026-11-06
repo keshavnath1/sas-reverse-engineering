@@ -115,3 +115,76 @@ this report. Updated `README.md`, `AGENTS.md`, `docs/APPROVALS.md`,
 files, the 100 outside those five documentation edits remained byte- and executable-mode
 identical. No dependency, workflow, package source, frozen contract, parser, historical
 artifact, downstream compatibility pin or existing test was edited.
+
+## Final macOS modes
+
+All three final runs used the same 722 methods, with **no failures or skips**. Fresh
+checkout and the wheel are tied to implementation commit
+`27ecad95a43d68c991d33c0b3aff44b94cf72696`. The launcher is a separately delivered
+kit file; the test suite selects the script from that checkout and independently verifies
+the installed Python package from the wheel environment.
+
+| Mode | Package/launcher origin | Actual result |
+|---|---|---|
+| Development | Development source; W fixtures invoke disposable bound copies of the launcher | 722 in 30.264 s, exit 0 |
+| Fresh local checkout | Explicit `fresh/src` on PYTHONPATH, verified import location; clean working tree after run | 722 in 31.488 s, exit 0 |
+| Installed wheel outside checkout | Separate existing venv's `lib/python3.12/site-packages/sas_re/cli.py`; unset PYTHONPATH | 722 in 32.078 s, exit 0 |
+
+```sh
+# From P:
+git clone --no-hardlinks --quiet . "$T/fresh"
+git -C "$T/fresh" rev-parse HEAD
+# From T/fresh:
+export PYTHONDONTWRITEBYTECODE=1 PYTHONPATH="$T/fresh/src"
+"$PY" -c 'from pathlib import Path; import sas_re.cli; print(sas_re.cli.__file__); assert Path(sas_re.cli.__file__).is_relative_to(Path.cwd()/"src")'
+"$PY" -m unittest discover -s tests -v
+"$PY" -m pip wheel --no-index --no-deps --no-build-isolation --no-cache-dir --wheel-dir "$T/wheels" .
+"$W" -m pip install --no-index --no-deps --no-cache-dir --force-reinstall "$T/wheels/sas_reverse_engineering-0.3.0-py3-none-any.whl"
+"$W" -m pip check
+# From T:
+unset PYTHONPATH
+"$W" -I -B -c 'from pathlib import Path; import sas_re.cli,sysconfig; q=Path(sas_re.cli.__file__); assert q.is_relative_to(sysconfig.get_path("purelib")); print(q)'
+"$W" -m unittest discover -s "$T/fresh/tests" -v
+"$W" -I -B -X utf8 "$T/wheel_smoke.py" "$T/fresh" "$T/candidate-wheel-smoke"
+# From P:
+.venv/bin/python "$T/scope_check.py"
+.venv/bin/python scripts/check_repository.py
+.venv/bin/sas-re check-baseline --checkout /private/tmp/sas-re-downstream-bc754e0
+git diff --cached --check
+git -C "$T/fresh" status --short
+```
+
+Commands returned 0. The fresh directory is a clone of the implementation commit,
+not a second editable installation. Packaging rebuilt and replaced only this project's
+wheel in the disposable wheel environment; no dependency was added, altered or downloaded
+by the launcher. `pip check` reported no broken requirements and a nonfatal cache
+permission warning. Wheel size 113,647 bytes; SHA-256
+`fba04db682b36e6d30f0d3a5a515e4aac7a03de4b793b6a5d5e78eeb0e2539e0`.
+The rebuilt installation's test-only record SHA-256 was
+`ae330887656cb48898e4a4f7f9faac7960e92c6843791459b28b2a971465f2c1`; its 2,429-entry
+file inventory hashed to `080a6c7e9d7d7eae093f59964c61a68f8618bde1fc3a9f0f52faa031192e1ad8`.
+All three direct/wrapped command pairs again returned 0 with identical stream bytes.
+A different installed closure has a different inventory even with the same project version.
+
+Launcher SHA-256: `83a32f061a69af598d62bb249fb98b87878641e6db7c51848146d0957cdddb7a`;
+tests: `55b04651f29c0a8ef6cb64fd59a475a0c6c1569999123a1701573091bdc321ef`.
+Scoped byte/mode, executable/LF/delivery-pin, Markdown target, whitespace and tracked-file
+guard checks passed; the guard is not full DLP. The read-only downstream checkout check
+passed for a clean pinned checkout, 20 files, none changed or missing.
+
+## Hosted Linux CI
+
+[Run 42307238880](https://github.com/keshavnath1/sas-reverse-engineering/actions/runs/42307238880)
+completed successfully at implementation commit `27ecad95a43d68c991d33c0b3aff44b94cf72696`.
+Ubuntu 24.04.5 x64, CPython 3.12.5: foundation job `128199551419` ran
+`python -m unittest discover -s tests -v` in the CI checkout (**722 in 39.574 s**)
+and `python -m unittest discover -s "$GITHUB_WORKSPACE/tests" -v` from the runner's
+temporary directory after wheel installation (**722 in 39.387 s**). Both passed;
+no skipped tests. The job used its native `/bin/bash` for the WS-1 tests; the exact
+runner Bash patch version was not captured. Existing synthetic demos and guard passed.
+The separate `sas-re check-baseline --remote` job `128199551255` passed. This validates
+Linux development/CI behavior, not native Windows, B1 isolation or workstation release.
+
+Stop here. A real independently approved kit, native Windows runtime/wheel closure and
+Windows W01–W06 observations remain missing. No new dependency installation, setup
+feature, source/workflow authority, semantic acceptance or later phase is implied.
