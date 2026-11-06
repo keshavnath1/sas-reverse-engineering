@@ -4,6 +4,8 @@ Approved baseline: `0061b7bf038f7b36add830912258232f174af197`.
 Scope: [CP2 design](CP2_DESIGN.md) and [user approval](APPROVALS.md), independently
 versioned input declarations, pure validators and exact legacy identity projection
 only. Package version remains 0.3.0; identify this change by its Git commit.
+Implementation commit: `bd566e37e33b0aec9fa14e899a0acaa0abc50e77`.
+Subsequent validation-record updates are documentation only.
 Native Windows qualification is **BLOCKED / NOT_RUN**. Semantic acceptance remains
 **BLOCKED**, verification **UNVERIFIABLE**, authority **DRAFT**, benchmarks **NOT_RUN**.
 
@@ -14,7 +16,7 @@ Native Windows qualification is **BLOCKED / NOT_RUN**. Semantic acceptance remai
 | Native macOS ARM64 | macOS 26.6.2, Darwin 25.6.0, CPython 3.12.5 / Clang 14.0.0; checkout and installed wheel | Existing approved environment; no new filesystem or physical-alias qualification |
 | Windows syntax and selection simulation on macOS | Pure native-string vectors; fresh interpreter forbidding POSIX imports/process/network; `sys.platform="win32"` denial tests | Does not emulate Windows Python, NTFS, ACLs, path lookup or PowerShell |
 | Native Windows 11 x64/NTFS/Python 3.12, PowerShell 7 preferred | BLOCKED / NOT_RUN; no approved native host/dependency environment available | No Windows dependencies installed or lock hashes extended |
-| Hosted Linux | Pending publication/observed CI record below | Existing Ubuntu workflow only; no new matrix or P2B infrastructure |
+| Hosted Linux x64 | Ubuntu 24.04.5, image `ubuntu-24.04` / `20261101.360.1`, CPython 3.12.5; checkout and installed wheel at implementation commit | Existing Ubuntu workflow only; no new matrix or P2B infrastructure |
 | Other platforms/filesystems | NOT_RUN | No support extension claimed |
 
 The local environment inventory found no `pwsh`, `powershell`, `wine`, `wine64`,
@@ -43,7 +45,7 @@ No VM, Docker, WSL, provider, cloud service or Git runtime prerequisite was adde
 | Local Agent-mastery baseline | PASS/0; clean pinned checkout and all 20 digests match; read-only |
 | Status | Exit 0; existing DRAFT / UNVERIFIABLE / BLOCKED semantics and NOT_RUN benchmarks preserved |
 | Final staged guard, docs and whitespace | PASS/0; no guard findings, 15 scoped files, 48 valid local Markdown links, balanced fences, working-tree and staged whitespace checks passed |
-| Hosted Linux CI | To be recorded after publication; local passes do not establish hosted success |
+| Hosted Linux implementation CI | Both jobs PASS; 456 checkout tests (19.407 s) and 456 installed-wheel tests (18.011 s), both OK; downstream remote pin matched |
 
 Durations are diagnostic test timings, not SAS workload benchmarks, productivity
 measurements or independent semantic samples. Repeated suites exercise the same
@@ -250,6 +252,49 @@ Separate agents reviewed contracts/purity, implemented path checks and authored
 independent public vectors; the parent reconciled results. They share the same
 development environment. This is not an isolated evaluator or human SAS semantic
 certification. No real intake or protected answers were read.
+
+## Observed publication and hosted validation
+
+`git commit -m 'Add CP2 pure local authorization and legacy identity projection'`
+and `git push origin main` both exited 0. The push advanced `0061b7b` to
+`bd566e37e33b0aec9fa14e899a0acaa0abc50e77` under the user's standing publication
+authorization. Hosted [run 42145810724](https://github.com/keshavnath1/sas-reverse-engineering/actions/runs/42145810724)
+completed successfully at that exact implementation commit.
+
+Both `foundation` (job `127656877414`) and `downstream-drift`
+(job `127656877046`) passed. GitHub API run/job metadata and decoded logs were
+inspected through the GitHub connector. The foundation logs record the two
+456-test runs above, successful public demos, unchanged history, installed
+site-packages assertion and status. Expected stale-source reports contain FAIL;
+those are checked negative outcomes, not CI failures. The drift job observed
+the exact frozen `bc754e0f1204a99020c864df2a5b25983005e09c` pin.
+
+The existing unchanged workflow executed these checks, all steps exiting 0:
+
+```bash
+python -m pip install --require-hashes --only-binary=:all: -r requirements.lock
+python -m pip install --no-deps --no-build-isolation -e .
+python -m pip check
+python scripts/check_repository.py
+python -m unittest discover -s tests -v
+python scripts/p1_demo.py --destination "$RUNNER_TEMP/synthetic-p1"
+python scripts/p2a_demo.py --destination "$RUNNER_TEMP/synthetic-p2a"
+python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .
+python -m pip install --no-deps --force-reinstall dist/*.whl
+cd "$RUNNER_TEMP"
+python -c 'import sas_re; assert "site-packages" in sas_re.__file__, sas_re.__file__'
+python -m unittest discover -s "$GITHUB_WORKSPACE/tests" -v
+python "$GITHUB_WORKSPACE/scripts/p2a_demo.py" --destination "$RUNNER_TEMP/synthetic-p2a-wheel"
+sas-re status
+python -m sas_re --version
+```
+
+The separate drift job installed the same locked requirements and own package
+(`python -m pip install --no-deps --no-build-isolation .`), then ran
+`sas-re check-baseline --remote`, exit 0. Hosted Linux dependency installation
+used the existing approved lock; it was not a dependency change or Windows setup.
+This is actual Linux regression evidence, distinct from local macOS tests,
+simulated Windows selection and unavailable native Windows qualification.
 
 ## Changed files and stopping boundary
 
