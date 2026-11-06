@@ -4,6 +4,8 @@
 authorized synthetic SAS evidence, canonical graph v2 and append-only attempts.
 CP1 adds import-safe platform selection and explicit filesystem capabilities;
 native Windows evidence I/O remains BLOCKED.
+CP2 adds pure validation of separately versioned local authorization declarations
+and an exact legacy identity projection; it grants no filesystem access.
 The closed subset is described in [P2A design](docs/P2A_DESIGN.md). Public regression
 tests demonstrate bounded behavior; independent semantic acceptance remains
 `BLOCKED`, verification `UNVERIFIABLE`, authority `DRAFT`, and benchmarks `NOT_RUN`.
@@ -23,7 +25,8 @@ See [P1 design](docs/P1_DESIGN.md), [P1 validation](docs/P1_VALIDATION.md),
 [approval scope](docs/APPROVALS.md), [plan](docs/IMPLEMENTATION_PLAN.md),
 [open decisions](docs/OPEN_DECISIONS.md), and [compatibility](docs/COMPATIBILITY.md).
 D01–D07 and D08-A/B are approved for their bounded phases. CP1 is separately
-approved for its capability boundary only; stop after CP1.
+approved for its capability boundary. CP2 is separately approved for pure local
+declarations and identity compatibility only; stop after CP2.
 D08-C and D09 remain open for P2B. See [P2A validation](docs/P2A_VALIDATION.md)
 and [public fixture review](docs/P2A_FIXTURE_REVIEW.md).
 
@@ -76,6 +79,33 @@ python -c 'import sas_re; print(sas_re.__file__)'
 The last path must identify installed site-packages for a wheel validation run.
 The test files retain their checkout location for the P0 Git/reference tests;
 the installed application must not import source code from that checkout.
+
+## CP2 pure authorization declarations
+
+The additive [CP2 contract and API](docs/CP2_DESIGN.md) separate logical declarations
+from native local root strings. They preserve the existing logical scope hash
+through the explicit `sas-re-scope-v1` projection. See [actual validation and
+qualification limits](docs/CP2_VALIDATION.md) and [public synthetic vectors](tests/cp2_vectors.py).
+
+```python
+from sas_re.authorization import (
+    validate_authorization, project_logical_scope, authorization_scope_identity,
+)
+
+# envelope is an already supplied dictionary; this API does not open a path.
+validate_authorization(envelope, expected_platform="windows")
+logical_hash_input = project_logical_scope(envelope)
+scope_sha256 = authorization_scope_identity(envelope)
+```
+
+`parse_authorization(raw_bytes)` also validates strict UTF-8 JSON bytes supplied
+by the caller. `load_authorization_schema()` returns the new bundled input schema.
+No filesystem bindings are applied and no existing evidence CLI accepts this
+envelope. Success validates declarations only: human approval is NOT_VERIFIED,
+physical authorization is not established, and Windows evidence I/O stays BLOCKED.
+Store actual envelopes outside Git, for example under the already ignored `local/`.
+The API works without Git, Docker, cloud services or any AI provider; native Windows
+execution remains unqualified until an approved actual environment is tested.
 
 ## P1 CLI
 

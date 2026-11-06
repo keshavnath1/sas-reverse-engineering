@@ -240,3 +240,21 @@ CP1 is separately authorized at portability baseline
 
 These records demonstrate bounded engineering controls, not native Windows
 production readiness, semantic acceptance or a completed portability project.
+
+## CP2 bounded update
+
+CP2 is separately authorized at `0061b7bf038f7b36add830912258232f174af197`;
+see [design](CP2_DESIGN.md), [validation](CP2_VALIDATION.md) and [approval](APPROVALS.md).
+Historical phase records above are unchanged.
+
+| Practice | CP2 evidence and limit |
+|---|---|
+| J2/J5: explicit scope and durable decisions | Independent input contract, fixed legacy projection and stop before binding consumption; CP3–CP5/P2B/P3 remain unapproved |
+| J3: observable feedback and integrity | Frozen-schema/source/artifact comparisons, original regressions, malformed input and no-I/O sentinels; exact commands/failures/corrections in validation |
+| J4: bounded delegation and separate review | Read-only contract audit, separate path-policy author, independent golden-vector author using frozen rules before reading candidate code; root reconciled API semantics and complete-path bounds |
+| J3: independent expected facts | Literal preimage and pinned hashes checked with a separate hashlib/JSON oracle and frozen inventory pipeline; public shared-environment development evidence, not protected SAS semantic acceptance |
+| J3: honest qualification/authority | Declaration validation grants no physical access or authenticated human approval; simulated Windows checks never count as native execution |
+| J1/J6: efficiency and cost | NOT_VERIFIED; no usage/cache/invoice telemetry, model comparison or productivity claim |
+
+These controls demonstrate bounded identity compatibility and unchanged evidence
+boundaries. They do not establish native Windows readiness or benchmark results.

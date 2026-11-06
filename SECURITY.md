@@ -86,3 +86,25 @@ Native Windows execution is not verified by simulated platform tests. Windows
 source authorization, handle traversal, ACLs, locking and publication remain
 unimplemented. Qualification is BLOCKED without an approved Windows interpreter
 and dependencies; do not relax the lock or install them without approval.
+
+## CP2 declaration boundary
+
+The separately versioned local authorization envelope is input data, not an
+authenticated approval, physical authorization or capability token. Its public
+validator performs pure syntax/reference checks and reads trusted bundled schemas
+only. Native paths are never resolved/opened, and no existing evidence workflow
+consumes the envelope. Validated Windows declarations still encounter the same
+CP1 BLOCKED boundary before source reads or store creation.
+
+Case/Unicode comparison screens detect some string aliases; they cannot establish
+physical identity, volume type, permissions, reparse/symlink absence, mapped-drive
+or mount disjointness. Those guarantees require separately approved future work.
+No human identity, signature, timestamp or approval is invented; caller metadata
+remains DECLARED with human approval NOT_VERIFIED.
+
+Local paths and caller metadata are excluded by an explicit versioned projection
+from canonical graph/source identities and never added to sealed artifacts. Keep
+actual envelopes outside Git (the existing ignored `local/` is suitable). CP2 uses
+only synthetic declarations in public tests. See [CP2 design](docs/CP2_DESIGN.md)
+for the deliberately restricted path profile and proof limits. Native Windows
+qualification and independent semantic acceptance remain BLOCKED.

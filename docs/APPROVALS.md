@@ -89,3 +89,20 @@ CP2 authorization envelopes, CP3/CP4 Windows reading/publication, CP5 functional
 AI adapters, P2B/P3 and downstream modifications remain unapproved. Semantic
 acceptance stays BLOCKED, authority DRAFT and benchmarks NOT_RUN. Stop after CP1
 and report actual platforms, commands, failures/corrections and proof limits.
+
+On 2026-11-05 the user accepted CP1 at
+`0061b7bf038f7b36add830912258232f174af197` within its tested scope and explicitly
+approved **CP2 only**: a separately versioned local authorization envelope,
+deterministic logical-scope projection, native path syntax validation without
+filesystem access, public validators, synthetic independent compatibility vectors,
+adversarial tests and design/validation/practice-ledger updates. Existing 411
+regressions, frozen v1/v2 schemas, sealed artifacts, identity rules and compatibility
+pin must remain unchanged. Publication authorization remains in effect.
+
+This approves the bounded CP2 contract/projection work proposed under CP-D02;
+it does not approve physical authorization, a local binding receipt/consumer,
+Windows I/O, CP3–CP5, P2B/P3 or downstream integration. A path string never grants
+source permission. No private workload, SAS execution, provider, Windows dependency
+installation or lock extension is authorized. Native Windows qualification remains
+BLOCKED unless actually executed in an approved environment. Semantic acceptance
+stays BLOCKED, authority DRAFT and benchmarks NOT_RUN. Stop after CP2 for review.

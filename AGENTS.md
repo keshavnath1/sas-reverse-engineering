@@ -1,15 +1,17 @@
-# CP1 operating boundary
+# CP2 operating boundary
 
-Read README.md and docs/APPROVALS.md before changes. CP1 is approved only for an
-import-safe platform/capability boundary and P0/P1/P2A regression preservation.
-Read docs/CP1_DESIGN.md and docs/CROSS_PLATFORM_PORTABILITY_PLAN.md. Preserve the
+Read README.md and docs/APPROVALS.md before changes. CP2 is approved only for a
+separately versioned local declaration envelope, pure validation, exact legacy
+logical projection and identity compatibility proofs. Read docs/CP2_DESIGN.md,
+docs/CP1_DESIGN.md and docs/CROSS_PLATFORM_PORTABILITY_PLAN.md. Preserve the
 existing P2A deterministic synthetic subset. D01–D07 and D08-A/B are approved for
-their bounded phases; D08-C and D09 remain open for P2B. Stop after CP1.
+their bounded phases; D08-C and D09 remain open for P2B. Stop after CP2.
 Read docs/P1_DESIGN.md and docs/P2_READINESS.md for proof and trust boundaries.
 
 Do not change frozen v1/v2 schemas, canonical byte/identity rules or artifacts.
 Windows evidence I/O must remain BLOCKED before input access or store creation.
-No CP2 native authorization, CP3/CP4 Windows I/O/publication, CP5 dependencies or
+Validated native strings never grant physical authorization. No envelope consumer,
+CP3/CP4 Windows I/O/publication, CP5 dependencies or
 new platform CI matrix is approved. Native Windows qualification needs an actual
 approved interpreter/dependency environment; simulation is not qualification.
 Public fixtures need independent review; they do not establish independent
