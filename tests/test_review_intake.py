@@ -67,6 +67,9 @@ class IntakeReviewTests(unittest.TestCase):
             manifest = json.loads(manifest_raw)
             replay, replay_destination = self.invoke(root, extra=("--modernization-drafts",))
             self.assertEqual(replay.returncode, 0, replay.stderr)
+            handoff = (destination / "MODERNIZATION_REVIEW.md").read_text()
+            self.assertIn("`MANIFEST.json`, `SOURCE_1.json`, and", handoff)
+            self.assertIn("exactly one of the two source JSON files", handoff)
             for name in ("migration-profile.yaml", "tie-out.yaml", "MODERNIZATION_REVIEW.md"):
                 self.assertEqual((destination / name).read_bytes(),
                                  (replay_destination / name).read_bytes())

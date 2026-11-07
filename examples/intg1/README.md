@@ -71,9 +71,13 @@ Ask for the five deliverables below using the actual INTAKE subject.
 | `sas-validate` | Verification plan | Public engineering checks and separate obligations for independently authorized SAS reference comparison |
 | `sas-architect` | Architecture, ADR and migration plan | Bounded candidate fit, unresolved assumptions, and conditions that would justify distributed alternatives |
 
-Require file-qualified source locations and evidence references for material
-claims. Keep individual declarations separate from potential cross-file
-handoffs. Save drafts and review records outside the evidence package.
+Use the generated handoff's GATE-1 citation rules. Structured references
+use bare `MANIFEST.json`, `SOURCE_1.json` or `SOURCE_2.json` filenames.
+Give each `SOURCE_DECLARED` claim evidence from exactly one source.
+Keep policy and expected public rows in review prose, where the reviewer
+can compare them to the plan, YAML and fixture. Keep individual declarations
+separate from potential cross-file handoffs. Save drafts and review records
+outside the evidence package.
 Python generates the evidence locally. The operator hands it to Copilot
 and records the human decision before candidate publication.
 

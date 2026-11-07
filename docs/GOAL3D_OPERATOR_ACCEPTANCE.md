@@ -98,3 +98,40 @@ verification was `UNVERIFIABLE` and semantic acceptance was `BLOCKED`.
 | Publication and replay manifest | `9adfcf573f0d7991bb83290f4baa70f97a270de409f98cba1cb112a2dc72f703` |
 
 The exact drafts, approval, gate receipts and publications were retained in local scratch.
+
+## Live rerun with the revised Copilot handoff
+
+The generated handoff and operator guide now direct Copilot to use bare
+GATE-1 filenames and cite exactly one source file per source declaration.
+Candidate policy and public row expectations stay in review prose. The
+handoff also specifies which source fields qualify for structured
+declarations and how to classify manifest status and dependency fields.
+
+On a fresh public synthetic INTAKE, Copilot read all five skills and
+produced reconstruction, PRD, dependency analysis, verification plan and
+ADR deliverables with 17 proposed claims. All citations used package
+basenames, and no claim combined declarations from separate source files.
+The raw record still returned `BLOCK` on four classification conflicts.
+Two claims misclassified manifest fields, and two cited operation kind
+as a structured source declaration.
+
+The operator preserved the original draft, classified the dependency
+basis as `INFERRED` and semantic verification as `PACKAGE_METADATA`, and
+kept the two operation-kind statements in prose. The corrected version 2
+record reached `REVIEW_REQUIRED` with no blockers. Keshav approved its
+exact bytes. GATE-1 returned `PASS` on publication and replay.
+
+MIG-2 matched all four expected public rows. The fresh replay matched
+all seven filenames and file bytes, and the manifest verified the six
+payloads. SAS reference execution was `NOT_RUN` and semantic acceptance
+was `BLOCKED`.
+
+| Retained artifact | SHA-256 |
+| --- | --- |
+| Raw Copilot draft | `2cd2fa35b412c30a63c2a66884a2891b0cf24d953a61bec3ac4686131276cd84` |
+| Claim record blocked by GATE-1 | `1aa4cf9381e39f70264b14f6bf81c51943d61453ccbe51c8588aec046b79b747` |
+| Corrected and approved claim record | `77de8892cb2339af2768981e5c8565832d8b8235fbd41583b1a0a9013f6acf55` |
+| Separate approval | `0abf7f783d56b8545871573bdc7ae20592416d47bfcce29fd0b040a3a6545b50` |
+| Publication and replay manifest | `2489b964b5cbdec4074208a06b0bf2d9ae049af00bcee2d31c97dc3db3b58f17` |
+
+The exact drafts, approval, receipts and publications were retained in local scratch.

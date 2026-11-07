@@ -422,6 +422,25 @@ against this subject's evidence.
 | sas-validate | Define public engineering checks and separate SAS reference obligations. |
 | sas-architect | Compare applicable architecture options and record candidate fit and limitations. |
 
+For the two-source INTAKE route, use these exact GATE-1 evidence filenames
+in structured claim references: `MANIFEST.json`, `SOURCE_1.json`, and
+`SOURCE_2.json`. Use bare filenames even when reading the files from a
+subfolder. Plans, YAML, row fixtures, and Markdown reports inform review
+prose. The gate resolves citations against the three JSON files above.
+
+Cite exactly one of the two source JSON files for each `SOURCE_DECLARED`
+claim. Use a `/declared_operation/` pointer ending in `input`, `output`,
+`selected_columns`, `ordering_keys`, or `declared_direction`. Keep the
+operation kind in prose. Cite manifest status fields such as
+`/semantic_verification` as `PACKAGE_METADATA`. For a handoff, write
+separate claims for the producer output and consumer input, then cite
+`MANIFEST.json` and `/cross_file_dependencies/0/classification` for the
+`INFERRED` relationship when that entry exists. Its `basis` is also
+`INFERRED`. Cite the corresponding
+`execution_order` and `dataset_version` fields for `UNRESOLVED` claims.
+Use literal text from the named deliverable section for each claim, and
+leave its disposition `UNREVIEWED`.
+
 Save the five deliverables outside this package. Follow the INTG-1 operator
 guide for the GATE-1 claim record and separate byte-bound human approval.
 The YAML files are review drafts. The existing continuation checks candidate
