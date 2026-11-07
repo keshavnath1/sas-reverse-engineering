@@ -1,0 +1,1 @@
+data work.projected; set work.samples; keep score reading; run;

@@ -1,0 +1,1 @@
+proc sort data=work.projected out=work.sorted; by reading; run;
