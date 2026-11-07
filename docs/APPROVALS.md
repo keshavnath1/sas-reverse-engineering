@@ -320,3 +320,9 @@ engineering demonstration and authorized the [MVP-3 behavioral tie-out](MVP3_VAL
 Its authority covers a public standard-library reference, frozen synthetic cases and
 local candidate checks. The unresolved include, full-workflow acceptance, B1 and
 runtime selection retain their separate gates. Stop at MVP-3 for review.
+
+At `8e9c0484a21c1fa8211f7a5418bac62a4bc1bd48` the user accepted MVP-3
+within its public synthetic development scope and authorized MVP-4 only. Its
+[decision review](../examples/mvp4/DECISION_REVIEW.md) links the accepted controls
+to the existing draft alternatives. Runtime selection, execution, semantic
+certification and migration approval remain separate decisions. Stop at MVP-4.

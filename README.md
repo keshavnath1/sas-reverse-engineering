@@ -1,5 +1,14 @@
 # SAS Reverse Engineering and Computation Architecture Planner
 
+## Review the architecture decision
+
+The [MVP-4 decision review](examples/mvp4/DECISION_REVIEW.md) connects all 17
+public behavioral controls to the original operations and to separate obligations
+for native Python and Spark. The matrix identifies which errors the checker
+caught, what remains unknown, and which tests or human decisions each proposal
+still needs. Production runtime selection is BLOCKED.
+[Reproduce the review and inspect its validation](docs/MVP4_VALIDATION.md).
+
 ## Check the synthetic workflow's behavior
 
 The [MVP-3 tie-out report](docs/MVP3_VALIDATION.md) compares fixed Python
