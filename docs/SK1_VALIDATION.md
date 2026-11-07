@@ -4,6 +4,8 @@ The three instruction-only skills are [sas-reconstruct](../skills/sas-reconstruc
 
 ## Discovery and actual agent use
 
+This section records the original SK-1 checks through accepted commit `3f46a7c7fe70fe1b12cb056917ea41e184ddca23`. The SK-1R checks below apply to the revised instructions.
+
 Official Codex guidance specifies repository-local `.agents/skills` roots and supports symlinked skill directories. This repository uses one relative link, `.agents/skills -> ../skills`, so each skill has one authoritative instruction file. The guard permits only that exact staged mode/target and working-tree link, with real in-tree parents. [Official discovery guidance](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills)
 
 | Executed check | Observed result |
@@ -16,7 +18,7 @@ Official Codex guidance specifies repository-local `.agents/skills` roots and su
 
 The independent forward test found ambiguity between sample links and a fresh output directory. The two review skills now explicitly direct fresh-run review to files from that same package. The reviewing agent reread and confirmed that clarification. Live exact-body loading was repeated after final prose edits.
 
-The final skill files have these SHA-256 values.
+The accepted SK-1 skill files had these SHA-256 values.
 
 ```text
 sas-reconstruct  d1f6b55071074c016d7de410d41f732d822d252f33fe85b0b4f098320910eb3c
@@ -34,3 +36,20 @@ sas-architect    e4d3802fb1ca3ac6ec0bc3172a029dc29f294e13bf45deb444225c858f257ea
 - All 30 P1/P2A historical files and both complete reports matched fresh and retained baselines. Eight frozen hashes, three P3-A1 hashes, the twelve earlier preview files and manifests, and all ten consolidated files matched. Consolidated MANIFEST SHA-256 remains `3efe4f68b923a2a59b37041cf30663c856891beb265ccad395fc2078e6970952`. The read-only Agent-mastery check passed for all 20 files at `bc754e0f1204a99020c864df2a5b25983005e09c`.
 
 The skills retain DRAFT authority, UNVERIFIABLE semantics, BLOCKED independent acceptance and benchmarks NOT_RUN. SK-2 analysis/validation and SK-3 handoff work require separate approval.
+
+## SK-1R usability refinements
+
+The refinement supports existing-package inspection without a command receipt, reserves receipt checks for fresh commands, distinguishes defective citations from declared unresolved dependencies, and reconciles individual behavioral verdicts before architecture review. Architecture notes can be returned in chat. Detailed case explanations and candidate obligations come from the existing decision review.
+
+- `.venv/bin/python -m unittest discover -s tests -v` exited 0 with **781/781** passing in 41.590 seconds on macOS 26.6.2 ARM64, CPython 3.12.5. Existing checks covered metadata, references, fixed invocation, package hashes and authority boundaries. Independent instruction review found no further issue. This documentation-only change added zero tests.
+- Actual `codex-cli 0.167.0-alpha.3.2` app-server `skills/list`, with repository cwd and `forceReload: true`, parsed and discovered all three revised skills as enabled, with zero errors. This check reused the existing discovery probe in temporary state. Editing and instruction review used explicit file guidance. Typed loading and completed model execution of the revised bodies were untested. The earlier SK-1 loading observation applies to the earlier bytes.
+- All 160 baseline tracked files were compared with `3f46a7c7fe70fe1b12cb056917ea41e184ddca23`. Only the three skills and this validation record differ. All 23 accepted example files matched byte for byte, including the ten-file consolidated package. Its manifest SHA-256 is `3efe4f68b923a2a59b37041cf30663c856891beb265ccad395fc2078e6970952`. Downstream metadata matched the baseline pin `bc754e0f1204a99020c864df2a5b25983005e09c`.
+- The existing preservation audit, `.venv/bin/python /private/tmp/sas-re-sk1-proof.q6kb2j8q/preserve.py --label sk1r --source /Users/divyasreegundaram/Downloads/sas-migration-skill-enhancement-v2/sas-reverse-engineering`, exited 0. All 30 regenerated historical artifacts, both complete reports, eight frozen hashes and three diagnostic hashes matched retained references. Authority statuses passed the existing checks.
+
+Revised skill SHA-256 values follow.
+
+```text
+sas-reconstruct  dd3cb8110e2ce09f94973a94d26a01ef280d81ae42c97e10f9b69763233b9a74
+sas-specify      acc8f94db61790a661364b0b7b604e341dcace520b864cbd7b0ee1dd12379532
+sas-architect    dcef5d5cb51deb793badda71777b481e3a348d46867f890e8991e1ca1049f755
+```
