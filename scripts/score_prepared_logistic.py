@@ -137,21 +137,45 @@ def score(values, coefficients):
     return eta, 1 / (1 + exp) if eta >= 0 else exp / (1 + exp)
 
 
-def build_scoring(source, digest, prep, population, scenario):
-    evidence, model = recover_model(secure_read(source.parent, source.name, LIMIT), digest)
+def load_model_fixtures():
+    """Read the exact public mapping and fixed coefficients."""
     fixtures = {}
     for name, expected in FIXTURE_PINS.items():
         raw = secure_read(EXAMPLE, name, LIMIT)
         if identity(raw)["sha256"] != expected:
             raise ValueError("MODEL_PUBLIC_FIXTURE_IDENTITY_MISMATCH")
         fixtures[name] = raw
+    return fixtures
+
+
+def _scoring_inputs(source, digest):
+    evidence, model = recover_model(secure_read(source.parent, source.name, LIMIT), digest)
+    fixtures = load_model_fixtures()
     contract = design_contract(model, _parse_json(fixtures["MAPPING.json"]))
     coefficients = coefficients_for(contract["columns"], _parse_json(fixtures["COEFFICIENTS.json"]))
+    return evidence, fixtures, contract, coefficients
+
+
+def build_scoring(source, digest, prep, population, scenario):
+    inputs = _scoring_inputs(source, digest)
     upstream, passed = build_package(prep, population)
     if not passed:
         raise ValueError("MODEL_UPSTREAM_ENGINEERING_COMPARISON_FAILED")
+    return _score_upstream(upstream, scenario, *inputs)
+
+
+def build_scoring_from_upstream(source, digest, upstream, scenario):
+    """Score a verified MIG-5 snapshot using its original pre-sort records."""
+    if _parse_json(upstream["VALIDATION.json"])["comparison"] != "PASS":
+        raise ValueError("MODEL_UPSTREAM_ENGINEERING_COMPARISON_FAILED")
+    return _score_upstream(upstream, scenario, *_scoring_inputs(source, digest))
+
+
+def _score_upstream(upstream, scenario, evidence, fixtures, contract, coefficients):
+    model = evidence["declared_operation"]
     run = next(row for row in _parse_json(upstream["SCENARIO_RESULTS.json"]) if row["scenario"] == scenario)
     decision = run["continuation"]
+    passed = True
     files = {}
     validation = {"candidate_gate": decision, "scoring": "NOT_RUN", "comparison": "NOT_RUN"}
     if decision == "PROCEED":

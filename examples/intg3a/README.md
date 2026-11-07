@@ -75,3 +75,44 @@ The [MIG-2 operator command](../intg1/README.md) still uses its existing
 arguments and output schema. Fresh MIG-2 manifests record the new
 GATE-1 implementation digest. Previously published manifests retain
 their original bytes.
+
+## Include SORT, CSV and fixed-coefficient scoring
+
+Use the same operator command with an explicit scenario when preparing a
+review subject. The versioned `public-mig5-downstream-review/1` subject
+binds that scenario, the public model source and recovered declarations,
+the exact mapping and coefficient files, and both downstream runners.
+The existing preparation and population evidence is still required.
+
+```bash
+python3.12 -IB scripts/review_mig5.py prepare --scenario passes \
+  --destination /tmp/sas-re-intg3a-branches-review
+```
+
+In addition to the preparation and population files, supply Copilot the
+bound `MODEL_EVIDENCE.json`, `MAPPING.json`, and `COEFFICIENTS.json` from the
+same subject. Include the public model source listed in the manifest.
+GATE-1 requires a source declaration citation from the model evidence
+as well. One example is `/declared_operation/model/response`. The mapping
+and coefficient files support candidate engineering claims. Keep the
+reference coding, event policy and fixed coefficients separate from SAS
+runtime behavior. The Copilot session and human review are manual.
+
+Use the same `continue` command with the new review package, its claim
+record, an exact-byte approval, and a fresh output destination. The
+scenario comes from the approved manifest. A different scenario requires
+its own review subject and approval. Choices are `passes`, `guard_disabled`,
+`empty`, `duplicates`, `count_mismatch`, and `invalid_identifier`.
+
+When the selected scenario returns `PROCEED`, MIG-6 sorts and exports all
+19 business fields. The CSV preserves the candidate's header, order,
+quoting, padding and LF policy. The case identifier stays in diagnostic
+evidence and is absent from sorted rows and CSV. MOD-2 reads the same
+eligible records in their original pre-sort order and writes its design
+and fixed scores. The output includes each branch's plan and engineering
+validation. Model fitting remains `NOT_RUN`.
+
+When the selected scenario blocks or refuses input, the package contains
+only MIG-5 diagnostics and approval records. GATE-1 refusal or any evidence
+identity mismatch prevents publication altogether. Repeat the same
+approved command in another fresh destination to compare output bytes.

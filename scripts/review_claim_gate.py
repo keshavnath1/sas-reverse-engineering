@@ -11,7 +11,7 @@ from sas_re.safeio import EvidenceError, _parse_json, read_json, secure_read
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from review_copilot_notes import LIMIT, load_review_payloads
 from review_intake import STATUS_FIELDS, identity, json_bytes
-from review_mig5 import POPULATION, PREPARATION, REVISION, load_subject
+from review_mig5 import DOWNSTREAM_REVISION, MODEL, POPULATION, PREPARATION, REVISION, load_subject
 
 
 DELIVERABLES = ("reconstruction", "prd", "dependency_analysis", "verification_plan", "adr")
@@ -67,8 +67,18 @@ def mig5_classification(filename, pointer):
         if re.fullmatch(r"/interval_effects/findings/[0-9]+/(?:sql_declaration|gate_declaration)(?:/[^/]+)*",
                         pointer):
             return "SOURCE_DECLARED"
+    if filename == MODEL:
+        if re.fullmatch(r"/declared_operation/(?:header|class|model|score_columns|ods_output|step_check)(?:/[^/]+)*",
+                        pointer):
+            return "SOURCE_DECLARED"
+    if filename == POPULATION:
+        if re.fullmatch(r"/selections/1/declared_operation/(?:ordering_keys|declared_direction)(?:/[^/]+)*",
+                        pointer):
+            return "SOURCE_DECLARED"
+    if filename in ("MAPPING.json", "COEFFICIENTS.json"):
+        return "CANDIDATE_ENGINEERING"
     if filename == "MANIFEST.json":
-        if pointer == "/sas_dataset_continuity":
+        if pointer in ("/sas_dataset_continuity", "/sas_export_execution", "/sas_scoring_equivalence"):
             return "UNRESOLVED"
         if pointer in ("/candidate_scope", "/scenario"):
             return "PACKAGE_METADATA"
@@ -82,10 +92,13 @@ def review_claims(package, raw_record, approval=None):
     } or type(record["version"]) is not int or record["version"] != 1:
         raise ValueError("CLAIM_RECORD_INVALID")
     candidate = _parse_json(secure_read(package, "MANIFEST.json", LIMIT))
-    mig5 = candidate.get("package_revision") == REVISION
+    downstream = candidate.get("package_revision") == DOWNSTREAM_REVISION
+    mig5 = downstream or candidate.get("package_revision") == REVISION
     loader = load_subject if mig5 else load_review_payloads
     manifest, payloads = loader(package, record["manifest_sha256"])
     evidence_names = (PREPARATION, POPULATION) if mig5 else ("SOURCE_1.json", "SOURCE_2.json")
+    if downstream:
+        evidence_names += (MODEL,)
     classify = mig5_classification if mig5 else evidence_classification
     documents = {"MANIFEST.json": manifest}
     for source in manifest["sources"]:
@@ -97,6 +110,10 @@ def review_claims(package, raw_record, approval=None):
         if any(evidence["source"][key] != original[key] for key in ("bytes", "sha256")):
             raise ValueError("REVIEW_SOURCE_IDENTITY_MISMATCH")
         documents[name] = evidence
+
+    if downstream:
+        for name in ("MAPPING.json", "COEFFICIENTS.json"):
+            documents[name] = _parse_json(payloads[name])
 
     deliverables = record["deliverables"]
     if (not isinstance(deliverables, dict) or set(deliverables) != set(DELIVERABLES)
@@ -167,7 +184,9 @@ def review_claims(package, raw_record, approval=None):
                 or (classification == "PACKAGE_METADATA" and expected_classes != {"PACKAGE_METADATA"})
                 or ("PACKAGE_METADATA" in expected_classes and classification != "PACKAGE_METADATA")
                 or ("INFERRED" in expected_classes and classification not in {"INFERRED", "UNRESOLVED"})
-                or ("UNRESOLVED" in expected_classes and classification != "UNRESOLVED")):
+                or ("UNRESOLVED" in expected_classes and classification != "UNRESOLVED")
+                or (downstream and "CANDIDATE_ENGINEERING" in expected_classes
+                    and classification != "CANDIDATE_ENGINEERING")):
             block("CLAIM_EVIDENCE_CLASSIFICATION_CONFLICT")
 
         if classification == "SOURCE_DECLARED" and expected_classes == {"SOURCE_DECLARED"}:

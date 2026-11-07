@@ -1,6 +1,8 @@
 """Exercise the approval boundary on the pinned public MIG-5 subject."""
 
 from hashlib import sha256
+import csv
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -69,9 +71,10 @@ class Mig5OperatorTests(unittest.TestCase):
             "reviewer": "Synthetic test reviewer", "decision": "APPROVED",
         }), encoding="utf-8")
 
-    def prepare(self):
+    def prepare(self, scenario=None):
         path = self.destination()
-        status, report = self.run_operator("prepare", path)
+        args = ("--scenario", scenario) if scenario is not None else ()
+        status, report = self.run_operator("prepare", path, *args)
         self.assertEqual(status, 0, report)
         return path.resolve()
 
@@ -162,3 +165,87 @@ class Mig5OperatorTests(unittest.TestCase):
         self.assertEqual(manifest["reviewer_approval"]["sha256"], sha256(self.approval.read_bytes()).hexdigest())
         for name, identity in manifest["files"].items():
             self.assertEqual(identity["sha256"], sha256(files[name]).hexdigest())
+
+    def select_scenario(self, scenario):
+        self.package = self.prepare(scenario)
+        self.claims["manifest_sha256"] = sha256((self.package / "MANIFEST.json").read_bytes()).hexdigest()
+        claims = self.claims["claims"]
+        if not any(claim["id"] == "model" for claim in claims):
+            text = "The public model declares the Default response."
+            self.claims["deliverables"]["reconstruction"]["Review"] += "\n" + text
+            claims.append({"id": "model", "text": text, "classification": "SOURCE_DECLARED",
+                           "deliverable": "reconstruction", "section": "Review",
+                           "disposition": "APPROVED", "evidence": [{
+                               "file": "MODEL_EVIDENCE.json",
+                               "pointer": "/declared_operation/model/response",
+                           }]})
+        self.approve()
+
+    def test_downstream_proceeds_and_replays_from_original_order(self):
+        self.select_scenario("passes")
+        outputs = []
+        for _ in range(2):
+            status, report, destination = self.proceed()
+            self.assertEqual(status, 0, report)
+            self.assertEqual((report["decision"], report["comparison"]), ("PASS", "PASS"))
+            outputs.append({path.name: path.read_bytes() for path in destination.iterdir()})
+        self.assertEqual(*outputs)
+        files = outputs[0]
+        manifest = json.loads(files["MANIFEST.json"])
+        self.assertEqual(set(manifest["files"]), files.keys() - {"MANIFEST.json"})
+        for name, expected in manifest["files"].items():
+            self.assertEqual(expected, {"sha256": sha256(files[name]).hexdigest(),
+                                        "bytes": len(files[name])})
+        rows = json.loads(files["SORTED_ROWS.json"])
+        self.assertEqual([row["id"] for row in rows], [0, 1])
+        expected_columns = {"id", "Default", *(f"n{i}" for i in range(1, 13)),
+                            *(f"c{i}" for i in range(1, 6))}
+        self.assertTrue(all(row.keys() == expected_columns for row in rows))
+        csv_rows = list(csv.DictReader(io.StringIO(files["PREPARED_EXPORT.csv"].decode())))
+        self.assertEqual(csv_rows, [{key: str(value) for key, value in row.items()} for row in rows])
+        self.assertEqual([row["id"] for row in json.loads(files["DESIGN.json"])["rows"]], [1, 0])
+        scores = json.loads(files["SCORES.json"])["rows"]
+        self.assertEqual([(row["case_id"], row["id"], row["eta"]) for row in scores],
+                         [("C01", 1, 1.5), ("C02", 0, 0.5)])
+        self.assertEqual(json.loads(files["SCORING_VALIDATION.json"])["comparison"], "PASS")
+        self.assertEqual(json.loads(files["EXPORT_VALIDATION.json"])["comparison"], "PASS")
+
+    def test_downstream_block_publishes_only_upstream_diagnostics(self):
+        self.select_scenario("duplicates")
+        status, report, destination = self.proceed()
+        self.assertEqual(status, 0, report)
+        files = {path.name for path in destination.iterdir()}
+        self.assertEqual(files, {"PREPARATION_EVIDENCE.json", "POPULATION_EVIDENCE.json",
+                                 "PLAN.json", "SCENARIO_RESULTS.json", "VALIDATION.json",
+                                 "CANDIDATE_MANIFEST.json", "GATE.json", "MANIFEST.json"})
+        runs = json.loads((destination / "SCENARIO_RESULTS.json").read_bytes())
+        selected = next(run for run in runs if run["scenario"] == "duplicates")
+        self.assertEqual(selected["continuation"], "BLOCK")
+        self.assertEqual(json.loads((destination / "MANIFEST.json").read_bytes())["scenario"],
+                         "duplicates")
+
+    def test_downstream_subject_requires_model_claim_and_exact_fixture_bytes(self):
+        self.select_scenario("passes")
+        self.assert_refused(1, "REVIEW_REQUIRED", "BOUND_HUMAN_APPROVAL_REQUIRED", approved=False)
+        self.record.write_bytes(self.record.read_bytes() + b"\n")
+        self.assert_refused(1, "REVIEW_REQUIRED", "BOUND_HUMAN_APPROVAL_REQUIRED")
+        adr = self.claims["deliverables"]["adr"]
+        original = adr["Review"]
+        adr["Review"] += " Traced the declared handoff."
+        self.approve()
+        self.assert_refused(2, "BLOCK", "DECLARED_HANDOFF")
+        adr["Review"] = original
+        model = self.claims["claims"].pop()
+        self.approve()
+        self.assert_refused(1, "REVIEW_REQUIRED", "PINNED_EVIDENCE_CLAIM_REQUIRED")
+        self.claims["claims"].append(model)
+        self.approve()
+        for name in ("MAPPING.json", "COEFFICIENTS.json"):
+            with self.subTest(name=name):
+                path = self.package / name
+                raw = path.read_bytes()
+                path.write_bytes(raw + b"\n")
+                self.assert_refused(2, "BLOCK", "REVIEW_PACKAGE_PAYLOAD_MISMATCH")
+                path.write_bytes(raw)
+        self.package = self.prepare("duplicates")
+        self.assert_refused(2, "BLOCK", "REVIEW_MANIFEST_SHA256_MISMATCH")

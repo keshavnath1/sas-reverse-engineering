@@ -71,9 +71,18 @@ def build_export(prep, population, scenario):
     upstream, passed = build_package(prep, population)
     if not passed:
         raise ValueError("MIGRATION_UPSTREAM_ENGINEERING_COMPARISON_FAILED")
+    return build_export_from_upstream(upstream, scenario)
+
+
+def build_export_from_upstream(upstream, scenario):
+    """Build export artifacts from an already validated MIG-5 package."""
+    upstream_validation = _parse_json(upstream["VALIDATION.json"])
+    passed = upstream_validation["comparison"] == "PASS"
+    if not passed:
+        raise ValueError("MIGRATION_UPSTREAM_ENGINEERING_COMPARISON_FAILED")
     run = next(item for item in _parse_json(upstream["SCENARIO_RESULTS.json"])
                if item["scenario"] == scenario)
-    validation = next(item for item in _parse_json(upstream["VALIDATION.json"])["scenarios"]
+    validation = next(item for item in upstream_validation["scenarios"]
                       if item["scenario"] == scenario)
     evidence = _parse_json(upstream["POPULATION_EVIDENCE.json"])
     sort = evidence["selections"][1]["declared_operation"]
