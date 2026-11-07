@@ -60,3 +60,21 @@ requirements still apply to any supported publication route.
 Artifact authority is DRAFT. Behavioral evidence is UNAVAILABLE. SAS reference
 and benchmark execution are NOT_RUN, semantic verification is UNVERIFIABLE,
 semantic acceptance is BLOCKED, and historical provenance is UNBOUND.
+
+## Run from a fresh INTAKE review
+
+Follow the [offline INTAKE guide](../modernization/README.md) to generate a
+fresh evidence directory. Pass its canonical path and the original INTAKE
+directory to the existing runner:
+
+```sh
+python3.12 -IB scripts/run_running_balance.py \
+  --package /path/to/generated-evidence --intake /path/to/INTAKE
+```
+
+Both directories must match the exact supported public workload. The runner
+checks the evidence manifest and its payloads, the original SAS files, scope
+and typed profile, and any generated modernization drafts against the published
+package identities. It accepts evidence with or without the complete draft set.
+The output is identical to the published-package invocation. The outer
+manifest SHA-256 identifies the supported workload in both cases.

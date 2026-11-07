@@ -7,6 +7,7 @@ import subprocess
 import sys
 from tempfile import TemporaryDirectory
 import unittest
+import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -34,6 +35,37 @@ class RunningBalanceTests(unittest.TestCase):
         first = subprocess.check_output(command)
         self.assertEqual(first, subprocess.check_output(command))
         self.assertEqual(json.loads(first), result)
+
+    def test_fresh_intake_reconstruction_and_tamper_refusal(self):
+        with TemporaryDirectory() as temporary:
+            intake = Path(temporary).resolve() / "INTAKE"
+            shutil.copytree(PACKAGE / "source", intake)
+            output = Path("/tmp").resolve() / f"sas-re-int1-balance-{uuid.uuid4().hex}"
+            self.addCleanup(shutil.rmtree, output, ignore_errors=True)
+            subprocess.check_output([
+                sys.executable, "-IB", str(ROOT / "scripts/review_intake.py"), "--p2a",
+                "--modernization-drafts", "--intake", str(intake), "--destination", str(output),
+            ])
+            command = [sys.executable, "-IB", str(ROOT / "scripts/run_running_balance.py")]
+            fresh = [*command, "--package", str(output), "--intake", str(intake)]
+            self.assertEqual(subprocess.check_output(fresh), subprocess.check_output(command))
+
+            for path in (intake / "main.sas.txt", intake / "profile.json", intake / "scope.json",
+                         output / "EVIDENCE.json", output / "INVENTORY.json", output / "MANIFEST.json",
+                         output / "tie-out.yaml"):
+                with self.subTest(path=path.name):
+                    original = path.read_bytes()
+                    path.write_bytes(original + b"\n")
+                    with self.assertRaisesRegex(ValueError, f"PACKAGE_PAYLOAD_IDENTITY_MISMATCH:{path.name}"):
+                        build_result(output, intake)
+                    path.write_bytes(original)
+
+            (output / "EVIDENCE.json").unlink()
+            with self.assertRaisesRegex(ValueError, "EVIDENCE_FILE_SET_MISMATCH"):
+                build_result(output, intake)
+            (intake / "enrich.sas.txt").unlink()
+            with self.assertRaisesRegex(ValueError, "INTAKE_FILE_SET_MISMATCH"):
+                build_result(output, intake)
 
     def test_state_ties_missing_and_join_multiplicity(self):
         running, ordered, enriched = run_pipeline(

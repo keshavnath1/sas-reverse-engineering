@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 import sys
 
-from sas_re.safeio import EvidenceError, secure_read
+from sas_re.safeio import EvidenceError, enumerate_files, secure_read
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from review_intake import STATUS_FIELDS, identity, json_bytes
@@ -80,18 +80,47 @@ def run_pipeline(raw_rows, lookup_rows):
     return running, ordered, enriched
 
 
-def build_result(package):
-    manifest_raw = secure_read(package, "MANIFEST.json", 65536)
+def verified_payload(directory, name, expected):
+    try:
+        raw = secure_read(directory, name)
+    except (EvidenceError, OSError) as error:
+        raise ValueError(f"PACKAGE_PAYLOAD_READ_REFUSED:{name}") from error
+    if identity(raw) != expected:
+        raise ValueError(f"PACKAGE_PAYLOAD_IDENTITY_MISMATCH:{name}")
+    return raw
+
+
+def fresh_profile(package, intake, supported_files):
+    """Verify both directories against the published workload's exact identities."""
+    manifest_raw = verified_payload(package, "MANIFEST.json", supported_files["evidence/MANIFEST.json"])
+    manifest = json.loads(manifest_raw)
+    if enumerate_files(intake) != sorted(manifest["inputs"]):
+        raise ValueError("INTAKE_FILE_SET_MISMATCH")
+    base = {"MANIFEST.json", *manifest["files"]}
+    drafts = {"MODERNIZATION_REVIEW.md", "migration-profile.yaml", "tie-out.yaml"}
+    actual = set(enumerate_files(package))
+    if actual not in (base, base | drafts):
+        raise ValueError("EVIDENCE_FILE_SET_MISMATCH")
+
+    for name in sorted(actual - {"MANIFEST.json"}):
+        verified_payload(package, name, supported_files[f"evidence/{name}"])
+    inputs = {name: verified_payload(intake, name, supported_files[f"source/{name}"])
+              for name in manifest["inputs"]}
+    return json.loads(inputs["profile.json"])
+
+
+def build_result(package, intake=None):
+    manifest_root = PACKAGE if intake is not None else package
+    manifest_raw = secure_read(manifest_root, "MANIFEST.json", 65536)
     if identity(manifest_raw)["sha256"] != PACKAGE_SHA256:
         raise ValueError("UNSUPPORTED_PACKAGE_IDENTITY")
     manifest = json.loads(manifest_raw)
-    payloads = {}
-    for name, expected in manifest["files"].items():
-        raw = secure_read(package, name)
-        if identity(raw) != expected:
-            raise ValueError("PACKAGE_PAYLOAD_IDENTITY_MISMATCH")
-        payloads[name] = raw
-    profile = json.loads(payloads["source/profile.json"])
+    if intake is None:
+        payloads = {name: verified_payload(package, name, expected)
+                    for name, expected in manifest["files"].items()}
+        profile = json.loads(payloads["source/profile.json"])
+    else:
+        profile = fresh_profile(package, intake, manifest["files"])
     raw, lookup = profile["inputs"]
     running, ordered, enriched = run_pipeline(raw["rows"], lookup["rows"])
 
@@ -123,9 +152,10 @@ def build_result(package):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--package", type=Path, default=PACKAGE)
+    parser.add_argument("--intake", type=Path, help="original INTAKE for a fresh evidence package")
     args = parser.parse_args()
     try:
-        result = build_result(args.package.absolute())
+        result = build_result(args.package.absolute(), args.intake.absolute() if args.intake else None)
     except (EvidenceError, OSError, ValueError) as error:
         parser.exit(2, f"REFUSED: {error}\n")
     sys.stdout.buffer.write(json_bytes(result))
