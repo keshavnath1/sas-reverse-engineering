@@ -11,6 +11,7 @@ from sas_re.safeio import EvidenceError, _parse_json, read_json, secure_read
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from review_copilot_notes import LIMIT, load_review_payloads
 from review_intake import STATUS_FIELDS, identity, json_bytes
+from review_mig5 import POPULATION, PREPARATION, REVISION, load_subject
 
 
 DELIVERABLES = ("reconstruction", "prd", "dependency_analysis", "verification_plan", "adr")
@@ -58,17 +59,38 @@ def evidence_classification(filename, pointer):
     return None
 
 
+def mig5_classification(filename, pointer):
+    if filename == PREPARATION:
+        if re.fullmatch(r"/declared_operation/status_rule_recovery/rules/[0-9]+(?:/[^/]+)*", pointer):
+            return "SOURCE_DECLARED"
+    if filename == POPULATION:
+        if re.fullmatch(r"/interval_effects/findings/[0-9]+/(?:sql_declaration|gate_declaration)(?:/[^/]+)*",
+                        pointer):
+            return "SOURCE_DECLARED"
+    if filename == "MANIFEST.json":
+        if pointer == "/sas_dataset_continuity":
+            return "UNRESOLVED"
+        if pointer in ("/candidate_scope", "/scenario"):
+            return "PACKAGE_METADATA"
+    return evidence_classification(filename, pointer)
+
+
 def review_claims(package, raw_record, approval=None):
     record = _parse_json(raw_record)
     if not isinstance(record, dict) or set(record) != {
         "version", "manifest_sha256", "deliverables", "claims",
     } or type(record["version"]) is not int or record["version"] != 1:
         raise ValueError("CLAIM_RECORD_INVALID")
-    manifest, payloads = load_review_payloads(package, record["manifest_sha256"])
+    candidate = _parse_json(secure_read(package, "MANIFEST.json", LIMIT))
+    mig5 = candidate.get("package_revision") == REVISION
+    loader = load_subject if mig5 else load_review_payloads
+    manifest, payloads = loader(package, record["manifest_sha256"])
+    evidence_names = (PREPARATION, POPULATION) if mig5 else ("SOURCE_1.json", "SOURCE_2.json")
+    classify = mig5_classification if mig5 else evidence_classification
     documents = {"MANIFEST.json": manifest}
     for source in manifest["sources"]:
         name = source["evidence"]
-        if name not in ("SOURCE_1.json", "SOURCE_2.json") or name in documents:
+        if name not in evidence_names or name in documents:
             raise ValueError("CLAIM_SOURCE_RECORD_INVALID")
         evidence = _parse_json(payloads[name])
         original = manifest["inputs"][source["path"]]
@@ -85,7 +107,7 @@ def review_claims(package, raw_record, approval=None):
             or not isinstance(record["claims"], list)):
         raise ValueError("CLAIM_DELIVERABLES_INVALID")
     blocks, pending, seen, covered = [], [], set(), set()
-    if manifest["cross_file_dependencies"]:
+    if mig5 or manifest["cross_file_dependencies"]:
         for name in DELIVERABLES:
             for section, text in deliverables[name].items():
                 prose = " ".join(re.sub(r"[*_\x60]", "", f"{section} {text}").casefold().split())
@@ -93,6 +115,7 @@ def review_claims(package, raw_record, approval=None):
                     if pattern.search(prose):
                         blocks.append({"deliverable": name, "section": section, "code": code})
 
+    cited_declarations = set()
     for claim in record["claims"]:
         if not isinstance(claim, dict) or set(claim) != {
             "id", "text", "classification", "evidence", "deliverable", "section", "disposition",
@@ -135,7 +158,7 @@ def review_claims(package, raw_record, approval=None):
                 value = pointer_value(documents[filename], pointer)
                 if value is None:
                     raise ValueError
-                expected_classes.add(evidence_classification(filename, pointer))
+                expected_classes.add(classify(filename, pointer))
                 evidence_files.add(filename)
             except (IndexError, KeyError, TypeError, ValueError):
                 block("CLAIM_EVIDENCE_UNRESOLVED")
@@ -147,6 +170,13 @@ def review_claims(package, raw_record, approval=None):
                 or ("UNRESOLVED" in expected_classes and classification != "UNRESOLVED")):
             block("CLAIM_EVIDENCE_CLASSIFICATION_CONFLICT")
 
+        if classification == "SOURCE_DECLARED" and expected_classes == {"SOURCE_DECLARED"}:
+            cited_declarations.update(evidence_files)
+
+    if mig5:
+        for name in evidence_names:
+            if name not in cited_declarations:
+                pending.append({"file": name, "code": "PINNED_EVIDENCE_CLAIM_REQUIRED"})
     for name in DELIVERABLES:
         if not any(deliverable == name for deliverable, _ in covered):
             pending.append({"deliverable": name, "code": "DELIVERABLE_CLAIMS_REVIEW_REQUIRED"})

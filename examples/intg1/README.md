@@ -91,3 +91,6 @@ GATE-1 PASS permits this engineering continuation. The bundle retains
 DRAFT authority, UNAVAILABLE behavioral evidence, UNVERIFIABLE semantic
 verification, BLOCKED semantic acceptance, NOT_RUN reference and benchmark
 execution, and UNBOUND historical source/run provenance.
+
+For the opt-in pinned public preparation and population gate suite, see the
+[INTG-3A MIG-5 operator workflow](../intg3a/README.md).

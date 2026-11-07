@@ -1,0 +1,164 @@
+"""Exercise the approval boundary on the pinned public MIG-5 subject."""
+
+from hashlib import sha256
+import json
+from pathlib import Path
+import subprocess
+import sys
+from tempfile import TemporaryDirectory
+import unittest
+from uuid import uuid4
+
+from test_review_workflow import ROOT, call, remove_destination
+
+
+SCRIPT = ROOT / "scripts/review_mig5.py"
+PREP = "PREPARATION_EVIDENCE.json"
+POP = "POPULATION_EVIDENCE.json"
+
+
+@unittest.skipUnless(sys.platform in ("darwin", "linux"), "Existing POSIX evidence workflow")
+class Mig5OperatorTests(unittest.TestCase):
+    def destination(self, stage="intg3a"):
+        path = Path("/tmp") / f"sas-re-{stage}-{uuid4().hex}"
+        self.addCleanup(remove_destination, path)
+        return path
+
+    def run_operator(self, mode, destination, *args):
+        result = subprocess.run([sys.executable, "-IB", str(SCRIPT), mode, "--destination",
+                                 str(destination), *map(str, args)], capture_output=True, timeout=60)
+        return result.returncode, json.loads(result.stdout)
+
+    def setUp(self):
+        root = Path(self.enterContext(TemporaryDirectory())).resolve()
+        self.record = root / "claims.json"
+        self.approval = root / "approval.json"
+        self.package = self.prepare()
+        evidence = json.loads((self.package / POP).read_bytes())
+        index = next(i for i, item in enumerate(evidence["interval_effects"]["findings"])
+                     if "sql_declaration" in item)
+        statements = (
+            ("reconstruction", "The first preparation rule tests status membership.", "SOURCE_DECLARED", PREP,
+             "/declared_operation/status_rule_recovery/rules/0/predicate"),
+            ("prd", "The population fragment declares a duplicate audit.", "SOURCE_DECLARED", POP,
+             f"/interval_effects/findings/{index}/sql_declaration"),
+            ("dependency_analysis", "SAS dataset continuity is unresolved.", "UNRESOLVED",
+             "MANIFEST.json", "/sas_dataset_continuity"),
+            ("verification_plan", "Behavioral evidence is unavailable.", "PACKAGE_METADATA",
+             "MANIFEST.json", "/behavioral_evidence"),
+            ("adr", "The public route runs the pinned scenario suite.", "PACKAGE_METADATA",
+             "MANIFEST.json", "/scenario"),
+        )
+        self.claims = {
+            "version": 1,
+            "manifest_sha256": sha256((self.package / "MANIFEST.json").read_bytes()).hexdigest(),
+            "deliverables": {name: {"Review": text} for name, text, *_ in statements},
+            "claims": [
+                {"id": name, "text": text, "classification": classification, "deliverable": name,
+                 "section": "Review", "disposition": "APPROVED",
+                 "evidence": [{"file": file, "pointer": pointer}]}
+                for name, text, classification, file, pointer in statements
+            ],
+        }
+        self.approve()
+
+    def approve(self):
+        self.record.write_text(json.dumps(self.claims), encoding="utf-8")
+        self.approval.write_text(json.dumps({
+            "record_sha256": sha256(self.record.read_bytes()).hexdigest(),
+            "reviewer": "Synthetic test reviewer", "decision": "APPROVED",
+        }), encoding="utf-8")
+
+    def prepare(self):
+        path = self.destination()
+        status, report = self.run_operator("prepare", path)
+        self.assertEqual(status, 0, report)
+        return path.resolve()
+
+    def proceed(self, approved=True):
+        path = self.destination()
+        args = ["--package", self.package, "--record", self.record]
+        if approved:
+            args.extend(("--approval", self.approval))
+        status, report = self.run_operator("continue", path, *args)
+        return status, report, path
+
+    def assert_refused(self, status, decision, code, *, approved=True):
+        observed, report, path = self.proceed(approved)
+        self.assertEqual(observed, status, report)
+        self.assertEqual(report["decision"], decision)
+        self.assertIn(code, [item["code"] for item in report.get("blocks", []) + report.get("pending", [])])
+        self.assertFalse(path.exists())
+
+    def test_approval_binding_and_refusal(self):
+        self.assert_refused(1, "REVIEW_REQUIRED", "BOUND_HUMAN_APPROVAL_REQUIRED", approved=False)
+        self.record.write_bytes(self.record.read_bytes() + b"\n")
+        self.assert_refused(1, "REVIEW_REQUIRED", "BOUND_HUMAN_APPROVAL_REQUIRED")
+        self.claims["deliverables"]["adr"]["Review"] += " Traced the declared handoff."
+        self.approve()
+        self.assert_refused(2, "BLOCK", "DECLARED_HANDOFF")
+        self.claims["deliverables"]["adr"]["Review"] = "The public route runs the pinned scenario suite."
+        claim = self.claims["claims"][1]
+        claim.update(classification="PACKAGE_METADATA",
+                     evidence=[{"file": "MANIFEST.json", "pointer": "/scenario"}])
+        self.approve()
+        self.assert_refused(1, "REVIEW_REQUIRED", "PINNED_EVIDENCE_CLAIM_REQUIRED")
+
+    def test_evidence_cannot_be_changed_removed_or_rebound(self):
+        for name in (PREP, POP):
+            with self.subTest(name=name):
+                evidence = self.package / name
+                raw = evidence.read_bytes()
+                evidence.write_bytes(raw + b"\n")
+                self.assert_refused(2, "BLOCK", "REVIEW_PACKAGE_PAYLOAD_MISMATCH")
+                evidence.unlink()
+                self.assert_refused(2, "BLOCK", "FILE_NOT_FOUND")
+                evidence.write_bytes(raw)
+
+        manifest_path = self.package / "MANIFEST.json"
+        manifest = json.loads(manifest_path.read_bytes())
+        raw = (self.package / PREP).read_bytes() + b"\n"
+        (self.package / PREP).write_bytes(raw)
+        manifest["files"][PREP] = {"sha256": sha256(raw).hexdigest(), "bytes": len(raw)}
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        self.claims["manifest_sha256"] = sha256(manifest_path.read_bytes()).hexdigest()
+        self.approve()
+        self.assert_refused(2, "BLOCK", "REVIEW_MANIFEST_SHA256_MISMATCH")
+
+    def test_publication_replays_and_preserves_standalone_mig5(self):
+        def snapshot(path):
+            return {item.name: item.read_bytes() for item in path.iterdir()}
+
+        subject = snapshot(self.package)
+        self.assertEqual(subject, snapshot(self.prepare()))
+        copies = []
+        for _ in range(2):
+            status, report, path = self.proceed()
+            self.assertEqual(status, 0, report)
+            self.assertEqual((report["decision"], report["migration"], report["comparison"]),
+                             ("PASS", "PUBLISHED", "PASS"))
+            copies.append(snapshot(path))
+        self.assertEqual(*copies)
+        files = copies[0]
+        self.assertEqual(subject, snapshot(self.package))
+        output = self.destination("mig5")
+        result = call(output, script=ROOT / "scripts/migrate_preparation_gates.py", extra=(
+            "--preparation-evidence", str(self.package / PREP),
+            "--population-evidence", str(self.package / POP),
+        ))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for name, raw in snapshot(output).items():
+            self.assertEqual(files["CANDIDATE_MANIFEST.json" if name == "MANIFEST.json" else name], raw)
+        runs = {row["scenario"]: row for row in json.loads(files["SCENARIO_RESULTS.json"])}
+        self.assertEqual(runs["passes"]["continuation"], "PROCEED")
+        self.assertEqual(runs["duplicates"]["continuation"], "BLOCK")
+        self.assertEqual(runs["duplicates"]["population"]["duplicate_groups"],
+                         [{"id": 1, "duplicate_count": 2}])
+        self.assertNotIn("PREPARED_EXPORT.csv", files)
+        self.assertNotIn("SCORES.json", files)
+        manifest = json.loads(files["MANIFEST.json"])
+        self.assertEqual(manifest["semantic_acceptance"], "BLOCKED")
+        self.assertEqual(manifest["input_manifest_sha256"], self.claims["manifest_sha256"])
+        self.assertEqual(manifest["reviewer_approval"]["sha256"], sha256(self.approval.read_bytes()).hexdigest())
+        for name, identity in manifest["files"].items():
+            self.assertEqual(identity["sha256"], sha256(files[name]).hexdigest())
