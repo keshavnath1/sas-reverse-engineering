@@ -65,3 +65,18 @@ planning and architecture decisions. Review the five drafts against the graph
 and keep them separate from the deterministic package. This route supports
 design review only. Existing GATE-1 and candidate publication routes retain
 their own evidence and approval contracts.
+
+Run citation preflight before human review of the Copilot Markdown draft:
+
+```bash
+python3.12 -IB scripts/check_p2a_citations.py \
+  --package /tmp/sas-re-int1-p2a-review --intake /path/to/INTAKE \
+  --draft /path/to/COPILOT_DELIVERABLES.md
+```
+
+Use canonical paths for the preflight inputs (on macOS, use `/private/tmp`
+in place of the `/tmp` alias). Use one inline code span per citation, such as `EVIDENCE.json#/operations/0`.
+The checker verifies the cited documents' package bindings and uses the
+existing claim-gate pointer resolver. `BLOCK` reports unresolved or malformed
+citations. `REVIEW_REQUIRED` means the supplied citations resolved. Claim
+coverage, factual support and classification still require human review.

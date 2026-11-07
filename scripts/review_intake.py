@@ -577,11 +577,33 @@ from each draft into the next. Save the drafts separately from this package.
 | sas-validate | Verification plan. Separate structural checks, proposed public engineering cases and attributable SAS reference evidence. Address join multiplicity and missing values, BY input order, retained state and conditional queue advancement where represented. Unbound LOG/LST provides no run evidence. |
 | sas-architect | ADR with conditional native and distributed designs. Tie each option to the actual dependencies, ordering and state, and state what must be proved before partitioning or benchmarking. Leave runtime selection pending. |
 
-Cite the supplied filename and JSON pointer for each material claim. Add
-canonical operation or edge IDs and original spans where applicable. Preserve
-the graph's classifications. Separate source declarations, inferred
-relationships, synthetic assumptions, unresolved behavior and proposed designs.
-Report checks actually performed separately from pending checks.
+For each material claim, put every JSON citation in its own inline code
+span using the exact form `FILENAME#/pointer`. Use bare filenames
+and one complete pointer per span. Cite only paths you opened and verified;
+never infer list indices from line numbers or use pointer ranges. The
+inventory has no approval or binding fields. The YAML drafts carry those
+fields. Before human review, the operator runs `scripts/check_p2a_citations.py`
+on the draft and returns any unresolved pointers for correction. A clean
+preflight still requires human review of coverage, meaning and classification.
+Add canonical operation or edge IDs and original spans where applicable. Apply
+these classifications consistently in every section:
+
+| Classification | Use and citation |
+| --- | --- |
+| SOURCE_DECLARED | An individual source-backed declaration or statement. Cite its operation fact and original span. A graph summary, inferred dependency, or profile value cannot establish a source declaration. |
+| INFERRED | A derived relationship or interpretation. Cite the specific edge or interpretation record and preserve its original graph classification. An edge marked INFERENCE remains inferred even when both endpoints have source citations. |
+| PROFILE_ASSUMPTION | A declared synthetic input descriptor, input sort order, row sample, or missing-value join policy. Cite the specific profile.json field. Describe its use by the graph separately from any source-declared BY or JOIN. |
+| PACKAGE_METADATA | Manifest statuses, counts, recorded identities, or YAML draft settings and approvals. Cite the exact status, count, digest, or setting. |
+| UNRESOLVED | Missing runtime, provenance, behavioral, or partitioning proof. Cite the relevant finding or boundary. |
+| PROPOSED | A draft requirement, test, or architecture decision. Cite the evidence that motivates it and state what would validate it. |
+
+Split claims that combine different evidence classes. Keep graph labels
+intact when describing what the graph records. Scope validation to the
+operations actually present. Request reference outputs for the cited
+operations and do not introduce scoring or other absent stages. Report checks
+actually performed separately from pending checks. Comparing recorded hashes
+is an identity consistency check. Report byte-level verification only if
+hashes were recomputed.
 
 The YAML files are drafts for operator review. This P2A package supports a
 design review only. GATE-1 and candidate continuation are outside this route.

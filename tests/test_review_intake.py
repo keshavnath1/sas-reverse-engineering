@@ -101,6 +101,10 @@ class IntakeReviewTests(unittest.TestCase):
                 self.assertIn(f"| {skill} |", handoff)
             self.assertIn("GATE-1 and candidate continuation are outside this route", handoff)
             self.assertNotIn("SOURCE_1.json", handoff)
+            for label in ("SOURCE_DECLARED", "INFERRED", "PROFILE_ASSUMPTION", "PACKAGE_METADATA",
+                          "UNRESOLVED", "PROPOSED"):
+                self.assertIn(f"| {label} |", handoff)
+            self.assertIn("An edge marked INFERENCE remains inferred", handoff)
             for name in ("migration-profile.yaml", "tie-out.yaml"):
                 draft = json.loads((drafts / name).read_bytes())
                 self.assertEqual(draft["binding"]["manifest_sha256"],
@@ -111,6 +115,29 @@ class IntakeReviewTests(unittest.TestCase):
             tie_out = json.loads((drafts / "tie-out.yaml").read_bytes())
             self.assertEqual(tie_out["reference"]["sas_execution"], "NOT_RUN")
             self.assertEqual(tie_out["reference"]["semantic_acceptance"], "BLOCKED")
+
+            draft = drafts.parent / f"p2a-citations-{uuid.uuid4().hex}.md"
+            self.addCleanup(draft.unlink, missing_ok=True)
+            command = [sys.executable, "-IB", str(ROOT / "scripts/check_p2a_citations.py"),
+                       "--package", str(drafts.resolve()), "--intake", str(root), "--draft", str(draft.resolve())]
+            valid = ("`EVIDENCE.json#/operations/0` `profile.json#/inputs/0/sorted_by`"
+                     " `scope.json#/profile_sha256`")
+            invalid = ("\n`INVENTORY.json#/binding/manifest_sha256`"
+                       "\n`INVENTORY.json#/approval/business_intent`"
+                       "\n`EVIDENCE.json#/statement_coverage/24`"
+                       "\nEVIDENCE.json#/operations/0")
+            for body, status, decision, count in (
+                (valid, 0, "REVIEW_REQUIRED", 0), (valid + invalid, 2, "BLOCK", 4),
+            ):
+                draft.write_text(body)
+                preflight = subprocess.run(command, capture_output=True, timeout=60)
+                self.assertEqual(preflight.returncode, status, preflight.stdout + preflight.stderr)
+                report = json.loads(preflight.stdout)
+                self.assertEqual(report["decision"], decision)
+                self.assertEqual(len(report["findings"]), count)
+                self.assertEqual(report["draft"]["sha256"], sha256(draft.read_bytes()).hexdigest())
+                self.assertEqual(report["semantic_acceptance"], "BLOCKED")
+                self.assertEqual(report["reference_experiment"], "NOT_RUN")
 
             scope["includes"] = []
             scope_file.write_text(json.dumps(scope))
