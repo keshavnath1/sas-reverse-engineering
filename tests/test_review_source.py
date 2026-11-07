@@ -96,3 +96,71 @@ class SourceReviewTests(unittest.TestCase):
                 self.assertEqual(evidence["source"]["selected_span"]["sha256"], sha256(raw).hexdigest())
                 self.assertIsNone(evidence["declared_operation"])
                 self.assertTrue(evidence["reason_codes"])
+
+    def test_data_step_recovers_declarations_and_six_separate_gaps(self):
+        statements = [
+            b"data work.target;",
+            b"set work.input;",
+            b"if category not in ('A','B') then delete;",
+            b"if category = 'A' then label = 1;",
+            b"else if category = 'B' then label = 0;",
+            b"if missing(key) then delete;",
+            b"if cmiss(x,",
+            b" y) > 0 then delete;",
+            b"if cmiss(z) > 0 then delete;",
+            b"keep key label;",
+            b"run;",
+        ]
+        raw = PREFIX + b"\r\n".join(statements)
+        run, dest = self.review(raw, lines="3:13")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        evidence = json.loads((dest / "EVIDENCE.json").read_bytes())
+        self.assertEqual(evidence["source"]["sha256"], sha256(raw).hexdigest())
+        self.assertEqual(evidence["source"]["selected_span"]["start"], len(PREFIX))
+        self.assertEqual(evidence["source"]["selected_span"]["end"], len(raw))
+        self.assertEqual(evidence["review_status"], "PARTIAL")
+        self.assertEqual(evidence["syntax_recognition"], "PARTIAL")
+        self.assertEqual(evidence["supported_profile_reconstruction"], "NOT_RUN")
+        op = evidence["declared_operation"]
+        self.assertEqual((op["kind"], op["input"], op["output"], op["selected_columns"]),
+                         ("DATA_STEP", "work.input", "work.target", ["key", "label"]))
+        for key, index in (("output", 0), ("input", 1), ("keep", 9)):
+            location = op["declaration_spans"][key]
+            self.assertEqual(location["line_start"], index + 3)
+            self.assertEqual(raw[location["start"]:location["end"]], statements[index])
+        gaps = op["unsupported_statements"]
+        expected = [(2, 2), (3, 3), (4, 4), (5, 5), (6, 7), (8, 8)]
+        self.assertEqual(len(gaps), len(expected))
+        for gap, (first, last) in zip(gaps, expected, strict=True):
+            location = gap["span"]
+            text = b"\r\n".join(statements[first:last + 1])
+            start = len(PREFIX) + sum(len(line) + 2 for line in statements[:first])
+            self.assertEqual(location, {
+                "line_start": first + 3, "line_end": last + 3,
+                "start": start, "end": start + len(text), "sha256": sha256(text).hexdigest(),
+            })
+            self.assertTrue(gap["reason_codes"])
+        self.assertEqual(op["row_selection"], "UNKNOWN")
+        self.assertEqual(op["selected_column_values_and_derivation"], "UNKNOWN")
+        self.assertNotIn("control_lineage", op)
+        self.assertEqual(evidence["behavioral_evidence"], "UNAVAILABLE")
+        readme = (dest / "README.md").read_bytes()
+        self.assertIn(b"2 output selections", readme)
+        self.assertNotIn(statements[3], readme)
+        self.assertNotIn(b"PASS", (dest / "EVIDENCE.json").read_bytes())
+        again, second = self.review(raw, lines="3:13")
+        self.assertEqual(again.returncode, 0, again.stderr)
+        self.assertEqual({p.name: p.read_bytes() for p in dest.iterdir()},
+                         {p.name: p.read_bytes() for p in second.iterdir()})
+
+    def test_data_review_requires_one_terminated_step_and_one_set_input(self):
+        raw = b"data work.target; set work.input; label = 1; keep label; run;"
+        run, dest = self.review(raw, lines="1:1")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        op = json.loads((dest / "EVIDENCE.json").read_bytes())["declared_operation"]
+        self.assertEqual(op["unsupported_statements"][0]["reason_codes"],
+                         ["TRANSFORMATION_OUTSIDE_REVIEW_SCOPE"])
+        for bad in (raw.removesuffix(b" run;"), raw.replace(b"set work.input;", b"set work.input work.other;")):
+            run, dest = self.review(bad, lines="1:1")
+            self.assertEqual(run.returncode, 2, run.stderr)
+            self.assertIsNone(json.loads((dest / "EVIDENCE.json").read_bytes())["declared_operation"])

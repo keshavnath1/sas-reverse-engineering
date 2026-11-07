@@ -71,7 +71,7 @@ and SQL's own ordering contract. The stateful package selects that revision.
 Real-source intake, broader syntax, native Windows qualification and independent
 semantic evaluation require separate authorization.
 
-## Review an authorized SAS SORT span
+## Review an authorized SAS SORT or DATA-step span
 
 On the existing POSIX developer setup, supply one authorized SAS file outside
 the checkout, its expected SHA-256 and an inclusive line range.
@@ -85,10 +85,18 @@ python3.12 -IB scripts/review_source.py \
 Use an absolute source path with real directory components and a fresh destination.
 The command hashes the original file with the existing 8 MiB read limit and
 parses at most 64 KiB from the selected lines. It accepts one bounded SORT block
-and refuses macro markers in that span. The review includes a dependency map,
+or one terminated DATA step with a single SET input and a statement-form KEEP.
+It refuses macro markers in that span. The review includes a dependency map,
 draft requirements and conditional architecture considerations. Its evidence
 register records original byte offsets, source and span hashes, and declared
 identifiers. It carries no source excerpts or local input path.
+
+For a DATA step, the review recovers the DATA, SET and KEEP declarations.
+Every transformation outside that scope has its own evidence entry with
+original lines, byte offsets, a digest and reason codes. KEEP names are declared
+output selections. Row eligibility, column values, label derivation and
+input/output types remain unknown. A DATA review with gaps reports PARTIAL
+syntax recognition and exits 0 when the partial package is written.
 
 Exit 0 means a partial source-only review was written. Exit 2 means refusal.
 For a verified source and valid range with unsupported syntax, the command

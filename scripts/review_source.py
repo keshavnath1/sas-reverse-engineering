@@ -1,4 +1,4 @@
-"""Review one explicitly selected SAS SORT span as source evidence."""
+"""Review one explicitly selected SAS SORT or DATA-step span as source evidence."""
 
 import argparse
 from hashlib import sha256
@@ -47,7 +47,81 @@ def line_span(raw, first, last):
     raise ValueError("LINE_RANGE_OUTSIDE_SOURCE")
 
 
-def inspect_sort(span, first, start):
+def original_location(location, first, start):
+    return {
+        "line_start": first + location["line_start"] - 1,
+        "line_end": first + location["line_end"] - 1,
+        "start": start + location["start"],
+        "end": start + location["end"],
+    }
+
+
+def inspect_data(parsed, span, first, start):
+    operation, = parsed["operations"]
+    statements = [item for item in parsed["statements"] if item["classification"] != "COMMENT"]
+    if ([item["classification"] for item in (statements[0], statements[-1])]
+            != ["HEADER", "TERMINATOR"]
+            or statements[0]["span"]["start"] != operation["span"]["start"]
+            or statements[-1]["span"]["end"] != operation["span"]["end"]):
+        return None, ["SINGLE_TERMINATED_DATA_STEP_REQUIRED"]
+
+    declarations = {}
+    for kind in ("output", "input", "keep"):
+        matches = [fact for fact in operation["facts"] if fact["kind"] == kind]
+        if len(matches) != 1:
+            return None, ["SINGLE_DATA_SET_KEEP_REQUIRED"]
+        declarations[kind] = matches[0]
+    input_fact = declarations["input"]
+    if input_fact["mode"] != "SET" or len(input_fact["datasets"]) != 1:
+        return None, ["SINGLE_SET_INPUT_REQUIRED"]
+
+    def bounds(location):
+        return location["start"], location["end"]
+
+    def bound_location(location):
+        a, b = bounds(location)
+        return {**original_location(location, first, start), "sha256": sha256(span[a:b]).hexdigest()}
+
+    # Parser fact spans can exclude the semicolon. Bind each declaration to
+    # its containing statement before deciding which statements are gaps.
+    declaration_locations = {}
+    for kind, fact in declarations.items():
+        a, b = bounds(fact["span"])
+        location = next(item["span"] for item in statements
+                        if item["span"]["start"] <= a and b <= item["span"]["end"])
+        declaration_locations[kind] = location
+    recovered = {bounds(location) for location in declaration_locations.values()}
+    gaps = {
+        bounds(item["span"]): (item["span"], set())
+        for item in statements[1:-1] if bounds(item["span"]) not in recovered
+    }
+    for issue in parsed["issues"]:
+        location = issue["span"]
+        gaps.setdefault(bounds(location), (location, set()))[1].add(issue["code"])
+    unsupported = [
+        {
+            "span": bound_location(location),
+            "reason_codes": sorted(codes) or ["TRANSFORMATION_OUTSIDE_REVIEW_SCOPE"],
+            "effect": "ROW_SELECTION_OR_VALUE_DERIVATION_UNRESOLVED",
+        }
+        for _, (location, codes) in sorted(gaps.items())
+    ]
+    return {
+        "kind": "DATA_STEP",
+        "input": input_fact["datasets"][0],
+        "output": declarations["output"]["dataset"],
+        "selected_columns": declarations["keep"]["names"],
+        "span": bound_location(operation["span"]),
+        "declaration_spans": {kind: bound_location(location) for kind, location in declaration_locations.items()},
+        "unsupported_statements": unsupported,
+        "row_selection": "UNKNOWN",
+        "selected_column_values_and_derivation": "UNKNOWN",
+        "input_schema": "UNKNOWN",
+        "output_schema": "UNKNOWN",
+    }, []
+
+
+def inspect_span(span, first, start):
     if len(span) > MAX_SPAN_BYTES:
         return None, ["SPAN_SIZE_LIMIT"]
     # Keep macro processing outside this entry point, including literal LET.
@@ -57,9 +131,11 @@ def inspect_sort(span, first, start):
         parsed = parse_source(span, file_key="source")
     except UnicodeDecodeError:
         return None, ["SPAN_NOT_UTF8"]
+    operations = parsed["operations"]
+    if len(operations) == 1 and operations[0]["kind"] == "DATA_STEP":
+        return inspect_data(parsed, span, first, start)
     if parsed["issues"]:
         return None, sorted({issue["code"] for issue in parsed["issues"]})
-    operations = parsed["operations"]
     statements = [item["classification"] for item in parsed["statements"]
                   if item["classification"] != "COMMENT"]
     if (len(operations) != 1 or operations[0]["kind"] != "PROC_SORT"
@@ -68,22 +144,14 @@ def inspect_sort(span, first, start):
     operation = operations[0]
     fact, = operation["facts"]
 
-    def original_location(location):
-        return {
-            "line_start": first + location["line_start"] - 1,
-            "line_end": first + location["line_end"] - 1,
-            "start": start + location["start"],
-            "end": start + location["end"],
-        }
-
     return {
         "kind": "PROC_SORT",
         "input": fact["input"],
         "output": fact["output"],
         "ordering_keys": fact["keys"],
         "declared_direction": "ASCENDING",
-        "span": original_location(operation["span"]),
-        "ordering_span": original_location(fact["span"]),
+        "span": original_location(operation["span"], first, start),
+        "ordering_span": original_location(fact["span"], first, start),
     }, []
 
 
@@ -105,6 +173,34 @@ def review_text(evidence):
     operation = evidence["declared_operation"]
     if operation is None:
         lines += ["**Unsupported span.** Review reason codes in the evidence register."]
+    elif operation["kind"] == "DATA_STEP":
+        columns = ", ".join(f"`{name}`" for name in operation["selected_columns"])
+        lines += [
+            "## Declared dependency map", "",
+            f"Unresolved upstream → `{operation['input']}` → DATA step "
+            f"→ `{operation['output']}` → unresolved downstream.", "",
+            f"KEEP declares {len(operation['selected_columns'])} output selections: {columns}.",
+            "Input and output schemas, row selection, selected values and label derivation remain unknown.", "",
+            "## Unsupported statement register", "",
+        ]
+        for gap in operation["unsupported_statements"]:
+            location = gap["span"]
+            reasons = ", ".join(gap["reason_codes"])
+            lines.append(f"- Lines {location['line_start']}–{location['line_end']}, original bytes "
+                         f"[{location['start']}, {location['end']}), SHA-256 `{location['sha256']}`. "
+                         f"{reasons}. Row selection or value derivation remains unresolved.")
+        if not operation["unsupported_statements"]:
+            lines.append("The review recovered the declared input, output and selection.")
+        lines += [
+            "", "## Draft requirements and architecture", "",
+            "- Confirm input and output descriptors and use the declared KEEP selection as a "
+            "candidate output contract.",
+            "- Establish the ordered transformation and exclusion rules with bound reference "
+            "rows before specifying survivor counts or derived label values.",
+            "- Consider a local preparation stage when the input and working set fit memory. "
+            "A partitioned alternative requires evidence for row selection, branch order, "
+            "state dependencies and output preservation across partitions and retries.",
+        ]
     else:
         keys = ", ".join(f"`{key}`" for key in operation["ordering_keys"])
         lines += [
@@ -158,12 +254,16 @@ def main():
             parser.exit(2, "source_identity: REFUSED (SOURCE_SHA256_MISMATCH)\n")
         start, end = line_span(raw, first, last)
         span = raw[start:end]
-        operation, reasons = inspect_sort(span, first, start)
+        operation, reasons = inspect_span(span, first, start)
+        is_data = operation is not None and operation["kind"] == "DATA_STEP"
+        syntax = "SUPPORTED" if operation else "UNSUPPORTED"
+        if is_data and operation["unsupported_statements"]:
+            syntax = "PARTIAL"
         evidence = {
             **STATUS,
-            "review_format": "source-only-sort/1",
+            "review_format": "source-only-data/1" if is_data else "source-only-sort/1",
             "source_identity": "VERIFIED",
-            "syntax_recognition": "SUPPORTED" if operation else "UNSUPPORTED",
+            "syntax_recognition": syntax,
             "review_status": "PARTIAL" if operation else "BLOCKED",
             "source": {
                 "sha256": source_digest,
