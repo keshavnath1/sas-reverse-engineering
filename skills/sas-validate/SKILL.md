@@ -1,7 +1,18 @@
 ---
 name: sas-validate
-description: Reconcile either approved public SAS workflow's behavioral controls with frozen cases and original evidence. Use to explain expected defects, unverified semantics, and the correctness evidence still needed by candidate architectures.
+description: Reconcile either approved public SAS workflow's behavioral controls with frozen cases and original evidence. Use to explain expected defects, unverified semantics, and the correctness evidence still needed by candidate architectures. Also use for an explicitly supplied public ML-2/MOD-2 modeling evidence package.
 ---
+
+## Public ML-2/MOD-2 modeling package
+
+Use this path when the request supplies the public ML-2 source review (EVIDENCE.json, or ML2_EVIDENCE.json in a review bundle) and its matching MOD-2 package. Confirm the manifest and plan refer to the same source and review identity before drawing conclusions. Use only the supplied artifacts. A canonical graph, legacy fixture reports and SAS tie-out are not prerequisites for this path. Report missing or mismatched evidence without filling gaps from another fixture.
+
+1. Inspect MANIFEST.json, VALIDATION.json, DESIGN.json, SCORES.json and the mapping and coefficients. Reconcile each public case's audit keys, expected and observed scores, and the reported tolerance. Distinguish a recorded check from a check you performed.
+2. Return a verification plan separating declaration checks, public engineering checks, independent SAS comparison and human acceptance. Name missing SAS descriptors, response profile, CLASS columns, fitted outputs and attributable scored rows. Preserve fitting, convergence, ODS production and reference execution as NOT_RUN.
+
+Label every material claim **SOURCE_DECLARED**, **CANDIDATE_ENGINEERING**, **INFERRED** or **UNRESOLVED**. Cite its supplied filename and JSON pointer or source location, including original byte ranges when available. Report the review actions actually performed separately from skill discovery, loads or file reads. Keep the result DRAFT, behavioral evidence UNAVAILABLE, semantic verification UNVERIFIABLE, acceptance BLOCKED, reference and benchmark execution NOT_RUN, and historical provenance UNBOUND. Return notes without editing artifacts or executing SAS.
+
+## Original synthetic fixture workflows
 
 Review evidence availability in MANIFEST.json before opening [TIEOUT.json](../../examples/offline-review/TIEOUT.json) from one existing [manifest-bound package](../../examples/offline-review/MANIFEST.json) or a requested fresh output of [review_workflow.py](../../scripts/review_workflow.py). Existing-package inspection requires no execution receipt. Read every package document from that chosen directory. Links here locate the checked-in example. The existing [tie-out script](../../scripts/mvp3_tieout.py) owns behavioral computation. Inspection can use its recorded results without rerunning it.
 

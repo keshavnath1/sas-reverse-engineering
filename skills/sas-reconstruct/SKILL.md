@@ -1,7 +1,18 @@
 ---
 name: sas-reconstruct
-description: Reconstruct or trace either approved public synthetic SAS workflow with the existing offline Python engine. Use for source identity, module ownership, data flow, dependency edges, and unresolved evidence.
+description: Reconstruct or trace either approved public synthetic SAS workflow with the existing offline Python engine. Use for source identity, module ownership, data flow, dependency edges, and unresolved evidence. Also use for an explicitly supplied public ML-2/MOD-2 modeling evidence package.
 ---
+
+## Public ML-2/MOD-2 modeling package
+
+Use this path when the request supplies the public ML-2 source review (EVIDENCE.json, or ML2_EVIDENCE.json in a review bundle) and its matching MOD-2 package. Confirm the manifest and plan refer to the same source and review identity before drawing conclusions. Use only the supplied artifacts. A canonical graph, legacy fixture reports and SAS tie-out are not prerequisites for this path. Report missing or mismatched evidence without filling gaps from another fixture.
+
+1. Resolve the MODEL input, output and score columns in the evidence. Cite their original spans and identify the prepared dataset as the declared input. Keep the sorted CSV separate if described in the guide. Treat pre-sort row-end eligibility in PLAN.json as candidate engineering.
+2. Return a short dependency and uncertainty review. Record the evidence pointers and byte anchors you resolved. Mark historical dataset continuity, execution order and step-check effects unresolved.
+
+Label every material claim **SOURCE_DECLARED**, **CANDIDATE_ENGINEERING**, **INFERRED** or **UNRESOLVED**. Cite its supplied filename and JSON pointer or source location, including original byte ranges when available. Report the review actions actually performed separately from skill discovery, loads or file reads. Keep the result DRAFT, behavioral evidence UNAVAILABLE, semantic verification UNVERIFIABLE, acceptance BLOCKED, reference and benchmark execution NOT_RUN, and historical provenance UNBOUND. Return notes without editing artifacts or executing SAS.
+
+## Original synthetic fixture workflows
 
 Inspect an existing manifest-bound package for `mvp2` or `by-retain-and-sum`, including the [checked-in example](../../examples/offline-review/README.md), or generate a fresh package when requested. For fresh reconstruction, run from this checkout with the prepared Python 3.12 environment active on a supported POSIX development host. Choose an unused destination and preserve any existing directory.
 

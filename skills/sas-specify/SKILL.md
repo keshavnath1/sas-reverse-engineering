@@ -1,7 +1,18 @@
 ---
 name: sas-specify
-description: Review the draft PRD and module specifications for either approved synthetic SAS workflow. Use to trace requirements to source evidence, find unsupported business claims, and identify questions for an owner.
+description: Review the draft PRD and module specifications for either approved synthetic SAS workflow. Use to trace requirements to source evidence, find unsupported business claims, and identify questions for an owner. Also use for an explicitly supplied public ML-2/MOD-2 modeling evidence package.
 ---
+
+## Public ML-2/MOD-2 modeling package
+
+Use this path when the request supplies the public ML-2 source review (EVIDENCE.json, or ML2_EVIDENCE.json in a review bundle) and its matching MOD-2 package. Confirm the manifest and plan refer to the same source and review identity before drawing conclusions. Use only the supplied artifacts. A canonical graph, legacy fixture reports and SAS tie-out are not prerequisites for this path. Report missing or mismatched evidence without filling gaps from another fixture.
+
+1. Trace the response, predictor order, CLASS references, scores and declared ODS targets from the source records. Use PLAN.json for the candidate event, encoding and eligibility rules.
+2. Return a modeling PRD with testable acceptance criteria, owner questions and a traceable requirement for each boundary. Record which source and candidate records support the requirements.
+
+Label every material claim **SOURCE_DECLARED**, **CANDIDATE_ENGINEERING**, **INFERRED** or **UNRESOLVED**. Cite its supplied filename and JSON pointer or source location, including original byte ranges when available. Report the review actions actually performed separately from skill discovery, loads or file reads. Keep the result DRAFT, behavioral evidence UNAVAILABLE, semantic verification UNVERIFIABLE, acceptance BLOCKED, reference and benchmark execution NOT_RUN, and historical provenance UNBOUND. Return notes without editing artifacts or executing SAS.
+
+## Original synthetic fixture workflows
 
 Work from one output of [review_workflow.py](../../scripts/review_workflow.py) or the [checked-in example](../../examples/offline-review/README.md). Use the [manifest](../../examples/offline-review/MANIFEST.json) to identify the subject and files. The engine's [generate_preview](../../src/sas_re/_draft_preview.py) already produces the drafts. Make review notes separately.
 

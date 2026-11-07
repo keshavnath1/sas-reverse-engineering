@@ -1,7 +1,18 @@
 ---
 name: sas-analyze
-description: Review dependency constraints and conditional optimization ideas for either approved public synthetic SAS workflow. Use to trace sequential boundaries, question independence claims, and identify missing parallelism proof.
+description: Review dependency constraints and conditional optimization ideas for either approved public synthetic SAS workflow. Use to trace sequential boundaries, question independence claims, and identify missing parallelism proof. Also use for an explicitly supplied public ML-2/MOD-2 modeling evidence package.
 ---
+
+## Public ML-2/MOD-2 modeling package
+
+Use this path when the request supplies the public ML-2 source review (EVIDENCE.json, or ML2_EVIDENCE.json in a review bundle) and its matching MOD-2 package. Confirm the manifest and plan refer to the same source and review identity before drawing conclusions. Use only the supplied artifacts. A canonical graph, legacy fixture reports and SAS tie-out are not prerequisites for this path. Report missing or mismatched evidence without filling gaps from another fixture.
+
+1. Compare the declared modeling input and outputs with the candidate's gate and pre-sort handoff in PLAN.json. Identify which dependency is source-declared and which belongs to the Python implementation.
+2. Return the execution-boundary assessment. Identify global category and fitting dependencies, and any conditional per-row scoring opportunity as an inference with proof obligations. Report absent partition, workload and benchmark evidence; make no claim of demonstrated independence.
+
+Label every material claim **SOURCE_DECLARED**, **CANDIDATE_ENGINEERING**, **INFERRED** or **UNRESOLVED**. Cite its supplied filename and JSON pointer or source location, including original byte ranges when available. Report the review actions actually performed separately from skill discovery, loads or file reads. Keep the result DRAFT, behavioral evidence UNAVAILABLE, semantic verification UNVERIFIABLE, acceptance BLOCKED, reference and benchmark execution NOT_RUN, and historical provenance UNBOUND. Return notes without editing artifacts or executing SAS.
+
+## Original synthetic fixture workflows
 
 Inspect one existing [manifest-bound package](../../examples/offline-review/MANIFEST.json), including the [checked-in example](../../examples/offline-review/README.md), or a requested fresh output of [review_workflow.py](../../scripts/review_workflow.py). Existing-package inspection requires no execution receipt. Read every package document from that chosen directory. Links here locate the checked-in example.
 
