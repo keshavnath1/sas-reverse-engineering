@@ -30,6 +30,9 @@ The report anchors refer to the original source byte coordinates.
 Save the complete deliverables and material claims outside the package
 using the [existing GATE-1 record and approval contract](../gate1/README.md).
 Use the SHA-256 of this subject's `MANIFEST.json` in the claim record.
+The [claim preflight](../gate1/README.md#prepare-a-copilot-draft-for-review)
+can wrap flat deliverables, prepare unreviewed claims and show GATE-1
+findings before human review.
 GATE-1 requires a source declaration claim from each evidence file.
 For example, cite a preparation rule at
 `/declared_operation/status_rule_recovery/rules/0/predicate` in

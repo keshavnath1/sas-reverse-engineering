@@ -74,3 +74,41 @@ keeps the producer and reader declarations separate, labels the potential
 handoff inferred, and keeps runtime lineage unresolved. Acceptance here
 applies to the submitted review. SAS verification stays UNVERIFIABLE and
 SAS acceptance stays BLOCKED.
+
+## Prepare a Copilot draft for review
+
+Ask Copilot for one JSON object per subject using the four record keys
+above. Supply the exact review manifest digest, all five complete
+deliverables, and a claim inventory with exact quoted text, section names,
+classifications and evidence pointers. Save each JSON object separately
+without Markdown fences. The preflight works with the existing INT-3 and
+pinned MIG-5 review subjects.
+
+```bash
+python3.12 -IB scripts/prepare_claim_record.py \
+  --package /private/tmp/example-review \
+  --draft /private/tmp/copilot-output/passes.json \
+  --destination /tmp/sas-re-claim-preflight-passes
+```
+
+The fresh destination contains the original `COPILOT_DRAFT.json`, the
+deterministic `CLAIMS_UNREVIEWED.json`, and `PREFLIGHT.json` with the
+draft identity and GATE-1 findings. A flat deliverable string keeps its
+complete text and is wrapped under its single cited section. A flat string
+with multiple claimed sections requires explicit section boundaries.
+For a pinned downstream subject, a matching scenario prefix on a
+manifest-listed citation filename is removed. Pointers, classifications,
+claim text, and prose are carried through for review. Every disposition
+starts as `UNREVIEWED`.
+
+The preflight exits 0 when GATE-1 returns `REVIEW_REQUIRED` and 2 on
+`BLOCK` or input refusal. A structurally usable record with GATE-1 blockers
+is retained with its findings for correction. A manifest mismatch or
+ambiguous flat structure is refused before the bundle is written.
+Use a new destination for a revised draft.
+
+The human reviewer checks complete claim coverage, evidence support and
+candidate assumptions before setting dispositions. Hash the final record
+after all edits and give GATE-1 a separate approval for that exact digest.
+Preflight has no approval input. For the integrated route, use a distinct
+draft, record and final approval for each scenario.

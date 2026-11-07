@@ -114,3 +114,36 @@ class ClaimAcceptanceGateTests(unittest.TestCase):
                 result = self.evaluate(record)
                 self.assertEqual(result["decision"], "BLOCK")
                 self.assertIn(code, [item["code"] for item in result["blocks"]])
+
+    def test_preflight_preserves_prose_and_requires_fresh_byte_bound_approval(self):
+        prepare = runpy.run_path(str(ROOT / "scripts/prepare_claim_record.py"))["prepare_record"]
+        draft = deepcopy(self.record)
+        draft["deliverables"]["prd"] = draft["deliverables"]["prd"]["Review"] + "\n\nDraft context."
+        raw = self.gate["json_bytes"](draft)
+        prepared, report = prepare(self.package, raw)
+        self.assertEqual((prepared, report), prepare(self.package, raw))
+        record = json.loads(prepared)
+        self.assertEqual(record["deliverables"]["prd"], {"Review": draft["deliverables"]["prd"]})
+        self.assertEqual(report["decision"], "REVIEW_REQUIRED")
+        self.assertFalse(report["blocks"])
+        self.assertEqual(report["record_sha256"], sha256(prepared).hexdigest())
+        self.assertTrue(all(claim["disposition"] == "UNREVIEWED" for claim in record["claims"]))
+        for claim in record["claims"]:
+            claim["disposition"] = "APPROVED"
+        self.assertEqual(self.evaluate(record, digest=report["record_sha256"])["decision"], "REVIEW_REQUIRED")
+        self.assertEqual(self.evaluate(record)["decision"], "PASS")
+
+    def test_preflight_retains_citation_and_prose_defects(self):
+        prepare = runpy.run_path(str(ROOT / "scripts/prepare_claim_record.py"))["prepare_record"]
+        draft = deepcopy(self.record)
+        name, (text, code) = next(iter(NEGATIVES.items()))
+        draft["deliverables"][name] = draft["deliverables"][name]["Review"] + "\n\n" + text
+        draft["claims"][0]["evidence"][0]["pointer"] = "/wrong"
+        prepared, report = prepare(self.package, self.gate["json_bytes"](draft))
+        self.assertEqual(report["decision"], "BLOCK")
+        self.assertEqual({item["code"] for item in report["blocks"]},
+                         {code, "CLAIM_EVIDENCE_UNRESOLVED", "CLAIM_EVIDENCE_CLASSIFICATION_CONFLICT"})
+        self.assertEqual(json.loads(prepared)["deliverables"][name]["Review"], draft["deliverables"][name])
+        draft["manifest_sha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "REVIEW_MANIFEST_SHA256_MISMATCH"):
+            prepare(self.package, self.gate["json_bytes"](draft))
