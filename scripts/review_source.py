@@ -388,6 +388,42 @@ def dependency_review(raw, ranges, source_digest, recover_rules=False, recover_m
     return evidence, ("\n".join(lines) + "\n").encode("utf-8")
 
 
+def single_review(raw, selected_range, source_digest, *, recover_rules=False,
+                  recover_missing=False, recover_logistic=False):
+    selected_span, operation, reasons = inspect_range(
+        raw, *selected_range, recover_rules=recover_rules,
+        recover_missing=recover_missing, recover_logistic=recover_logistic,
+    )
+    is_data = operation is not None and operation["kind"] == "DATA_STEP"
+    syntax = "SUPPORTED" if operation else "UNSUPPORTED"
+    if is_data and operation["unsupported_statements"]:
+        syntax = "PARTIAL"
+    evidence = {
+        **STATUS,
+        "review_format": "source-only-data/1" if is_data else "source-only-sort/1",
+        "source_identity": "VERIFIED",
+        "syntax_recognition": syntax,
+        "review_status": "PARTIAL" if operation else "BLOCKED",
+        "source": {
+            "sha256": source_digest,
+            "bytes": len(raw),
+            "selected_span": selected_span,
+        },
+        "declared_operation": operation,
+        "reason_codes": reasons,
+        "boundaries": BOUNDARIES,
+    }
+    if is_data and recover_rules:
+        evidence["review_format"] = "source-only-data/2"
+    if is_data and recover_missing:
+        evidence["review_format"] = "source-only-data/3"
+    if recover_logistic:
+        evidence.update(review_format="source-only-logistic/1", reference_experiment="NOT_RUN",
+                        historical_source_run_provenance="UNBOUND")
+    readme = review_text(evidence)
+    return evidence, readme
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--source", required=True, type=Path, help="absolute path to one authorized SAS file")
@@ -445,37 +481,10 @@ def main():
                 recover_sql=args.recover_sql_gates,
             )
         else:
-            selected_span, operation, reasons = inspect_range(
-                raw, *ranges[0], recover_rules=args.recover_status_rules,
+            evidence, readme = single_review(
+                raw, ranges[0], source_digest, recover_rules=args.recover_status_rules,
                 recover_missing=args.recover_missing_exclusions, recover_logistic=args.recover_logistic,
             )
-            is_data = operation is not None and operation["kind"] == "DATA_STEP"
-            syntax = "SUPPORTED" if operation else "UNSUPPORTED"
-            if is_data and operation["unsupported_statements"]:
-                syntax = "PARTIAL"
-            evidence = {
-                **STATUS,
-                "review_format": "source-only-data/1" if is_data else "source-only-sort/1",
-                "source_identity": "VERIFIED",
-                "syntax_recognition": syntax,
-                "review_status": "PARTIAL" if operation else "BLOCKED",
-                "source": {
-                    "sha256": source_digest,
-                    "bytes": len(raw),
-                    "selected_span": selected_span,
-                },
-                "declared_operation": operation,
-                "reason_codes": reasons,
-                "boundaries": BOUNDARIES,
-            }
-            if is_data and args.recover_status_rules:
-                evidence["review_format"] = "source-only-data/2"
-            if is_data and args.recover_missing_exclusions:
-                evidence["review_format"] = "source-only-data/3"
-            if args.recover_logistic:
-                evidence.update(review_format="source-only-logistic/1", reference_experiment="NOT_RUN",
-                                historical_source_run_provenance="UNBOUND")
-            readme = review_text(evidence)
         files = {
             "README.md": readme,
             "EVIDENCE.json": (json.dumps(evidence, indent=2, sort_keys=True) + "\n").encode("utf-8"),
