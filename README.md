@@ -32,6 +32,8 @@ DRAFT / UNVERIFIABLE / BLOCKED / NOT_RUN statuses.
 Open the [multi-file modernization example](examples/modernization/README.md)
 to review recovered SAS logic, architecture choices and candidate coverage.
 The example runs offline from a declared public synthetic INTAKE.
+The [running-balance candidate](examples/running-balance/README.md) executes
+that exact package as a draft engineering example.
 
 Follow the [INTG-1 operator workflow](examples/intg1/README.md) to inventory
 a public INTAKE folder, generate source evidence, and review it in GitHub
