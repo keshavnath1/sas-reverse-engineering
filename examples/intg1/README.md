@@ -121,6 +121,41 @@ The planner reports the proposed route and leaves publication to the
 existing continuation. Follow the separate GATE-1 and human approval steps
 below for MIG-2 or the pinned INTG-3 operator workflow for MIG-5.
 
+## Bind the reviewed plan to publication
+
+Save the exact `PLAN_PROPOSED` output from the planner as a new file. Keep
+the reviewed profile and tie-out bytes available with it. Use the version 1
+claim record as a template, set its version to 2, and add a
+`modernization` object with these two fields:
+
+| Field | Value |
+| --- | --- |
+| `plan` | Object with `bytes` and `sha256` for the saved planner output |
+| `configuration_inputs` | Exact object from the saved planner output, with the byte count and SHA-256 of each reviewed YAML file |
+
+The reviewer checks the plan and both YAML files against those identities
+before approving the complete version 2 claim record. Obtain a separate
+approval using the SHA-256 of that final record. An earlier version 1
+approval covers its own record. Each configuration or plan edit requires
+planning again, updating the version 2 binding and obtaining fresh approval.
+
+Add all three arguments to the existing continuation command below, or
+to `review_mig5.py continue` for the exact pinned INTG-3 subject.
+
+```bash
+--modernization-plan "$plan" --profile "$profile" --tie-out "$tie_out"
+```
+
+The continuation replays the planner, compares the saved plan bytes and
+checks the configuration binding through GATE-1 before running the existing
+candidate. The publication manifest includes the plan, configuration,
+review, approval, implementation and output identities.
+`ENGINEERING_TIE_OUT.json` summarizes public engineering checks and names
+the comparisons that were unavailable or did not run. CSV identity records
+the bytes written when export proceeds. The pinned public checks compare
+sorted IDs and fixed scores. An independent CSV byte comparison remains
+unavailable. An expected candidate block publishes diagnostics only.
+
 ## 2. Review the claims and approve the exact record
 
 Save a `claims.json` outside the evidence package using the

@@ -85,12 +85,18 @@ def mig5_classification(filename, pointer):
     return evidence_classification(filename, pointer)
 
 
-def review_claims(package, raw_record, approval=None):
+def review_claims(package, raw_record, approval=None, *, configuration=None):
     record = _parse_json(raw_record)
-    if not isinstance(record, dict) or set(record) != {
-        "version", "manifest_sha256", "deliverables", "claims",
-    } or type(record["version"]) is not int or record["version"] != 1:
+    fields = {"version", "manifest_sha256", "deliverables", "claims"}
+    version = 1
+    if configuration is not None:
+        fields.add("modernization")
+        version = 2
+    if (not isinstance(record, dict) or set(record) != fields
+            or type(record["version"]) is not int or record["version"] != version):
         raise ValueError("CLAIM_RECORD_INVALID")
+    if configuration is not None and json_bytes(record["modernization"]) != json_bytes(configuration):
+        raise ValueError("CLAIM_MODERNIZATION_BINDING_MISMATCH")
     candidate = _parse_json(secure_read(package, "MANIFEST.json", LIMIT))
     downstream = candidate.get("package_revision") == DOWNSTREAM_REVISION
     mig5 = downstream or candidate.get("package_revision") == REVISION

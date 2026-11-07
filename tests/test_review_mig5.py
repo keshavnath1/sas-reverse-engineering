@@ -11,6 +11,7 @@ from tempfile import TemporaryDirectory
 import unittest
 from uuid import uuid4
 
+from test_plan_modernization import configured_arguments
 from test_review_workflow import ROOT, call, remove_destination
 
 
@@ -78,12 +79,12 @@ class Mig5OperatorTests(unittest.TestCase):
         self.assertEqual(status, 0, report)
         return path.resolve()
 
-    def proceed(self, approved=True):
+    def proceed(self, approved=True, extra=()):
         path = self.destination()
         args = ["--package", self.package, "--record", self.record]
         if approved:
             args.extend(("--approval", self.approval))
-        status, report = self.run_operator("continue", path, *args)
+        status, report = self.run_operator("continue", path, *args, *extra)
         return status, report, path
 
     def assert_refused(self, status, decision, code, *, approved=True):
@@ -246,6 +247,36 @@ class Mig5OperatorTests(unittest.TestCase):
         scores = json.loads((destination / "SCORES.json").read_bytes())["rows"]
         self.assertEqual([row["id"] for row in rows], [0, 1])
         self.assertEqual([row["id"] for row in scores], [1, 0])
+
+    def test_configured_downstream_preserves_proceed_and_block(self):
+        for scenario in ("passes", "duplicates"):
+            with self.subTest(scenario=scenario):
+                self.claims.pop("modernization", None)
+                self.claims["version"] = 1
+                self.select_scenario(scenario)
+                args, replan = configured_arguments(self, self.package, self.record.parent)
+                self.claims.update(version=2, modernization=replan())
+                self.approve()
+                status, report, destination = self.proceed(extra=args)
+                self.assertEqual(status, 0, report)
+                manifest = json.loads((destination / "MANIFEST.json").read_bytes())
+                self.assertEqual(manifest["modernization"], self.claims["modernization"])
+                checks = json.loads((destination / "ENGINEERING_TIE_OUT.json").read_bytes())["checks"]
+                if scenario == "passes":
+                    self.assertEqual(checks["population_and_gate"][0]["candidate_gate"], "PROCEED")
+                    self.assertEqual(checks["ordering_and_output"]["status"], "PASS")
+                    self.assertEqual(checks["csv_bytes"]["comparison"], "UNAVAILABLE")
+                    self.assertEqual(checks["fixed_scoring"]["status"], "PASS")
+                    rows = json.loads((destination / "SORTED_ROWS.json").read_bytes())
+                    scores = json.loads((destination / "SCORES.json").read_bytes())["rows"]
+                    self.assertEqual([row["id"] for row in rows], [0, 1])
+                    self.assertEqual([row["id"] for row in scores], [1, 0])
+                else:
+                    self.assertEqual(checks["population_and_gate"][0]["candidate_gate"], "BLOCK")
+                    self.assertEqual(checks["csv_bytes"]["status"], "NOT_RUN")
+                    self.assertEqual(checks["fixed_scoring"]["status"], "NOT_RUN")
+                    for name in ("PREPARED_EXPORT.csv", "SORTED_ROWS.json", "SCORES.json", "DESIGN.json"):
+                        self.assertFalse((destination / name).exists())
 
     def test_downstream_subject_requires_model_claim_and_exact_fixture_bytes(self):
         self.select_scenario("passes")

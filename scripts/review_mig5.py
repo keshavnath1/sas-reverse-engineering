@@ -8,6 +8,8 @@ from sas_re.platform_io import require_evidence_io
 from sas_re.safeio import EvidenceError, _parse_json, ensure_disjoint, secure_read
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from configured_continuation import (add_configuration_arguments, load_configuration,
+                                     publication_metadata)
 from migrate_preparation_gates import EVIDENCE_PINS, LIMIT, PINS, ROOT, build_package
 from migrate_sort_export import SCENARIOS
 from migration_candidate import AUTHORITY
@@ -152,9 +154,11 @@ def continue_mig5(args, scratch, leaf):
     ensure_disjoint(scratch / leaf, [package])
     record = args.record.absolute()
     approval = args.approval.absolute() if args.approval else None
+    configuration = load_configuration(args)
     raw_record = secure_read(record.parent, record.name, LIMIT)
     raw_approval = secure_read(approval.parent, approval.name, LIMIT) if approval else None
-    gate = review_claims(package, raw_record, _parse_json(raw_approval) if approval else None)
+    gate = review_claims(package, raw_record, _parse_json(raw_approval) if approval else None,
+                         configuration=configuration[0] if configuration else None)
     if gate["decision"] != "PASS":
         return (1 if gate["decision"] == "REVIEW_REQUIRED" else 2), gate
     try:
@@ -162,6 +166,8 @@ def continue_mig5(args, scratch, leaf):
         if (secure_read(record.parent, record.name, LIMIT) != raw_record
                 or secure_read(approval.parent, approval.name, LIMIT) != raw_approval):
             raise ValueError("APPROVED_REVIEW_CHANGED")
+        if configuration and configuration[2]["input_manifest_sha256"] != gate["manifest_sha256"]:
+            raise ValueError("MODERNIZATION_SUBJECT_CHANGED")
         files, passed = build_package(package / PREPARATION, package / POPULATION)
         candidate_manifest = files["MANIFEST.json"]
         candidate = _parse_json(candidate_manifest)
@@ -174,6 +180,8 @@ def continue_mig5(args, scratch, leaf):
             files.update(branch_files)
         files["CANDIDATE_MANIFEST.json"] = files.pop("MANIFEST.json")
         files["GATE.json"] = json_bytes(gate)
+        candidate_route = "MIG-5/MIG-6/MOD-2" if downstream else "MIG-5"
+        modernization = publication_metadata(configuration, files, gate["manifest_sha256"], candidate_route)
         files["MANIFEST.json"] = json_bytes({
             "package_revision": ("public-integrated-mig5-downstream/1" if downstream
                                  else "public-integrated-mig5/1"),
@@ -187,6 +195,7 @@ def continue_mig5(args, scratch, leaf):
                 for name in ("review_mig5.py", "review_claim_gate.py")
             },
             "files": {name: identity(raw) for name, raw in files.items()},
+            **modernization,
             **AUTHORITY,
         })
         write_bundle(scratch, leaf, files, names=tuple(files), allow_csv=downstream)
@@ -217,6 +226,7 @@ def main():
     proceed.add_argument("--package", required=True, type=Path)
     proceed.add_argument("--record", required=True, type=Path)
     proceed.add_argument("--approval", type=Path)
+    add_configuration_arguments(proceed)
     args = parser.parse_args()
     try:
         require_evidence_io()

@@ -10,6 +10,7 @@ from tempfile import TemporaryDirectory
 import unittest
 import uuid
 
+from test_plan_modernization import configured_arguments
 from test_review_workflow import ROOT, call, remove_destination
 
 
@@ -144,6 +145,59 @@ class IntegratedReviewTests(unittest.TestCase):
         for name in ("PLAN.json", "ROWS.json", "VALIDATION.json"):
             self.assertEqual(bundles[0][name], (legacy / name).read_bytes())
         self.assertEqual(before, snapshot(self.package))
+
+    def test_configuration_bound_publication_requires_new_approval(self):
+        args, replan = configured_arguments(self, self.package, self.record.parent, intake=self.intake)
+        self.write_claims()
+        review = ("--record", str(self.record), "--approval", str(self.approval))
+        binding = replan()
+        self.assert_paused("BLOCK", "CLAIM_INPUT_REFUSED", *review, *args)
+        claim = json.loads(self.record.read_bytes())
+        claim.update(version=2, modernization=binding)
+        self.record.write_text(json.dumps(claim), encoding="utf-8")
+        self.assert_paused("REVIEW_REQUIRED", "BOUND_HUMAN_APPROVAL_REQUIRED", *review, *args)
+        approval = json.loads(self.approval.read_bytes())
+        approval["record_sha256"] = sha256(self.record.read_bytes()).hexdigest()
+        self.approval.write_text(json.dumps(approval), encoding="utf-8")
+        first, first_path = self.invoke(*review, *args)
+        second, second_path = self.invoke(*review, *args)
+        for result in (first, second):
+            self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertEqual({p.name: p.read_bytes() for p in first_path.iterdir()},
+                         {p.name: p.read_bytes() for p in second_path.iterdir()})
+        manifest = json.loads((first_path / "MANIFEST.json").read_bytes())
+        self.assertEqual(manifest["modernization"], claim["modernization"])
+        self.assertEqual(manifest["semantic_acceptance"], "BLOCKED")
+        tie_out = json.loads((first_path / "ENGINEERING_TIE_OUT.json").read_bytes())
+        self.assertEqual(tie_out["checks"]["ordering_and_output"]["status"], "PASS")
+        self.assertEqual(tie_out["reference_experiment"], "NOT_RUN")
+
+        for config in ("profile.yaml", "tie-out.yaml"):
+            path = self.record.parent / config
+            original = path.read_bytes()
+            path.write_bytes(original + b"\n")
+            self.assert_paused("BLOCK", "MODERNIZATION_PLAN_CHANGED", *review, *args)
+            replan()
+            self.assert_paused("BLOCK", "CLAIM_MODERNIZATION_BINDING_MISMATCH", *review, *args)
+            path.write_bytes(original)
+            replan()
+
+        profile = self.record.parent / "profile.yaml"
+        original = profile.read_bytes()
+        pending = json.loads(original)
+        pending["target"]["runtime"] = "PENDING"
+        profile.write_text(json.dumps(pending), encoding="utf-8")
+        self.assert_paused("BLOCK", "MODERNIZATION_PLAN_REQUIRED", *review, *args)
+        profile.write_bytes(original)
+
+        scope = self.intake / "scope.json"
+        original = scope.read_bytes()
+        scope.write_bytes(original + b"\n")
+        self.assert_paused("BLOCK", "CLAIM_INPUT_REFUSED", *review, *args)
+        scope.write_bytes(original)
+        evidence = self.package / "SOURCE_1.json"
+        evidence.write_bytes(evidence.read_bytes() + b"\n")
+        self.assert_paused("BLOCK", "CLAIM_INPUT_REFUSED", *review, *args)
 
     def test_gate_pass_cannot_enable_unsupported_source(self):
         scope_path = self.intake / "scope.json"

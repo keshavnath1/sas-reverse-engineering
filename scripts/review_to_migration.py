@@ -8,6 +8,8 @@ from sas_re.platform_io import require_evidence_io
 from sas_re.safeio import EvidenceError, _parse_json, ensure_disjoint, secure_read
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from configured_continuation import (add_configuration_arguments, load_configuration,
+                                     publication_metadata)
 from migrate_projection_sort import load_plan, run_rows
 from mvp1_demo import scratch_destination, write_bundle
 from review_claim_gate import AUTHORITY, review_claims
@@ -26,11 +28,16 @@ def continue_review(args):
     if record is None:
         return 1, {"decision": "REVIEW_REQUIRED", "pending": [{"code": "COPILOT_CLAIM_RECORD_REQUIRED"}]}
     try:
+        configuration = load_configuration(args)
         raw_record = read_input(record)
         raw_approval = read_input(args.approval.absolute()) if args.approval else None
-        gate = review_claims(package, raw_record, _parse_json(raw_approval) if raw_approval is not None else None)
+        gate = review_claims(package, raw_record, _parse_json(raw_approval) if raw_approval is not None else None,
+                             configuration=configuration[0] if configuration else None)
     except (EvidenceError, OSError, ValueError, TypeError, KeyError, AttributeError, IndexError) as error:
-        return 2, {"decision": "BLOCK", "blocks": [{"code": getattr(error, "code", "CLAIM_INPUT_REFUSED")}]}
+        code = getattr(error, "code", "CLAIM_INPUT_REFUSED")
+        if isinstance(error, ValueError) and str(error).startswith(("MODERNIZATION_", "CLAIM_MODERNIZATION_")):
+            code = str(error)
+        return 2, {"decision": "BLOCK", "blocks": [{"code": code}]}
     if gate["decision"] != "PASS":
         return (1 if gate["decision"] == "REVIEW_REQUIRED" else 2), gate
 
@@ -44,6 +51,8 @@ def continue_review(args):
         if (identity(read_input(record))["sha256"] != gate["record_sha256"]
                 or read_input(args.approval.absolute()) != raw_approval):
             raise ValueError("APPROVED_REVIEW_CHANGED")
+        if configuration and configuration[2]["input_manifest_sha256"] != gate["manifest_sha256"]:
+            raise ValueError("MODERNIZATION_SUBJECT_CHANGED")
         raw_rows = read_input(args.rows.absolute())
         if identity(raw_rows)["sha256"] != args.rows_sha256:
             raise ValueError("MIGRATION_ROWS_SHA256_MISMATCH")
@@ -54,6 +63,10 @@ def continue_review(args):
             "VALIDATION.json": json_bytes({**validation, **AUTHORITY}),
             "GATE.json": json_bytes(gate),
         }
+        input_count = len(_parse_json(raw_rows)["input"]) if configuration else None
+        modernization = publication_metadata(
+            configuration, files, gate["manifest_sha256"], "MIG-2", input_count=input_count,
+        )
         scripts = Path(__file__).resolve().parent
         files["MANIFEST.json"] = json_bytes({
             "package_revision": "public-integrated-migration/1",
@@ -68,6 +81,7 @@ def continue_review(args):
                              "migrate_projection_sort.py", "migration_candidate.py")
             },
             "files": {name: identity(raw) for name, raw in files.items()},
+            **modernization,
             **AUTHORITY,
         })
         write_bundle(scratch, leaf, files, names=tuple(files))
@@ -95,6 +109,7 @@ def main():
     parser.add_argument("--rows", required=True, type=Path)
     parser.add_argument("--rows-sha256", required=True)
     parser.add_argument("--destination", required=True, help="fresh /tmp/sas-re-intg1-<label> directory")
+    add_configuration_arguments(parser)
     args = parser.parse_args()
     try:
         status, result = continue_review(args)

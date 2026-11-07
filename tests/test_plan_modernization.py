@@ -1,5 +1,6 @@
 """Public planning checks for the existing INTAKE and pinned INTG-3 subjects."""
 
+from hashlib import sha256
 import json
 from pathlib import Path
 import shutil
@@ -158,3 +159,38 @@ class ModernizationPlanningTests(unittest.TestCase):
                     rejected = self.invoke(*args, pinned=True)
                     self.assertEqual(rejected.returncode, 2, rejected.stdout)
                     self.assertNotIn("plan", json.loads(rejected.stdout))
+
+
+def configured_arguments(test, package, root, *, intake=None):
+    """Prepare reviewed fixture bytes through the planner's CLI."""
+    prefix = [sys.executable, "-IB", str(ROOT / "scripts/plan_modernization.py"),
+              "--package", str(package)]
+    if intake is not None:
+        prefix.extend(("--intake", str(intake)))
+
+    def run(*args):
+        return subprocess.run([*prefix, *args], capture_output=True, timeout=60)
+
+    drafts = json.loads(run("--emit-drafts").stdout)
+    profile, tie_out = root / "profile.yaml", root / "tie-out.yaml"
+    args = ("--profile", str(profile), "--tie-out", str(tie_out))
+    names = {"migration-profile.yaml": profile, "tie-out.yaml": tie_out}
+    for name, path in names.items():
+        path.write_text(json.dumps(drafts[name]), encoding="utf-8")
+    pending = run(*args)
+    test.assertEqual(pending.returncode, 1, pending.stdout)
+    for name, choices in json.loads(pending.stdout)["supported_operator_policy"].items():
+        drafts[name].update(status="REVIEWED", **choices)
+        names[name].write_text(json.dumps(drafts[name]), encoding="utf-8")
+    plan = root / "plan.json"
+
+    def replan():
+        result = run(*args)
+        test.assertEqual(result.returncode, 0, result.stdout)
+        plan.write_bytes(result.stdout)
+        return {
+            "plan": {"bytes": len(result.stdout), "sha256": sha256(result.stdout).hexdigest()},
+            "configuration_inputs": json.loads(result.stdout)["configuration_inputs"],
+        }
+
+    return (*args, "--modernization-plan", str(plan)), replan
