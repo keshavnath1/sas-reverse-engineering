@@ -23,14 +23,14 @@ class SourceReviewTests(unittest.TestCase):
         directory = self.enterContext(TemporaryDirectory(dir=scratch))
         self.source = Path(directory) / "input.sas"
 
-    def review(self, raw, lines="3:5", expected=None, destination=None):
+    def review(self, raw, lines="3:5", expected=None, destination=None, second_lines=None):
         self.source.write_bytes(raw)
         if destination is None:
             destination = Path("/tmp") / f"sas-re-source-{uuid.uuid4().hex}"
             self.addCleanup(remove_destination, destination)
         run = call(destination, script=SCRIPT, extra=(
             "--source", str(self.source), "--source-sha256", expected or sha256(raw).hexdigest(),
-            "--lines", lines,
+            "--lines", lines, *(("--lines", second_lines) if second_lines else ()),
         ))
         return run, destination
 
@@ -164,3 +164,50 @@ class SourceReviewTests(unittest.TestCase):
             run, dest = self.review(bad, lines="1:1")
             self.assertEqual(run.returncode, 2, run.stderr)
             self.assertIsNone(json.loads((dest / "EVIDENCE.json").read_bytes())["declared_operation"])
+
+    def test_two_ranges_bind_a_declared_connection_and_leave_middle_unexamined(self):
+        data = (b"data work.Mixed;\r\nset work.input;\r\n"
+                b"if missing(id) then delete;\r\nkeep id label;\r\nrun;\r\n")
+        middle = b"%unexamined; data work.mixed; run;\r\n"
+        sort = b"proc sort data=WORK.MIXED out=work.result; by id; run;"
+        raw = PREFIX + data + middle + sort
+        run, dest = self.review(raw, lines="3:7", second_lines="9:9")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        payload = (dest / "EVIDENCE.json").read_bytes()
+        evidence = json.loads(payload)
+        self.assertEqual(evidence["source"]["sha256"], sha256(raw).hexdigest())
+        first, second = evidence["selections"]
+        for item, expected, start in ((first, data, len(PREFIX)),
+                                      (second, sort, len(PREFIX + data + middle))):
+            location = item["selected_span"]
+            self.assertEqual((location["start"], location["end"]), (start, start + len(expected)))
+            self.assertEqual(location["sha256"], sha256(expected).hexdigest())
+        self.assertEqual(first["declared_operation"]["selected_columns"], ["id", "label"])
+        self.assertEqual(len(first["declared_operation"]["unsupported_statements"]), 1)
+        self.assertEqual(second["declared_operation"]["ordering_keys"], ["id"])
+        self.assertEqual(evidence["connection"], {
+            "classification": "SOURCE_DECLARED", "execution_verification": "EXECUTION_UNVERIFIED",
+            "data_output": "work.mixed", "sort_input": "work.mixed",
+        })
+        self.assertEqual(evidence["intervening_span"], {
+            "status": "UNEXAMINED", "start": len(PREFIX + data), "end": len(PREFIX + data + middle),
+        })
+        self.assertNotIn(middle, payload)
+        self.assertEqual(evidence["semantic_acceptance"], "BLOCKED")
+        again, other = self.review(raw, lines="3:7", second_lines="9:9")
+        self.assertEqual(again.returncode, 0, again.stderr)
+        for name in ("README.md", "EVIDENCE.json"):
+            self.assertEqual((dest / name).read_bytes(), (other / name).read_bytes())
+
+    def test_nonmatching_connection_and_ambiguous_selection(self):
+        data = b"data work.target; set work.input; keep id; run;\n"
+        sort = b"proc sort data=work.other out=work.sorted; by id; run;"
+        run, dest = self.review(data + sort, lines="1:1", second_lines="2:2")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        evidence = json.loads((dest / "EVIDENCE.json").read_bytes())
+        self.assertEqual(evidence["connection"]["classification"], "UNRESOLVED")
+        for raw, second in ((data + sort, "1:2"),
+                            (data.replace(b"set work.input", b"set work.input work.extra") + sort, "2:2")):
+            run, dest = self.review(raw, lines="1:1", second_lines=second)
+            self.assertEqual(run.returncode, 2, run.stderr)
+            self.assertFalse(dest.exists())

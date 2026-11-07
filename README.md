@@ -104,6 +104,14 @@ writes the bound diagnostic package and exits 2. A hash mismatch produces no
 package. Key schema and execution behavior are UNKNOWN, supported-profile
 reconstruction is NOT_RUN, and behavioral evidence is UNAVAILABLE.
 
+To review a DATA step and a later SORT together, repeat `--lines` with two
+disjoint ranges in source order. For example, use `--lines 10:20 --lines 30:32`.
+The command hashes the file once and analyzes the two selected ranges separately.
+Matching dataset identifiers yield a SOURCE_DECLARED / EXECUTION_UNVERIFIED
+connection. Different identifiers leave the connection UNRESOLVED. The bytes
+between the ranges are UNEXAMINED, and runtime dataset identity and version
+remain unknown. The package retains each operation's original span and findings.
+
 ## Review the architecture decision
 
 The [MVP-4 decision review](examples/mvp4/DECISION_REVIEW.md) connects all 17

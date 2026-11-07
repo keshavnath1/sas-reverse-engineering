@@ -223,20 +223,114 @@ def review_text(evidence):
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
+def inspect_range(raw, first, last):
+    start, end = line_span(raw, first, last)
+    span = raw[start:end]
+    operation, reasons = inspect_span(span, first, start)
+    location = {
+        "line_start": first, "line_end": last, "start": start, "end": end,
+        "sha256": sha256(span).hexdigest(),
+    }
+    return location, operation, reasons
+
+
+def dependency_review(raw, ranges, source_digest):
+    selections = []
+    for first, last in ranges:
+        span, operation, reasons = inspect_range(raw, first, last)
+        selections.append({"selected_span": span, "declared_operation": operation,
+                           "reason_codes": reasons})
+    data, sort = (item["declared_operation"] for item in selections)
+    if not data or not sort or (data["kind"], sort["kind"]) != ("DATA_STEP", "PROC_SORT"):
+        raise ValueError("DATA_THEN_SORT_REQUIRED")
+
+    # The parser already normalizes ordinary SAS identifiers to lowercase.
+    matched = data["output"] == sort["input"]
+    connection = {
+        "classification": "SOURCE_DECLARED" if matched else "UNRESOLVED",
+        "execution_verification": "EXECUTION_UNVERIFIED",
+        "data_output": data["output"],
+        "sort_input": sort["input"],
+    }
+    first_span, last_span = (item["selected_span"] for item in selections)
+    intermediate = {
+        "status": "UNEXAMINED",
+        "start": first_span["end"],
+        "end": last_span["start"],
+    }
+    evidence = {
+        **STATUS,
+        "review_format": "source-only-dependency/1",
+        "source_identity": "VERIFIED",
+        "syntax_recognition": "PARTIAL" if data["unsupported_statements"] else "SUPPORTED",
+        "review_status": "PARTIAL",
+        "source": {"sha256": source_digest, "bytes": len(raw)},
+        "selections": selections,
+        "connection": connection,
+        "intervening_span": intermediate,
+        "boundaries": BOUNDARIES,
+    }
+    relationship = (
+        f"DATA writes and SORT reads the declared dataset `{data['output']}`."
+        if matched else
+        f"DATA writes `{data['output']}` while SORT reads `{sort['input']}`. The connection is unresolved."
+    )
+    columns = ", ".join(f"`{name}`" for name in data["selected_columns"])
+    keys = ", ".join(f"`{key}`" for key in sort["ordering_keys"])
+    lines = [
+        "# Source-only DATA and SORT review", "",
+        "See [EVIDENCE.json](EVIDENCE.json) for hashes, original spans and parser reasons.", "",
+        "~~~text",
+        *(f"{key}: {value}" for key, value in evidence.items() if isinstance(value, str)),
+        "~~~", "",
+        "## Declared dependencies", "",
+        f"DATA reads `{data['input']}` and writes `{data['output']}`.",
+        f"SORT reads `{sort['input']}` and writes `{sort['output']}` by {keys} ascending.",
+        f"{connection['classification']} / EXECUTION_UNVERIFIED. {relationship}", "",
+        f"Intervening bytes [{intermediate['start']}, {intermediate['end']}) are UNEXAMINED. "
+        "Statements there may write the intermediate dataset or introduce other effects. "
+        "Runtime dataset identity, version and successful execution remain unknown.", "",
+        f"KEEP declares {len(data['selected_columns'])} output selections ({columns}).",
+        "Input and output schemas, key type, row survival and label derivation remain unknown.", "",
+        "## Unresolved DATA statements", "",
+    ]
+    for gap in data["unsupported_statements"]:
+        location = gap["span"]
+        reasons = ", ".join(gap["reason_codes"])
+        lines.append(f"- Lines {location['line_start']}–{location['line_end']}. {reasons}.")
+    if not data["unsupported_statements"]:
+        lines.append("The review recovered the declared input, output and selection.")
+    lines += [
+        "", "## Candidate requirements and proof obligations", "",
+        "- Bind the prepared dataset version to both operations and account for intervening effects.",
+        "- Confirm the boundary schemas and numeric key contract. Establish row eligibility, "
+        "label values, row preservation and ordering against attributable reference outputs.",
+        "- Resolve upstream and downstream effects separately. Behavioral evidence is unavailable.",
+    ]
+    return evidence, ("\n".join(lines) + "\n").encode("utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--source", required=True, type=Path, help="absolute path to one authorized SAS file")
     parser.add_argument("--source-sha256", required=True, help="expected SHA-256 of original file bytes")
-    parser.add_argument("--lines", required=True, help="inclusive FIRST:LAST line range")
+    parser.add_argument("--lines", required=True, action="append", help="inclusive FIRST:LAST, repeat for DATA then SORT")
     parser.add_argument("--destination", required=True, help="fresh /tmp/sas-re-source-<label> directory")
     args = parser.parse_args()
     if not re.fullmatch(r"[0-9a-fA-F]{64}", args.source_sha256):
         parser.error("--source-sha256 requires 64 hexadecimal digits")
-    if not re.fullmatch(r"[1-9][0-9]{0,7}:[1-9][0-9]{0,7}", args.lines):
-        parser.error("--lines requires positive FIRST:LAST line numbers")
-    first, last = map(int, args.lines.split(":"))
-    if first > last:
-        parser.error("--lines requires FIRST <= LAST")
+    if len(args.lines) not in (1, 2):
+        parser.error("supply one or two --lines ranges")
+    ranges = []
+    for value in args.lines:
+        if not re.fullmatch(r"[1-9][0-9]{0,7}:[1-9][0-9]{0,7}", value):
+            parser.error("--lines requires positive FIRST:LAST line numbers")
+        first, last = map(int, value.split(":"))
+        if first > last:
+            parser.error("--lines requires FIRST <= LAST")
+        ranges.append((first, last))
+    if len(ranges) == 2 and ranges[0][1] >= ranges[1][0]:
+        parser.error("two --lines ranges must be in source order and disjoint")
     source = args.source
     if not source.is_absolute() or ".." in source.parts or source.suffix.lower() != ".sas":
         parser.error("--source requires an absolute .sas path without parent traversal")
@@ -252,33 +346,32 @@ def main():
         source_digest = sha256(raw).hexdigest()
         if source_digest != args.source_sha256.lower():
             parser.exit(2, "source_identity: REFUSED (SOURCE_SHA256_MISMATCH)\n")
-        start, end = line_span(raw, first, last)
-        span = raw[start:end]
-        operation, reasons = inspect_span(span, first, start)
-        is_data = operation is not None and operation["kind"] == "DATA_STEP"
-        syntax = "SUPPORTED" if operation else "UNSUPPORTED"
-        if is_data and operation["unsupported_statements"]:
-            syntax = "PARTIAL"
-        evidence = {
-            **STATUS,
-            "review_format": "source-only-data/1" if is_data else "source-only-sort/1",
-            "source_identity": "VERIFIED",
-            "syntax_recognition": syntax,
-            "review_status": "PARTIAL" if operation else "BLOCKED",
-            "source": {
-                "sha256": source_digest,
-                "bytes": len(raw),
-                "selected_span": {
-                    "line_start": first, "line_end": last, "start": start, "end": end,
-                    "sha256": sha256(span).hexdigest(),
+        if len(ranges) == 2:
+            evidence, readme = dependency_review(raw, ranges, source_digest)
+        else:
+            selected_span, operation, reasons = inspect_range(raw, *ranges[0])
+            is_data = operation is not None and operation["kind"] == "DATA_STEP"
+            syntax = "SUPPORTED" if operation else "UNSUPPORTED"
+            if is_data and operation["unsupported_statements"]:
+                syntax = "PARTIAL"
+            evidence = {
+                **STATUS,
+                "review_format": "source-only-data/1" if is_data else "source-only-sort/1",
+                "source_identity": "VERIFIED",
+                "syntax_recognition": syntax,
+                "review_status": "PARTIAL" if operation else "BLOCKED",
+                "source": {
+                    "sha256": source_digest,
+                    "bytes": len(raw),
+                    "selected_span": selected_span,
                 },
-            },
-            "declared_operation": operation,
-            "reason_codes": reasons,
-            "boundaries": BOUNDARIES,
-        }
+                "declared_operation": operation,
+                "reason_codes": reasons,
+                "boundaries": BOUNDARIES,
+            }
+            readme = review_text(evidence)
         files = {
-            "README.md": review_text(evidence),
+            "README.md": readme,
             "EVIDENCE.json": (json.dumps(evidence, indent=2, sort_keys=True) + "\n").encode("utf-8"),
         }
         write_bundle(scratch, leaf, files, names=tuple(files))
@@ -294,7 +387,7 @@ def main():
         "source_identity": evidence["source_identity"],
         "syntax_recognition": evidence["syntax_recognition"],
     }, indent=2))
-    return 0 if operation else 2
+    return 0 if evidence["review_status"] == "PARTIAL" else 2
 
 
 if __name__ == "__main__":
