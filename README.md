@@ -34,6 +34,9 @@ a public INTAKE folder, generate source evidence, and review it in GitHub
 Copilot Agent. Byte-bound human approval through GATE-1 permits the supported
 Python projection and SORT candidate to publish.
 
+For a declared public synthetic project with literal includes and typed inputs,
+use the [opt-in P2A INTAKE review](docs/GOAL4B_P2A_INTAKE.md).
+
 ## Run the offline review
 
 Open the [sample review folder](examples/offline-review/README.md) to read the

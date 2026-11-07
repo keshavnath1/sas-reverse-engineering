@@ -309,6 +309,115 @@ def inventory_intake(intake):
             "semantic_acceptance": "BLOCKED"}
 
 
+def build_p2a_review(intake):
+    """Adapt an exact public file set to the existing P2A scope and profile."""
+    from tempfile import TemporaryDirectory
+
+    from sas_re.evidence import build_inventory
+    from sas_re.semantic import reconstruct
+
+    scope_bytes = secure_read(intake, "scope.json", 4096)
+    manifest = _parse_json(scope_bytes)
+    if (not isinstance(manifest, dict)
+            or set(manifest) != {"version", "scope", "entrypoint", "sources",
+                                "includes", "profile_sha256", "supporting"}
+            or manifest["version"] != "p2a/1" or manifest["scope"] != "public-synthetic"):
+        raise ValueError("INTAKE_P2A_SCOPE_INVALID")
+    sources, supporting = manifest["sources"], manifest["supporting"]
+    entrypoint, includes = manifest["entrypoint"], manifest["includes"]
+    if (not isinstance(sources, dict) or not 1 <= len(sources) <= 20
+            or not isinstance(supporting, dict) or len(supporting) > 4
+            or not isinstance(entrypoint, str) or entrypoint not in sources
+            or not isinstance(includes, list) or len(includes) > 20):
+        raise ValueError("INTAKE_P2A_SCOPE_INVALID")
+
+    profile_name = "profile.json"
+    entries = {profile_name: (manifest["profile_sha256"], "CONFIG")}
+    for items, is_source in ((sources, True), (supporting, False)):
+        for name, digest in items.items():
+            safe_relative(name)
+            suffix = Path(name).suffix.lower()
+            if is_source:
+                if not name.lower().endswith(SOURCE_SUFFIXES):
+                    raise ValueError("INTAKE_P2A_FILE_UNSUPPORTED")
+                kind = "SAS" if name == entrypoint else "INCLUDE"
+            else:
+                kind = {".log": "LOG", ".lst": "LST"}.get(suffix)
+            if "/" in name or not kind or name.lower() in {n.lower() for n in entries}:
+                raise ValueError("INTAKE_P2A_FILE_UNSUPPORTED")
+            entries[name] = digest, kind
+
+    def file_key(name):
+        return "synthetic:" + name
+
+    dependencies = []
+    pairs = set()
+    for pair in includes:
+        if (not isinstance(pair, list) or len(pair) != 2
+                or any(not isinstance(name, str) or name not in sources for name in pair)
+                or pair[0] == pair[1] or pair[1] == entrypoint or tuple(pair) in pairs):
+            raise ValueError("INTAKE_P2A_INCLUDE_INVALID")
+        pairs.add(tuple(pair))
+    for index, (source, target) in enumerate(sorted(pairs)):
+        dependencies.append({"dependency_id": f"include-{index}", "kind": "INCLUDE",
+                             "status": "DECLARED", "from_file_key": file_key(source),
+                             "to_file_key": file_key(target)})
+
+    if enumerate_files(intake) != sorted(["scope.json", *entries]):
+        raise ValueError("INTAKE_FILE_SET_MISMATCH")
+    inputs = {"scope.json": identity(scope_bytes)}
+    with TemporaryDirectory(prefix="sas-re-intake-p2a-") as temporary:
+        snapshot = Path(temporary).resolve()
+        for name, (digest, kind) in sorted(entries.items()):
+            if not isinstance(digest, str) or not re.fullmatch("[0-9a-f]{64}", digest):
+                raise ValueError("INTAKE_SHA256_INVALID")
+            raw = secure_read(intake, name, 65536 if kind in {"SAS", "INCLUDE"} else 16384)
+            inputs[name] = identity(raw)
+            if inputs[name]["sha256"] != digest:
+                raise ValueError("INTAKE_P2A_SHA256_MISMATCH")
+            (snapshot / name).write_bytes(raw)
+        if enumerate_files(intake) != sorted(["scope.json", *entries]):
+            raise ValueError("INTAKE_FILE_SET_MISMATCH")
+        profile = _parse_json((snapshot / profile_name).read_bytes())
+        if (not isinstance(profile, dict) or profile.get("entrypoints") != [file_key(entrypoint)]
+                or profile.get("log_bindings") != [] or profile.get("lst_bindings") != []):
+            raise ValueError("INTAKE_P2A_PROFILE_SCOPE_MISMATCH")
+        scope = {
+            "schema_version": "1.0", "workspace_id": "public-intake", "run_id": "public-p2a",
+            "module_ids": ["main"], "synthetic": True,
+            "roots": [{"root_id": "synthetic", "path": str(snapshot)}],
+            "files": [{"file_key": file_key(name), "root_id": "synthetic", "path": name,
+                       "kind": kind, "module_id": "main", "encoding": "utf-8"}
+                      for name, (_, kind) in sorted(entries.items())],
+            "dependencies": dependencies, "log_associations": [],
+        }
+        inventory = build_inventory(scope, "intake-p2a")
+        graph = reconstruct(scope, inventory, profile, profile_file_key=file_key(profile_name))
+
+    partial = bool(graph["unknowns"] or graph["contradictions"])
+    readme = (
+        "# Public synthetic P2A source review\n\n"
+        "The [inventory](INVENTORY.json) records the authorized file identities. "
+        "[P2A evidence](EVIDENCE.json) contains source spans, operation facts, dependencies, "
+        "statement coverage and unresolved findings. Input schemas and order are declared "
+        "synthetic profile assumptions. LOG/LST files, if supplied, have no run binding.\n\n"
+        "SAS reference execution is NOT_RUN. This draft does not authorize candidate publication.\n"
+    )
+    files = {"README.md": readme.encode(), "INVENTORY.json": json_bytes(inventory),
+             "EVIDENCE.json": json_bytes(graph)}
+    files["MANIFEST.json"] = json_bytes({
+        **{key: graph[key] for key in STATUS_FIELDS if key in graph},
+        "behavioral_evidence": "UNAVAILABLE", "reference_experiment": "NOT_RUN",
+        "historical_source_run_provenance": "UNBOUND",
+        "package_revision": "public-intake-p2a/1", "scope": manifest["scope"],
+        "review_status": "PARTIAL" if partial else "DRAFT",
+        "reconstruction_status": "PARTIAL" if partial else "COMPLETE",
+        "inputs": inputs, "source_evidence": "EVIDENCE.json", "copilot_review": "NOT_TESTED",
+        "files": {name: identity(data) for name, data in files.items()},
+    })
+    return files
+
+
 def build_review(intake):
     scope_bytes = secure_read(intake, "scope.json", 4096)
     legacy = sha256(scope_bytes).hexdigest() == SCOPE_SHA256
@@ -462,7 +571,10 @@ def main():
     output.add_argument("--inventory", action="store_true", help="print a draft inventory and scope proposal")
     parser.add_argument("--modernization-drafts", action="store_true",
                         help="include draft configuration and a five-skill review handoff")
+    parser.add_argument("--p2a", action="store_true", help="review a declared public P2A project")
     args = parser.parse_args()
+    if args.p2a and (args.inventory or args.modernization_drafts):
+        parser.error("--p2a requires --destination and cannot generate modernization drafts")
     if args.inventory and args.modernization_drafts:
         parser.error("--modernization-drafts requires --destination")
     try:
@@ -476,7 +588,7 @@ def main():
             raise FileExistsError
         intake = args.intake.absolute()
         ensure_disjoint(destination, [intake])
-        files = build_review(intake)
+        files = build_p2a_review(intake) if args.p2a else build_review(intake)
         if args.modernization_drafts:
             files.update(modernization_drafts(files))
         write_bundle(scratch, leaf, files, names=tuple(files))

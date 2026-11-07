@@ -46,6 +46,66 @@ class IntakeReviewTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         return json.loads(result.stdout)
 
+    def test_p2a_opt_in_binds_profile_and_literal_include(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp).resolve()
+            raw = {
+                "main.sas": b"%include 'settings.sas';\ndata work.out; set &source.; by id; retain n 0; n + id; run;\n",
+                "settings.sas": b"%let source=work.raw;\n",
+                "profile.json": json.dumps({
+                    "schema_version": "2.0", "profile_id": "sas94-synthetic-v1",
+                    "entrypoints": ["synthetic:main.sas"],
+                    "inputs": [{"name": "work.raw", "module_id": "main", "sorted_by": ["id"],
+                                "columns": [{"name": "id", "type": "NUMERIC", "length": 8}],
+                                "rows": [["1"]]}],
+                    "log_bindings": [], "lst_bindings": [],
+                    "numeric_missing_join_policy": "SAS_ORDINARY_MISSING_EQUALS_MISSING",
+                }).encode(),
+            }
+            for name, data in raw.items():
+                (root / name).write_bytes(data)
+            hashes = {name: sha256(data).hexdigest() for name, data in raw.items()}
+            scope = {"version": "p2a/1", "scope": "public-synthetic", "entrypoint": "main.sas",
+                     "sources": {name: hashes[name] for name in ("main.sas", "settings.sas")},
+                     "includes": [["main.sas", "settings.sas"]], "supporting": {},
+                     "profile_sha256": hashes["profile.json"]}
+            scope_file = root / "scope.json"
+            scope_file.write_text(json.dumps(scope))
+            legacy, refused = self.invoke(root)
+            self.assertEqual(legacy.returncode, 2)
+            self.assertFalse(refused.exists())
+
+            result, output = self.invoke(root, extra=("--p2a",))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            graph = json.loads((output / "EVIDENCE.json").read_bytes())
+            self.assertEqual([op["kind"] for op in graph["operations"]], ["INCLUDE", "MACRO", "DATA_STEP"])
+            self.assertEqual(graph["profile_sha256"], hashes["profile.json"])
+            self.assertEqual(graph["operations"][1]["span"]["citation"]["source_sha256"],
+                             hashes["settings.sas"])
+            self.assertEqual(graph["unknowns"], [])
+            manifest = json.loads((output / "MANIFEST.json").read_bytes())
+            self.assertEqual(manifest["reference_experiment"], "NOT_RUN")
+            self.assertEqual(manifest["semantic_acceptance"], "BLOCKED")
+
+            result, replay = self.invoke(root, extra=("--p2a",))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual({f.name: f.read_bytes() for f in output.iterdir()},
+                             {f.name: f.read_bytes() for f in replay.iterdir()})
+
+            scope["includes"] = []
+            scope_file.write_text(json.dumps(scope))
+            result, partial = self.invoke(root, extra=("--p2a",))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            partial_graph = json.loads((partial / "EVIDENCE.json").read_bytes())
+            self.assertIn("SOURCE_NOT_REACHED", {issue["code"] for issue in partial_graph["unknowns"]})
+            self.assertNotIn("MACRO", {op["kind"] for op in partial_graph["operations"]})
+
+            (root / "profile.json").write_bytes(raw["profile.json"] + b"\n")
+            result, refused = self.invoke(root, extra=("--p2a",))
+            self.assertEqual(result.returncode, 2)
+            self.assertIn(b"INTAKE_P2A_SHA256_MISMATCH", result.stderr)
+            self.assertFalse(refused.exists())
+
     def test_inventory_proposes_scope_for_new_sources_and_support(self):
         with TemporaryDirectory() as temp:
             root = Path(temp).resolve()
