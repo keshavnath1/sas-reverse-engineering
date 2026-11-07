@@ -27,6 +27,12 @@ can continue to invoke it directly with the command below, offline and without
 an AI provider. These skills cover two approved public fixtures and preserve the
 DRAFT / UNVERIFIABLE / BLOCKED / NOT_RUN statuses.
 
+## Review a public INTAKE before running a migration candidate
+
+Follow the [INTG-1 operator workflow](examples/intg1/README.md) to generate
+two-source evidence, review it in GitHub Copilot Agent, obtain byte-bound
+human approval through GATE-1, and run the supported Python projection and SORT.
+
 ## Run the offline review
 
 Open the [sample review folder](examples/offline-review/README.md) to read the
