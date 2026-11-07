@@ -1,0 +1,391 @@
+{
+  "artifact_authority": "DRAFT",
+  "behavioral_evidence": "UNAVAILABLE",
+  "benchmark_execution": "NOT_RUN",
+  "copilot_goal1_session": "NOT_RUN",
+  "engineering_runs": {
+    "duplicates": {
+      "byte_identical_replay": true,
+      "candidate_manifest": {
+        "bytes": 2243,
+        "sha256": "933e973d200d885746233eb0175a461d139d31f62dc75d584db517a245229b6f"
+      },
+      "claim_record": {
+        "bytes": 15389,
+        "sha256": "0a19cbb6d6f3b465d6077c613d6c1ef7d9c833383f7592aaf3420765b3c30927"
+      },
+      "files": {
+        "CANDIDATE_MANIFEST.json": {
+          "bytes": 2243,
+          "sha256": "933e973d200d885746233eb0175a461d139d31f62dc75d584db517a245229b6f"
+        },
+        "GATE.json": {
+          "bytes": 508,
+          "sha256": "24c0946d15c10a4ea24e85ab28c082a86b4c285d8687f0ec8eb50a787b4bab37"
+        },
+        "PLAN.json": {
+          "bytes": 10872,
+          "sha256": "d8d39fed4a342c9bbf047babafe1d59e28e3593cfbabfb124f25cedd34e6c0d7"
+        },
+        "POPULATION_EVIDENCE.json": {
+          "bytes": 11177,
+          "sha256": "90af7c8eef586067a566cac9130f77609c4552190df2a0cb908ae367ca4f9b56"
+        },
+        "PREPARATION_EVIDENCE.json": {
+          "bytes": 8203,
+          "sha256": "178671f6b7f0bfe7bcaa74abeeb2834c453b0ee1ac8cfadf9e7f40643d4ac2f5"
+        },
+        "SCENARIO_RESULTS.json": {
+          "bytes": 90248,
+          "sha256": "e58b9e4d57b7ff1158bb86cb15b40ae7a743888302f180259e37ebe193df931d"
+        },
+        "VALIDATION.json": {
+          "bytes": 6854,
+          "sha256": "4e14d65e959310e3c4de4de95906063c5dd5c1587a67dc36e0cddb0a17954cc1"
+        }
+      },
+      "manifest": {
+        "bytes": 2356,
+        "sha256": "df7ccee57e9b7973e33a3e55444bf506d6a48a1a8762baf3916aa43a4f0b4c09"
+      },
+      "reviewer_approval": {
+        "bytes": 140,
+        "sha256": "5a8a8252448a817b2fbab6ec9944ccf0c52706599f47625cba96cfd16b8e5975"
+      }
+    },
+    "passes": {
+      "byte_identical_replay": true,
+      "candidate_manifest": {
+        "bytes": 2243,
+        "sha256": "933e973d200d885746233eb0175a461d139d31f62dc75d584db517a245229b6f"
+      },
+      "claim_record": {
+        "bytes": 15305,
+        "sha256": "fa6d660983f8be5823b04189cdededee26e7dc3bbd69b16e87b7d320e75bdd77"
+      },
+      "files": {
+        "CANDIDATE_MANIFEST.json": {
+          "bytes": 2243,
+          "sha256": "933e973d200d885746233eb0175a461d139d31f62dc75d584db517a245229b6f"
+        },
+        "DESIGN.json": {
+          "bytes": 952,
+          "sha256": "8530963e7b3c3340670242866b1d6ba8be98d66cf12e93561b9dd13f0fcad9cd"
+        },
+        "EXPORT_PLAN.json": {
+          "bytes": 12670,
+          "sha256": "eef32b2ebd497d847e388f1540d28ae4ed8de1ada0faa5a471cf6decf0eab71e"
+        },
+        "EXPORT_VALIDATION.json": {
+          "bytes": 1918,
+          "sha256": "fc7fa180b9cc1220c447e414d3e850da8e1f98688981cf5da4d53718419e9eba"
+        },
+        "GATE.json": {
+          "bytes": 508,
+          "sha256": "b6d50b7fc63ad19b03c31ac7fcbc5e00e9042c8b1b6929ace96896aa9914f325"
+        },
+        "PLAN.json": {
+          "bytes": 10872,
+          "sha256": "d8d39fed4a342c9bbf047babafe1d59e28e3593cfbabfb124f25cedd34e6c0d7"
+        },
+        "POPULATION_EVIDENCE.json": {
+          "bytes": 11177,
+          "sha256": "90af7c8eef586067a566cac9130f77609c4552190df2a0cb908ae367ca4f9b56"
+        },
+        "PREPARATION_EVIDENCE.json": {
+          "bytes": 8203,
+          "sha256": "178671f6b7f0bfe7bcaa74abeeb2834c453b0ee1ac8cfadf9e7f40643d4ac2f5"
+        },
+        "PREPARED_EXPORT.csv": {
+          "bytes": 171,
+          "sha256": "0b933411d41e2d3d60dfe7023b10037527cbd137ceee4dcbb769333c3055c15e"
+        },
+        "SCENARIO_RESULTS.json": {
+          "bytes": 90248,
+          "sha256": "e58b9e4d57b7ff1158bb86cb15b40ae7a743888302f180259e37ebe193df931d"
+        },
+        "SCORES.json": {
+          "bytes": 249,
+          "sha256": "48893f53d232b27f43603ffabedebcfe180f0186ff583369e50fc031a6fe2b17"
+        },
+        "SCORING_PLAN.json": {
+          "bytes": 6789,
+          "sha256": "b96fac259da8af589af082cf2ad77f7febeeccdbdffdb78af3e20d4bc2d9ab8c"
+        },
+        "SCORING_VALIDATION.json": {
+          "bytes": 786,
+          "sha256": "f17e8584887f32d96794db62beeb13082d01763b2324fcfe6ce40c9c7c592192"
+        },
+        "SORTED_ROWS.json": {
+          "bytes": 579,
+          "sha256": "aac311b50e859364cb1d3a370466d77397ada991cb489538e194e9147094a8ad"
+        },
+        "VALIDATION.json": {
+          "bytes": 6854,
+          "sha256": "4e14d65e959310e3c4de4de95906063c5dd5c1587a67dc36e0cddb0a17954cc1"
+        }
+      },
+      "manifest": {
+        "bytes": 3451,
+        "sha256": "c12022d3f82320ce4fc282a61611b310e8f8da5d29d5ac57aac5ece452f74a74"
+      },
+      "reviewer_approval": {
+        "bytes": 140,
+        "sha256": "d7d91be82a0f8208b5c8b6d87b7570114a2c602a2983fbfd71fbf17b41012aa0"
+      }
+    }
+  },
+  "files": {
+    "ARCHITECTURE.md": {
+      "bytes": 3892,
+      "sha256": "bbacc087e21dc3b45d7642660ef0e4732a5b0b4464f99ebdd69cc04dd86759a6"
+    },
+    "OPTIMIZATION.md": {
+      "bytes": 1955,
+      "sha256": "bea2aa1ddc5541fcb4a7099471a81078a3959f16ef2c935f39afcef42bbbd7de"
+    },
+    "README.md": {
+      "bytes": 4417,
+      "sha256": "e825cc79a17252b047d984bc74db99f841f0fdb76e0376a7e48838c135e14373"
+    },
+    "REQUIREMENTS.md": {
+      "bytes": 3256,
+      "sha256": "43b7c0ce1e0b15573a976003e5d81472998d08d5464b973d1ecbdd70dcc32dd5"
+    },
+    "TRACE_MAP.md": {
+      "bytes": 4682,
+      "sha256": "92b09b229ffc1064a9444bc7359b5c0d099652627d238d6703252ceca6f3b471"
+    },
+    "VALIDATION.md": {
+      "bytes": 4829,
+      "sha256": "bc7d91ef0df06a6f84ec48bc33ece76639ccc70a71de4d139f71c9f7a2f45845"
+    }
+  },
+  "historical_source_run_provenance": "UNBOUND",
+  "human_review": "REQUIRED",
+  "intg4": "FAIL",
+  "intg4r": "PASS",
+  "package_revision": "public-modernization-review/1",
+  "reference_experiment": "NOT_RUN",
+  "review_subjects": {
+    "duplicates": {
+      "files": {
+        "COEFFICIENTS.json": {
+          "bytes": 296,
+          "sha256": "b41d066a5302f7908c97eebe133809a5445fc658b2393d6e8e5e6e78c0a70a64"
+        },
+        "MAPPING.json": {
+          "bytes": 463,
+          "sha256": "707f4c7d8c5afb2ccd8073d5dea34ff754c9af8487ae56b95881240e9f53e2a5"
+        },
+        "MODEL_EVIDENCE.json": {
+          "bytes": 4371,
+          "sha256": "d50300920d5cfc72c32e571878fee9348a39658fdfd15635b2d73340da19c293"
+        },
+        "POPULATION.md": {
+          "bytes": 3632,
+          "sha256": "0962cfc22fde84c469ce33952ea2e04466298aa48ed34bfdb87e873afabaf68d"
+        },
+        "POPULATION_EVIDENCE.json": {
+          "bytes": 11177,
+          "sha256": "90af7c8eef586067a566cac9130f77609c4552190df2a0cb908ae367ca4f9b56"
+        },
+        "PREPARATION.md": {
+          "bytes": 5049,
+          "sha256": "dfd72617e17f28557281bbd6edcfadb2a3f53beae6712df39d63aecb79c859da"
+        },
+        "PREPARATION_EVIDENCE.json": {
+          "bytes": 8203,
+          "sha256": "178671f6b7f0bfe7bcaa74abeeb2834c453b0ee1ac8cfadf9e7f40643d4ac2f5"
+        }
+      },
+      "inputs": {
+        "examples/mig3/CASES.json": {
+          "bytes": 1239,
+          "sha256": "4b8eb9867cc2a32c793f134fb28d684576ea486592822441e0a3d7ae8a4e0865"
+        },
+        "examples/mig3/preparation.sas.txt": {
+          "bytes": 459,
+          "sha256": "dccdf7b4b11eba5fd7369157c7b3e8ef002d3b8c7bf2c9a5547dc80e161b8cf8"
+        },
+        "examples/mig4/population.sas.txt": {
+          "bytes": 830,
+          "sha256": "21e16d05e77999c9b2de565c7f1348d9d4b9aae27736024ca286062f8731d110"
+        },
+        "examples/mig5/SCENARIOS.json": {
+          "bytes": 1487,
+          "sha256": "945d503e01a88a45c50078d1eaa11c5d95237fb1eb98420797bbfe4aff088faf"
+        },
+        "examples/mod2/COEFFICIENTS.json": {
+          "bytes": 296,
+          "sha256": "b41d066a5302f7908c97eebe133809a5445fc658b2393d6e8e5e6e78c0a70a64"
+        },
+        "examples/mod2/MAPPING.json": {
+          "bytes": 463,
+          "sha256": "707f4c7d8c5afb2ccd8073d5dea34ff754c9af8487ae56b95881240e9f53e2a5"
+        },
+        "examples/mod2/model.sas.txt": {
+          "bytes": 618,
+          "sha256": "0f6741a10b6fc29de02fdd9a4500c95f2cc948814d109c1643cfd893a7e58a4c"
+        },
+        "scripts/migrate_population.py": {
+          "bytes": 14797,
+          "sha256": "12358fadc1f69da1019119d587c83072d6bb6d26f9875494ac817113a7bbb015"
+        },
+        "scripts/migrate_preparation.py": {
+          "bytes": 9804,
+          "sha256": "91c632829174f1b9075a8b4bccaf8d67df13be30ea94cf86df053ed9a81f1bbe"
+        },
+        "scripts/migrate_preparation_gates.py": {
+          "bytes": 7696,
+          "sha256": "66280be42e9f6a5e77cd59f1a292af31a63463c0e840812abbfc19a3331b88dc"
+        },
+        "scripts/migrate_sort_export.py": {
+          "bytes": 9083,
+          "sha256": "2cbbade405963a0e355e1158bafee9699fe5612b4efc063f95ccfe724a8bd222"
+        },
+        "scripts/mvp1_demo.py": {
+          "bytes": 5464,
+          "sha256": "6ff73c01d33e2ec58961fca4bbc4f082e445654d016129e619348e8b360e2aab"
+        },
+        "scripts/preparation_candidate.py": {
+          "bytes": 7496,
+          "sha256": "9f0c1f3e16d99be58299bd4c156783112aff43aaf41334082a9c3244d0df9547"
+        },
+        "scripts/score_prepared_logistic.py": {
+          "bytes": 13746,
+          "sha256": "890618cd943dcfd4951182f242df34545db4f681290715caad8c50b163c09f8f"
+        }
+      },
+      "manifest": {
+        "bytes": 4010,
+        "sha256": "57fb8c0a4b2dec668f5363a48f120ebb5bb405c3ec9ecd39c8d6eefde2fbd477"
+      },
+      "sources": [
+        {
+          "evidence": "PREPARATION_EVIDENCE.json",
+          "path": "examples/mig3/preparation.sas.txt"
+        },
+        {
+          "evidence": "POPULATION_EVIDENCE.json",
+          "path": "examples/mig4/population.sas.txt"
+        },
+        {
+          "evidence": "MODEL_EVIDENCE.json",
+          "path": "examples/mod2/model.sas.txt"
+        }
+      ]
+    },
+    "passes": {
+      "files": {
+        "COEFFICIENTS.json": {
+          "bytes": 296,
+          "sha256": "b41d066a5302f7908c97eebe133809a5445fc658b2393d6e8e5e6e78c0a70a64"
+        },
+        "MAPPING.json": {
+          "bytes": 463,
+          "sha256": "707f4c7d8c5afb2ccd8073d5dea34ff754c9af8487ae56b95881240e9f53e2a5"
+        },
+        "MODEL_EVIDENCE.json": {
+          "bytes": 4371,
+          "sha256": "d50300920d5cfc72c32e571878fee9348a39658fdfd15635b2d73340da19c293"
+        },
+        "POPULATION.md": {
+          "bytes": 3632,
+          "sha256": "0962cfc22fde84c469ce33952ea2e04466298aa48ed34bfdb87e873afabaf68d"
+        },
+        "POPULATION_EVIDENCE.json": {
+          "bytes": 11177,
+          "sha256": "90af7c8eef586067a566cac9130f77609c4552190df2a0cb908ae367ca4f9b56"
+        },
+        "PREPARATION.md": {
+          "bytes": 5049,
+          "sha256": "dfd72617e17f28557281bbd6edcfadb2a3f53beae6712df39d63aecb79c859da"
+        },
+        "PREPARATION_EVIDENCE.json": {
+          "bytes": 8203,
+          "sha256": "178671f6b7f0bfe7bcaa74abeeb2834c453b0ee1ac8cfadf9e7f40643d4ac2f5"
+        }
+      },
+      "inputs": {
+        "examples/mig3/CASES.json": {
+          "bytes": 1239,
+          "sha256": "4b8eb9867cc2a32c793f134fb28d684576ea486592822441e0a3d7ae8a4e0865"
+        },
+        "examples/mig3/preparation.sas.txt": {
+          "bytes": 459,
+          "sha256": "dccdf7b4b11eba5fd7369157c7b3e8ef002d3b8c7bf2c9a5547dc80e161b8cf8"
+        },
+        "examples/mig4/population.sas.txt": {
+          "bytes": 830,
+          "sha256": "21e16d05e77999c9b2de565c7f1348d9d4b9aae27736024ca286062f8731d110"
+        },
+        "examples/mig5/SCENARIOS.json": {
+          "bytes": 1487,
+          "sha256": "945d503e01a88a45c50078d1eaa11c5d95237fb1eb98420797bbfe4aff088faf"
+        },
+        "examples/mod2/COEFFICIENTS.json": {
+          "bytes": 296,
+          "sha256": "b41d066a5302f7908c97eebe133809a5445fc658b2393d6e8e5e6e78c0a70a64"
+        },
+        "examples/mod2/MAPPING.json": {
+          "bytes": 463,
+          "sha256": "707f4c7d8c5afb2ccd8073d5dea34ff754c9af8487ae56b95881240e9f53e2a5"
+        },
+        "examples/mod2/model.sas.txt": {
+          "bytes": 618,
+          "sha256": "0f6741a10b6fc29de02fdd9a4500c95f2cc948814d109c1643cfd893a7e58a4c"
+        },
+        "scripts/migrate_population.py": {
+          "bytes": 14797,
+          "sha256": "12358fadc1f69da1019119d587c83072d6bb6d26f9875494ac817113a7bbb015"
+        },
+        "scripts/migrate_preparation.py": {
+          "bytes": 9804,
+          "sha256": "91c632829174f1b9075a8b4bccaf8d67df13be30ea94cf86df053ed9a81f1bbe"
+        },
+        "scripts/migrate_preparation_gates.py": {
+          "bytes": 7696,
+          "sha256": "66280be42e9f6a5e77cd59f1a292af31a63463c0e840812abbfc19a3331b88dc"
+        },
+        "scripts/migrate_sort_export.py": {
+          "bytes": 9083,
+          "sha256": "2cbbade405963a0e355e1158bafee9699fe5612b4efc063f95ccfe724a8bd222"
+        },
+        "scripts/mvp1_demo.py": {
+          "bytes": 5464,
+          "sha256": "6ff73c01d33e2ec58961fca4bbc4f082e445654d016129e619348e8b360e2aab"
+        },
+        "scripts/preparation_candidate.py": {
+          "bytes": 7496,
+          "sha256": "9f0c1f3e16d99be58299bd4c156783112aff43aaf41334082a9c3244d0df9547"
+        },
+        "scripts/score_prepared_logistic.py": {
+          "bytes": 13746,
+          "sha256": "890618cd943dcfd4951182f242df34545db4f681290715caad8c50b163c09f8f"
+        }
+      },
+      "manifest": {
+        "bytes": 4006,
+        "sha256": "f1159f3f397c640d867401d1be4e3eb2bd232dd2fdcf068247088847fb48f864"
+      },
+      "sources": [
+        {
+          "evidence": "PREPARATION_EVIDENCE.json",
+          "path": "examples/mig3/preparation.sas.txt"
+        },
+        {
+          "evidence": "POPULATION_EVIDENCE.json",
+          "path": "examples/mig4/population.sas.txt"
+        },
+        {
+          "evidence": "MODEL_EVIDENCE.json",
+          "path": "examples/mod2/model.sas.txt"
+        }
+      ]
+    }
+  },
+  "scope": "public-synthetic",
+  "semantic_acceptance": "BLOCKED",
+  "semantic_verification": "UNVERIFIABLE"
+}
