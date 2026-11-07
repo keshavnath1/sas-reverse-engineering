@@ -92,6 +92,26 @@ class IntakeReviewTests(unittest.TestCase):
             self.assertEqual({f.name: f.read_bytes() for f in output.iterdir()},
                              {f.name: f.read_bytes() for f in replay.iterdir()})
 
+            result, drafts = self.invoke(root, extra=("--p2a", "--modernization-drafts"))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            for artifact in output.iterdir():
+                self.assertEqual(artifact.read_bytes(), (drafts / artifact.name).read_bytes())
+            handoff = (drafts / "MODERNIZATION_REVIEW.md").read_text()
+            for skill in ("sas-reconstruct", "sas-specify", "sas-analyze", "sas-validate", "sas-architect"):
+                self.assertIn(f"| {skill} |", handoff)
+            self.assertIn("GATE-1 and candidate continuation are outside this route", handoff)
+            self.assertNotIn("SOURCE_1.json", handoff)
+            for name in ("migration-profile.yaml", "tie-out.yaml"):
+                draft = json.loads((drafts / name).read_bytes())
+                self.assertEqual(draft["binding"]["manifest_sha256"],
+                                 sha256((output / "MANIFEST.json").read_bytes()).hexdigest())
+                self.assertEqual(set(draft["binding"]["evidence"]), {"INVENTORY.json", "EVIDENCE.json"})
+                self.assertEqual(draft["binding"]["evidence"]["EVIDENCE.json"],
+                                 manifest["files"]["EVIDENCE.json"])
+            tie_out = json.loads((drafts / "tie-out.yaml").read_bytes())
+            self.assertEqual(tie_out["reference"]["sas_execution"], "NOT_RUN")
+            self.assertEqual(tie_out["reference"]["semantic_acceptance"], "BLOCKED")
+
             scope["includes"] = []
             scope_file.write_text(json.dumps(scope))
             result, partial = self.invoke(root, extra=("--p2a",))

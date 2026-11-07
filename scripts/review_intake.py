@@ -555,6 +555,40 @@ guide for the GATE-1 claim record and separate byte-bound human approval.
 The YAML files are review drafts. The existing continuation checks candidate
 eligibility against the declared source and the reviewed evidence.
 """
+    if manifest["package_revision"] == "public-intake-p2a/1":
+        handoff = f"""# P2A INTAKE modernization review
+
+Review manifest SHA-256 `{binding['manifest_sha256']}`.
+In a human-invoked Agent session, supply [MANIFEST.json](MANIFEST.json),
+[INVENTORY.json](INVENTORY.json), [EVIDENCE.json](EVIDENCE.json), this handoff,
+[migration-profile.yaml](migration-profile.yaml), and [tie-out.yaml](tie-out.yaml).
+Verify the manifest-listed payload digests and the P2A graph's inventory and
+profile bindings before review. Stop on a missing or mismatched identity.
+
+Use the five existing skills in order. For this subject, use the P2A graph in
+place of the fixture-specific reports in their instructions. Carry findings
+from each draft into the next. Save the drafts separately from this package.
+
+| Skill | Draft and evidence to use |
+| --- | --- |
+| sas-reconstruct | TRACE reconstruction. Use inventory file hashes and graph operations, facts and statement coverage. Cite the original file, lines and half-open byte span. Record unknowns, contradictions and any source the graph did not reach. |
+| sas-specify | PRD and testable requirements. Trace each requirement to a recovered fact or label it as a proposed requirement needing owner confirmation. Keep typed input descriptors and declared input order as synthetic profile assumptions. |
+| sas-analyze | MAP and dependency review. Cite graph edges by ID and trace their evidence operations. Distinguish declared reads and writes from inferred edges. Assess represented order and state constraints, including across BY groups and guarded LAG calls when present. Missing edges leave independence unproved. |
+| sas-validate | Verification plan. Separate structural checks, proposed public engineering cases and attributable SAS reference evidence. Address join multiplicity and missing values, BY input order, retained state and conditional queue advancement where represented. Unbound LOG/LST provides no run evidence. |
+| sas-architect | ADR with conditional native and distributed designs. Tie each option to the actual dependencies, ordering and state, and state what must be proved before partitioning or benchmarking. Leave runtime selection pending. |
+
+Cite the supplied filename and JSON pointer for each material claim. Add
+canonical operation or edge IDs and original spans where applicable. Preserve
+the graph's classifications. Separate source declarations, inferred
+relationships, synthetic assumptions, unresolved behavior and proposed designs.
+Report checks actually performed separately from pending checks.
+
+The YAML files are drafts for operator review. This P2A package supports a
+design review only. GATE-1 and candidate continuation are outside this route.
+Behavioral evidence is UNAVAILABLE, SAS reference and benchmark execution are
+NOT_RUN, semantic verification is UNVERIFIABLE, and semantic acceptance is
+BLOCKED.
+"""
     # JSON is a YAML 1.2 subset and keeps serialization deterministic.
     return {
         "MIGRATION_PROFILE.json": json_bytes(profile),
@@ -573,8 +607,8 @@ def main():
                         help="include draft configuration and a five-skill review handoff")
     parser.add_argument("--p2a", action="store_true", help="review a declared public P2A project")
     args = parser.parse_args()
-    if args.p2a and (args.inventory or args.modernization_drafts):
-        parser.error("--p2a requires --destination and cannot generate modernization drafts")
+    if args.p2a and args.inventory:
+        parser.error("--p2a requires --destination")
     if args.inventory and args.modernization_drafts:
         parser.error("--modernization-drafts requires --destination")
     try:

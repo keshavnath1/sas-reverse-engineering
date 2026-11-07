@@ -47,7 +47,21 @@ dependencies and unknowns to review coverage. Unsupported syntax and unbound
 observations can produce a `PARTIAL` reconstruction. Refused identities and
 invalid scopes produce no package.
 
-This route publishes a draft source review. Use the existing operator routes
-for modernization YAML and candidate publication. SAS reference execution is
+This route publishes a draft source review. SAS reference execution is
 `NOT_RUN`, semantic verification is `UNVERIFIABLE` and semantic acceptance is
 `BLOCKED`.
+
+## Five-skill modernization handoff
+
+Add `--modernization-drafts` to the command above to generate
+`MODERNIZATION_REVIEW.md`, `migration-profile.yaml` and `tie-out.yaml` alongside
+the unchanged P2A evidence package. The drafts bind the source-review manifest
+and its inventory and graph identities.
+
+In a human-invoked Agent session, provide the exact artifacts listed in the
+handoff and ask the five existing skills to follow its P2A evidence mapping.
+The handoff covers TRACE reconstruction, requirements, MAP analysis, validation
+planning and architecture decisions. Review the five drafts against the graph
+and keep them separate from the deterministic package. This route supports
+design review only. Existing GATE-1 and candidate publication routes retain
+their own evidence and approval contracts.
