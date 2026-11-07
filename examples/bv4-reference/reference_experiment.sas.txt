@@ -1,0 +1,249 @@
+/*
+  BV-4 public synthetic reference experiment. Preparation status only:
+  artifact_authority: DRAFT
+  reference_experiment: NOT_RUN
+  semantic_verification: UNVERIFIABLE
+  semantic_acceptance: BLOCKED
+  benchmark_execution: NOT_RUN
+
+  Base SAS 9.4 syntax is intended; it has NOT been compiled or executed.
+  Copy these exact bytes to a .sas file OUTSIDE the repository. An authorized
+  custodian must use a fresh working directory, retain the complete LOG/LST,
+  and bind this submitted file to an external execution receipt. See README.md.
+  BV4 is a permanent library in that working directory. Never use an existing
+  results directory. NOREPLACE is supplementary, not a tested safety boundary.
+  All literals and names below are public synthetic experiment data.
+  No historical source, schema, run identifier, expected verdict or gold is used.
+*/
+
+options noreplace source source2 notes mprint linesize=200 obs=max firstobs=1;
+libname bv4 '.';
+ods listing;
+title 'BV-4 public synthetic observations - DRAFT, not certification';
+%put BV4|ENV|SAS_VERSION=&sysvlong4|OS=&sysscp|OS_DETAIL=&sysscpl;
+proc options option=(encoding locale validvarname missing obs firstobs
+                     source source2 notes mprint replace);
+run;
+data _null_;
+  length observed_local_time 8;
+  observed_local_time = datetime();
+  putlog 'BV4|BEGIN|local_time=' observed_local_time e8601dt26.6;
+run;
+
+/* INPUT 1: twelve full-sequence cases. Defaults apply to every input row.
+   id is the positive input ordinal except for the explicit C02/C04/C05/
+   C06/C11 overrides. Default is not an input column in this dataset.
+   There is no output verdict or predicted label in either input constructor. */
+data bv4.full_input;
+  length case_id $3 status $8
+         id n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 8
+         c1 c2 c3 c4 c5 $4;
+  input case_id $ status $;
+  id = _n_;
+  n1=1; n2=1; n3=1; n4=1; n5=1; n6=1;
+  n7=1; n8=1; n9=1; n10=1; n11=1; n12=1;
+  c1='X'; c2='X'; c3='X'; c4='X'; c5='X';
+  select (case_id);
+    when ('C02') do; id=0; n1=0; c1='.'; end;
+    when ('C04') do; id=.; n1=.; c1=' '; end;
+    when ('C05') id=.;
+    when ('C06') id=.A;
+    when ('C07') n1=.;
+    when ('C08') n12=._;
+    when ('C09') c1=' ';
+    when ('C10') c5=' ';
+    when ('C11') do; id=.; n1=.; c1=' '; end;
+    when ('C12') do; n1=.; c1=' '; end;
+    otherwise;
+  end;
+  datalines;
+C01 A
+C02 B
+C03 C
+C04 C
+C05 A
+C06 B
+C07 A
+C08 B
+C09 A
+C10 B
+C11 A
+C12 B
+;
+run;
+
+/* INPUT 2: deliberately isolated pair probes, not full-sequence cases.
+   Rule 0 is absent from their arm. The input sentinel 9 makes no assignment
+   observable; it is not a hypothesis about the real program's initial PDV. */
+data bv4.probe_input;
+  length case_id $3 status $8
+         id n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 Default 8
+         c1 c2 c3 c4 c5 $4;
+  input case_id $ status $;
+  id = _n_;
+  n1=1; n2=1; n3=1; n4=1; n5=1; n6=1;
+  n7=1; n8=1; n9=1; n10=1; n11=1; n12=1;
+  c1='X'; c2='X'; c3='X'; c4='X'; c5='X';
+  Default=9;
+  if case_id='P02' then id=.;
+  datalines;
+P01 C
+P02 C
+;
+run;
+
+/* ARM 1: uninstrumented six-rule business step. Implicit output only.
+   case_id is audit-only. This synthetic schema is not a historical descriptor. */
+data bv4.full_plain;
+  length case_id $3 status $8
+         id n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 Default 8
+         c1 c2 c3 c4 c5 $4;
+  set bv4.full_input;
+  /* Rule 0: no prerequisite. */
+  if status not in ('A','B') then delete;
+  /* Rules 1/2: false predecessors [0] / [0,1], respectively. */
+  if status='A' then Default=1;
+  else if status='B' then Default=0;
+  /* Rule 3: [0], NOT [0,1,2]. Both branches rejoin here. */
+  if missing(id) then delete;
+  /* Rule 4: [0,3]. */
+  if cmiss(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12)>0 then delete;
+  /* Rule 5: [0,3,4]. */
+  if cmiss(c1,c2,c3,c4,c5)>0 then delete;
+  keep case_id id n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12
+       c1 c2 c3 c4 c5 Default;
+run;
+
+/* An event is emitted only at an actually reached statement. No predicates
+   or functions from the six rules are evaluated by this logging macro.
+   Sequence resets per row. BEFORE_DELETE precedes the DELETE statement;
+   ROW_END_REACHED is a control-point observation, not proof of a written row. */
+%macro bv4_event(rule,event);
+  _bv4_seq = _bv4_seq + 1;
+  putlog 'BV4|TRACE|arm=' _bv4_arm '|case=' case_id
+         '|seq=' _bv4_seq '|rule=' "&rule" '|event=' "&event"
+         '|Default=' Default best32.;
+%mend bv4_event;
+
+/* Shared instrumented rules 1-5. The ELSE IF remains immediately linked.
+   No R2 entry marker is inserted between IF and ELSE. R2_ASSIGN and
+   PAIR_FALLTHROUGH report reached bodies, not precomputed predicate results.
+   No rule reports a skipped CMISS argument or claims lazy CMISS evaluation. */
+%macro bv4_pair_and_missing;
+  %bv4_event(1,PAIR_ENTER);
+  if status='A' then do;
+    Default=1;
+    %bv4_event(1,ASSIGNED);
+  end;
+  else if status='B' then do;
+    Default=0;
+    %bv4_event(2,ASSIGNED);
+  end;
+  else do;
+    %bv4_event(2,PAIR_FALLTHROUGH);
+  end;
+
+  %bv4_event(3,ENTER);
+  if missing(id) then do;
+    %bv4_event(3,BEFORE_DELETE);
+    delete;
+  end;
+  %bv4_event(3,CONTINUE);
+
+  %bv4_event(4,ENTER);
+  if cmiss(n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12)>0 then do;
+    %bv4_event(4,BEFORE_DELETE);
+    delete;
+  end;
+  %bv4_event(4,CONTINUE);
+
+  %bv4_event(5,ENTER);
+  if cmiss(c1,c2,c3,c4,c5)>0 then do;
+    %bv4_event(5,BEFORE_DELETE);
+    delete;
+  end;
+  %bv4_event(5,CONTINUE);
+  %bv4_event(.,ROW_END_REACHED);
+%mend bv4_pair_and_missing;
+
+/* ARM 2: same input dataset as ARM 1; only logging/control-body wrappers added. */
+data bv4.full_traced;
+  length case_id $3 status $8
+         id n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 Default 8
+         c1 c2 c3 c4 c5 $4 _bv4_arm $10 _bv4_seq 8;
+  set bv4.full_input;
+  _bv4_arm='FULL'; _bv4_seq=0;
+  %bv4_event(.,ROW_BEGIN);
+  %bv4_event(0,ENTER);
+  if status not in ('A','B') then do;
+    %bv4_event(0,BEFORE_DELETE);
+    delete;
+  end;
+  %bv4_event(0,CONTINUE);
+  %bv4_pair_and_missing;
+  keep case_id id n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12
+       c1 c2 c3 c4 c5 Default;
+run;
+
+/* ARM 3: rule 0 is intentionally NOT PRESENT. The sentinel comes from SET.
+   This is a linked-pair/rejoin probe, not evidence of full-sequence fallthrough. */
+data bv4.pair_probe;
+  length case_id $3 status $8
+         id n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 Default 8
+         c1 c2 c3 c4 c5 $4 _bv4_arm $10 _bv4_seq 8;
+  set bv4.probe_input;
+  _bv4_arm='PAIR_PROBE'; _bv4_seq=0;
+  %bv4_event(.,ROW_BEGIN);
+  %bv4_pair_and_missing;
+  keep case_id id n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12
+       c1 c2 c3 c4 c5 Default;
+run;
+
+/* Collection only: descriptors and typed dumps of ACTUAL rows in five
+   datasets. This helper neither computes expectations nor compares outputs.
+   Character hex preserves stored padding. BEST32 retains printed missing tags;
+   HEX16 also records host numeric representation, not a portable numeric hash.
+   The two flags describe existing columns; absent columns are not invented. */
+%macro bv4_dump(ds,has_status,has_default);
+  proc contents data=&ds varnum;
+  run;
+  data _null_;
+    set &ds;
+    length _bv4_field $32 _bv4_i 8;
+    array _bv4_num[*] id n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12
+      %if &has_default = 1 %then %do; Default %end; ;
+    array _bv4_char[*] c1 c2 c3 c4 c5;
+    putlog "BV4|DUMP_BEGIN|dataset=&ds|row=" _n_
+           '|case=' case_id '|case_char3_hex=' case_id $hex6.;
+    %if &has_status = 1 %then %do;
+      putlog 'BV4|CHAR|field=status|length=8|hex=' status $hex16.;
+    %end;
+    do _bv4_i=1 to dim(_bv4_num);
+      _bv4_field=vname(_bv4_num[_bv4_i]);
+      putlog 'BV4|NUM|field=' _bv4_field '|length=8|text='
+             _bv4_num[_bv4_i] best32. '|host_hex='
+             _bv4_num[_bv4_i] hex16.;
+    end;
+    do _bv4_i=1 to dim(_bv4_char);
+      _bv4_field=vname(_bv4_char[_bv4_i]);
+      putlog 'BV4|CHAR|field=' _bv4_field '|length=4|hex='
+             _bv4_char[_bv4_i] $hex8.;
+    end;
+    putlog "BV4|DUMP_END|dataset=&ds|row=" _n_ '|case=' case_id;
+  run;
+%mend bv4_dump;
+
+%bv4_dump(bv4.full_input,1,0);
+%bv4_dump(bv4.probe_input,1,1);
+%bv4_dump(bv4.full_plain,0,1);
+%bv4_dump(bv4.full_traced,0,1);
+%bv4_dump(bv4.pair_probe,0,1);
+
+data _null_;
+  length observed_local_time 8;
+  observed_local_time=datetime();
+  putlog 'BV4|END_REACHED|local_time=' observed_local_time e8601dt26.6;
+run;
+/* END_REACHED is not success, equivalence, approval or a complete-log claim.
+   Inspect diagnostics, retained datasets, dumps and receipt independently. */
+title;
