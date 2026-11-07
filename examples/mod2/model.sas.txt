@@ -1,0 +1,10 @@
+ods output ParameterEstimates=work.public_coef FitStatistics=work.public_fit
+  Association=work.public_assoc ClassLevelInfo=work.public_class ConvergenceStatus=work.public_status;
+proc logistic data=work.prepared_data descending;
+  class group_a(ref='Reference A') group_b(ref='Reference B')
+    group_c(ref='Reference C') group_d(ref='Reference D') group_e(ref='Reference E') / param=ref;
+  model Default=x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 group_a group_b group_c group_d group_e;
+  output out=work.sas_scored xbeta=sas_eta predicted=sas_phat;
+run;
+%assert_step(step_name=Public fit and score);
+ods output close;
