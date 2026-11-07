@@ -4,6 +4,31 @@ Run these steps from the repository root with the existing Python 3.12
 development installation on macOS or Linux. Use public synthetic files
 only. Choose unused scratch names for both destinations.
 
+## Start with a new INTAKE folder
+
+Put the authorized public synthetic programs and supporting files in
+`INTAKE`. From the checkout, inventory the folder before declaring scope.
+
+```bash
+python3.12 -IB scripts/review_intake.py --intake ./INTAKE --inventory
+```
+
+The JSON report inventories file names and hashes bounded recognized files.
+It probes whole SAS files with the existing DATA, SORT and logistic
+recognizers and reports supported, partial or unsupported syntax.
+For one or two flat sources with recognized operations, the report can
+propose a scope with exact hashes, ranges and modes. Review the proposed
+scope and save the `proposed_scope` object as `INTAKE/scope.json` to declare
+the files you authorize for review. The inventory command leaves that
+decision with the operator. For existing scopes, use the evidence command
+below. For unrecognized programs, review the reported diagnostics and
+declare bounded ranges explicitly when the existing modes fit.
+
+The scope can bind up to four supporting files as notes, logs, listings
+or configuration. The evidence package records their identity and role.
+Treat their contents as supporting material during human review. A file
+hash alone establishes neither runtime provenance nor SAS behavior.
+
 ## 1. Generate evidence and pause
 
 ```bash
@@ -28,14 +53,21 @@ matching Markdown reports. Point the agent to the repository's
 `sas-architect` instructions under `.agents/skills/` and confirm which
 instructions the session actually uses.
 
-Ask for five deliverables: reconstruction, PRD, dependency analysis,
-verification plan and ADR. Require file-qualified source locations and
-evidence references for material claims. Ask the agent to keep individual
-DATA and SORT declarations separate from their potential cross-file
-handoff, leave runtime order and dataset version unresolved, and distinguish
-the bounded MIG-2 engineering choice from independently observed behavior.
-Request notes outside the evidence package. This workflow uses a manual
-handoff. Python does not contact Copilot.
+Ask for the five deliverables below using the actual INTAKE subject.
+
+| Skill | Draft deliverable | Evidence to use |
+| --- | --- | --- |
+| `sas-reconstruct` | Reconstruction and TRACE | Selected declarations, source-qualified spans, unsupported constructs and uninspected ranges |
+| `sas-specify` | PRD and specifications | Traced calculations and transformations, plus open questions about business intent |
+| `sas-analyze` | Dependency and optimization analysis | MAP edges, state and ordering constraints, with unresolved execution order and dataset versions |
+| `sas-validate` | Verification plan | Public engineering checks and separate obligations for independently authorized SAS reference comparison |
+| `sas-architect` | Architecture, ADR and migration plan | Bounded candidate fit, unresolved assumptions, and conditions that would justify distributed alternatives |
+
+Require file-qualified source locations and evidence references for material
+claims. Keep individual declarations separate from potential cross-file
+handoffs. Save drafts and review records outside the evidence package.
+Python generates the evidence locally. The operator hands it to Copilot
+and records the human decision before candidate publication.
 
 ## 2. Review the claims and approve the exact record
 

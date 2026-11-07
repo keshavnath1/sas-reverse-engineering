@@ -4,6 +4,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 from tempfile import TemporaryDirectory
 import unittest
@@ -105,6 +106,21 @@ class IntegratedReviewTests(unittest.TestCase):
     def test_pass_reuses_candidate_and_preserves_review(self):
         def snapshot(path):
             return {item.name: item.read_bytes() for item in path.iterdir()}
+
+        scope = self.intake / "scope.json"
+        scope.unlink()
+        (self.intake / "run.log").write_text("Public synthetic context", encoding="utf-8")
+        discovery = subprocess.run(
+            [sys.executable, "-IB", str(ROOT / "scripts/review_intake.py"),
+             "--intake", str(self.intake), "--inventory"],
+            capture_output=True, timeout=60,
+        )
+        self.assertEqual(discovery.returncode, 0, discovery.stderr)
+        proposal = json.loads(discovery.stdout)["proposed_scope"]
+        self.assertIsNotNone(proposal, discovery.stdout)
+        scope.write_text(json.dumps(proposal), encoding="utf-8")
+        self.package = self.build_package()
+        self.assert_paused("REVIEW_REQUIRED", "COPILOT_CLAIM_RECORD_REQUIRED")
 
         before = snapshot(self.package)
         self.assertEqual(before, snapshot(self.build_package()))

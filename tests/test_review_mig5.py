@@ -211,18 +211,41 @@ class Mig5OperatorTests(unittest.TestCase):
         self.assertEqual(json.loads(files["EXPORT_VALIDATION.json"])["comparison"], "PASS")
 
     def test_downstream_block_publishes_only_upstream_diagnostics(self):
-        self.select_scenario("duplicates")
+        scenarios = (
+            ("empty", "BLOCK", 1),
+            ("duplicates", "BLOCK", 3),
+            ("count_mismatch", "BLOCK", 5),
+            ("invalid_identifier", "NOT_RUN", None),
+        )
+        for scenario, continuation, blocking_gate in scenarios:
+            with self.subTest(scenario=scenario):
+                self.select_scenario(scenario)
+                status, report, destination = self.proceed()
+                self.assertEqual(status, 0, report)
+                self.assertEqual((report["decision"], report["comparison"]), ("PASS", "PASS"))
+                files = {path.name for path in destination.iterdir()}
+                self.assertEqual(files, {"PREPARATION_EVIDENCE.json", "POPULATION_EVIDENCE.json",
+                                         "PLAN.json", "SCENARIO_RESULTS.json", "VALIDATION.json",
+                                         "CANDIDATE_MANIFEST.json", "GATE.json", "MANIFEST.json"})
+                runs = json.loads((destination / "SCENARIO_RESULTS.json").read_bytes())
+                selected = next(run for run in runs if run["scenario"] == scenario)
+                self.assertEqual(selected["continuation"], continuation)
+                if blocking_gate is not None:
+                    self.assertEqual(selected["population"]["first_blocking_gate"], blocking_gate)
+                manifest = json.loads((destination / "MANIFEST.json").read_bytes())
+                self.assertEqual(manifest["scenario"], scenario)
+                self.assertEqual(manifest["reference_experiment"], "NOT_RUN")
+                self.assertEqual(manifest["semantic_acceptance"], "BLOCKED")
+
+    def test_disabled_expected_count_guard_allows_both_branches(self):
+        self.select_scenario("guard_disabled")
         status, report, destination = self.proceed()
         self.assertEqual(status, 0, report)
-        files = {path.name for path in destination.iterdir()}
-        self.assertEqual(files, {"PREPARATION_EVIDENCE.json", "POPULATION_EVIDENCE.json",
-                                 "PLAN.json", "SCENARIO_RESULTS.json", "VALIDATION.json",
-                                 "CANDIDATE_MANIFEST.json", "GATE.json", "MANIFEST.json"})
-        runs = json.loads((destination / "SCENARIO_RESULTS.json").read_bytes())
-        selected = next(run for run in runs if run["scenario"] == "duplicates")
-        self.assertEqual(selected["continuation"], "BLOCK")
-        self.assertEqual(json.loads((destination / "MANIFEST.json").read_bytes())["scenario"],
-                         "duplicates")
+        self.assertEqual((report["decision"], report["comparison"]), ("PASS", "PASS"))
+        rows = json.loads((destination / "SORTED_ROWS.json").read_bytes())
+        scores = json.loads((destination / "SCORES.json").read_bytes())["rows"]
+        self.assertEqual([row["id"] for row in rows], [0, 1])
+        self.assertEqual([row["id"] for row in scores], [1, 0])
 
     def test_downstream_subject_requires_model_claim_and_exact_fixture_bytes(self):
         self.select_scenario("passes")

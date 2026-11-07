@@ -4,6 +4,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 from tempfile import TemporaryDirectory
 import unittest
@@ -38,6 +39,52 @@ class IntakeReviewTests(unittest.TestCase):
             destination = Path("/tmp") / f"sas-re-int1-{uuid.uuid4().hex}"
             self.addCleanup(remove_destination, destination)
         return call(destination, script=SCRIPT, extra=("--intake", str(intake))), destination
+
+    def inventory(self, root):
+        result = subprocess.run([sys.executable, "-IB", str(SCRIPT), "--intake", str(root),
+                                 "--inventory"], capture_output=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return json.loads(result.stdout)
+
+    def test_inventory_proposes_scope_for_new_sources_and_support(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp).resolve()
+            self.two_sources(root)
+            scope_path = root / "scope.json"
+            scope_path.unlink()
+            (root / "run.log").write_bytes(b"Unverified public log")
+            (root / "run.lst").write_bytes(b"Unverified public listing")
+            (root / "settings.json").write_bytes(b"{}")
+            discovered = self.inventory(root)
+            self.assertEqual(discovered, self.inventory(root))
+            self.assertFalse(scope_path.exists())
+            self.assertEqual(discovered["blockers"], [])
+            self.assertEqual(discovered["inventory"][0]["syntax_recognition"], "SUPPORTED")
+            scope_path.write_text(json.dumps(discovered["proposed_scope"]))
+            run, destination = self.invoke(root)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            manifest = json.loads((destination / "MANIFEST.json").read_bytes())
+            for name, role in (("run.log", "log"), ("run.lst", "listing"),
+                               ("settings.json", "configuration")):
+                raw = (root / name).read_bytes()
+                self.assertEqual(manifest["inputs"][name], {
+                    "role": role, "inspection": "IDENTITY_ONLY",
+                    "bytes": len(raw), "sha256": sha256(raw).hexdigest(),
+                })
+            self.assertEqual(manifest["cross_file_resolution"], "POTENTIAL")
+            self.assertEqual(manifest["reference_experiment"], "NOT_RUN")
+            self.assertEqual(manifest["semantic_acceptance"], "BLOCKED")
+
+    def test_inventory_reports_unsupported_source_and_undeclared_file(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp).resolve()
+            (root / "unknown.sas").write_bytes(b"%include 'external.sas';")
+            (root / "unknown.bin").write_bytes(b"arbitrary data")
+            report = self.inventory(root)
+            self.assertIsNone(report["proposed_scope"])
+            self.assertEqual(report["inventory"][0]["inspection"], "NAME_ONLY")
+            self.assertEqual(report["inventory"][1]["syntax_recognition"], "UNSUPPORTED")
+            self.assertIn("MACRO_MARKER_OUTSIDE_SCOPE", report["inventory"][1]["reason_codes"])
 
     def test_public_intake_is_deterministic_and_traceable(self):
         with TemporaryDirectory() as temp:

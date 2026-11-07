@@ -29,9 +29,10 @@ DRAFT / UNVERIFIABLE / BLOCKED / NOT_RUN statuses.
 
 ## Review a public INTAKE before running a migration candidate
 
-Follow the [INTG-1 operator workflow](examples/intg1/README.md) to generate
-two-source evidence, review it in GitHub Copilot Agent, obtain byte-bound
-human approval through GATE-1, and run the supported Python projection and SORT.
+Follow the [INTG-1 operator workflow](examples/intg1/README.md) to inventory
+a public INTAKE folder, generate source evidence, and review it in GitHub
+Copilot Agent. Byte-bound human approval through GATE-1 permits the supported
+Python projection and SORT candidate to publish.
 
 ## Run the offline review
 

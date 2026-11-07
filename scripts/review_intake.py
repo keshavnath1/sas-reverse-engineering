@@ -15,7 +15,7 @@ from sas_re.safeio import (EvidenceError, _parse_json, ensure_disjoint, enumerat
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from migration_review import anchor, location, render
 from mvp1_demo import scratch_destination, write_bundle
-from review_source import dependency_review, line_span, single_review
+from review_source import dependency_review, inspect_range, line_span, single_review
 
 
 SCOPE_SHA256 = "268585d9ac407d5d26b924aed49b5e7fe5edac55928576209ee20cae86ebf9ba"
@@ -36,6 +36,13 @@ def json_bytes(value):
 
 SINGLE_MODES = {"data": "DATA_STEP", "sort": "PROC_SORT", "logistic": "PROC_LOGISTIC"}
 PAIR_MODES = {"data-sort", "data-sort-sql"}
+SUPPORT_SUFFIXES = {
+    "note": (".txt", ".md"),
+    "log": (".log",),
+    "listing": (".lst",),
+    "configuration": (".cfg", ".ini", ".json", ".yaml", ".yml", ".toml"),
+}
+SOURCE_SUFFIXES = (".sas", ".sas.txt")
 
 
 def validate_scope(scope):
@@ -82,15 +89,16 @@ def validate_scope(scope):
         validate_source(source)
     for item in supporting:
         name = item["path"].lower()
-        if name.endswith((".sas", ".sas.txt")):
+        if name.endswith(SOURCE_SUFFIXES):
             raise ValueError("INTAKE_MULTIPLE_SOURCES_UNSUPPORTED")
-        if item["role"] != "note" or not name.endswith((".txt", ".md")):
+        role = item["role"]
+        if not isinstance(role, str) or not name.endswith(SUPPORT_SUFFIXES.get(role, ())):
             raise ValueError("INTAKE_SUPPORT_ROLE_UNSUPPORTED")
     return sources, supporting
 
 
 def validate_source(source):
-    if not source["path"].lower().endswith((".sas", ".sas.txt")):
+    if not source["path"].lower().endswith(SOURCE_SUFFIXES):
         raise ValueError("INTAKE_SOURCE_TYPE_UNSUPPORTED")
     mode = source["mode"]
     if not isinstance(mode, str) or mode not in SINGLE_MODES.keys() | PAIR_MODES:
@@ -239,6 +247,67 @@ def two_source_review(sources, source_bytes, inputs, scope_name):
     return files
 
 
+def inventory_intake(intake):
+    """Propose a scope from whole-file recognitions without authorizing it."""
+    inventory, sources, supporting, blockers = [], [], [], []
+    for name in enumerate_files(intake):
+        lower = name.lower()
+        is_source = lower.endswith(SOURCE_SUFFIXES)
+        role = next((role for role, suffixes in SUPPORT_SUFFIXES.items()
+                     if lower.endswith(suffixes)), None)
+        entry = {"path": name, "inspection": "NAME_ONLY"}
+        inventory.append(entry)
+        if lower == "scope.json" or "/" in name or not (is_source or role):
+            blockers.append({"path": name, "code": "EXISTING_SCOPE" if lower == "scope.json"
+                             else "INTAKE_FILE_REQUIRES_MANUAL_SCOPING"})
+            continue
+        try:
+            raw = secure_read(intake, name, 65536 if is_source else 16384)
+        except EvidenceError as error:
+            if error.code != "FILE_SIZE_LIMIT":
+                raise
+            blockers.append({"path": name, "code": error.code})
+            continue
+        entry.update(identity(raw), inspection="IDENTITY_ONLY")
+        if not is_source:
+            entry["role"] = role
+            supporting.append({"path": name, "sha256": entry["sha256"], "role": role})
+            continue
+
+        lines = len(re.findall(rb"[^\r\n]*(?:\r\n|\r|\n)|[^\r\n]+$", raw))
+        if not lines:
+            blockers.append({"path": name, "code": "EMPTY_SOURCE"})
+            continue
+        _, operation, reasons = inspect_range(raw, 1, lines)
+        if not operation:
+            _, operation, logistic_reasons = inspect_range(raw, 1, lines, recover_logistic=True)
+            if not operation:
+                reasons = sorted(set(reasons + logistic_reasons))
+        entry.update(inspection="WHOLE_SOURCE_PROBE", reason_codes=reasons)
+        if not operation:
+            entry["syntax_recognition"] = "UNSUPPORTED"
+            blockers.append({"path": name, "code": "INTAKE_SOURCE_REQUIRES_MANUAL_SCOPING"})
+            continue
+        entry["syntax_recognition"] = "PARTIAL" if operation.get("unsupported_statements") else "SUPPORTED"
+        mode = next(mode for mode, kind in SINGLE_MODES.items() if kind == operation["kind"])
+        sources.append({"path": name, "sha256": entry["sha256"], "ranges": [[1, lines]], "mode": mode})
+
+    proposal = None
+    if not blockers:
+        proposal = {"version": 1 if len(sources) == 1 else 2, "scope": "public-synthetic",
+                    "sources": sources, "supporting": supporting}
+        if len(sources) == 1:
+            proposal["mode"] = sources[0].pop("mode")
+        try:
+            validate_scope(proposal)
+        except ValueError as error:
+            blockers.append({"code": str(error)})
+            proposal = None
+    return {"inventory": inventory, "proposed_scope": proposal, "blockers": blockers,
+            "reference_experiment": "NOT_RUN", "semantic_verification": "UNVERIFIABLE",
+            "semantic_acceptance": "BLOCKED"}
+
+
 def build_review(intake):
     scope_bytes = secure_read(intake, "scope.json", 4096)
     legacy = sha256(scope_bytes).hexdigest() == SCOPE_SHA256
@@ -305,10 +374,15 @@ def build_review(intake):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--intake", required=True, type=Path, help="authorized public synthetic directory")
-    parser.add_argument("--destination", required=True, help="fresh /tmp/sas-re-int1-<label> directory")
+    output = parser.add_mutually_exclusive_group(required=True)
+    output.add_argument("--destination", help="fresh /tmp/sas-re-int1-<label> directory")
+    output.add_argument("--inventory", action="store_true", help="print a draft inventory and scope proposal")
     args = parser.parse_args()
     try:
         require_evidence_io()
+        if args.inventory:
+            print(json_bytes(inventory_intake(args.intake.absolute())).decode("utf-8"), end="")
+            return 0
         scratch, leaf = scratch_destination(args.destination, "int1")
         destination = scratch / leaf
         if os.path.lexists(destination):
