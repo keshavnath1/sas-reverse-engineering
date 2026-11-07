@@ -27,6 +27,8 @@ SKILLS = {
     "sas-reconstruct": {"MANIFEST.json", "EVIDENCE.md"},
     "sas-specify": {"EVIDENCE.md", "PRD.md", "MODULES.md"},
     "sas-architect": {"ARCHITECTURE.md", "ADR_NATIVE.md", "ADR_SPARK.md", "DECISION_REVIEW.md", "TIEOUT.json"},
+    "sas-analyze": {"MANIFEST.json", "EVIDENCE.md", "ARCHITECTURE.md", "DECISION_REVIEW.md"},
+    "sas-validate": {"MANIFEST.json", "EVIDENCE.md", "TIEOUT.json", "DECISION_REVIEW.md"},
 }
 COMMAND_PREFIX = ["python3.12", "-IB", "scripts/review_workflow.py", "--destination"]
 SAMPLE_DIGEST = "da630e0225c7b2705bc22d37154560031c93ee675e1ca8c64fb312a0a1c179b6"
@@ -77,7 +79,7 @@ class SkillDefinitionTests(unittest.TestCase):
                 self.assertTrue(front[2].strip())
         self.assertEqual(len(descriptions), len(SKILLS))
 
-    def test_discovery_alias_resolves_to_the_same_three_definitions(self):
+    def test_discovery_alias_resolves_to_the_same_definitions(self):
         link = ROOT / ".agents" / "skills"
         self.assertTrue(link.is_symlink())
         self.assertEqual(os.readlink(link), "../skills")
@@ -109,6 +111,34 @@ class SkillDefinitionTests(unittest.TestCase):
                     self.assertFalse(commands(path))
         instructed_argv()
         self.assertRegex(skill("sas-reconstruct").read_text(), r"(?is)Windows.{0,130}BLOCKED|BLOCKED.{0,130}Windows")
+
+    def test_analysis_and_validation_links_bind_the_existing_subject(self):
+        references = {
+            "sas-analyze": ("src/sas_re/_dependency_diagnostics.py", "docs/P3_A1_DESIGN.md"),
+            "sas-validate": ("tests/mvp3_cases.py", "scripts/mvp3_tieout.py", "docs/MVP3_VALIDATION.md"),
+        }
+        for name, sources in references.items():
+            with self.subTest(skill=name):
+                path = skill(name)
+                linked = {}
+                for target in re.findall(r"\[[^\]\n]+\]\(([^)\n]+)\)", path.read_text()):
+                    resolved = (path.parent / unquote(urlsplit(target).path)).resolve()
+                    linked[resolved.name] = resolved
+                for source in sources:
+                    self.assertEqual(linked[Path(source).name], ROOT / source)
+                for artifact in SKILLS[name]:
+                    self.assertEqual(linked[artifact], SAMPLE / artifact)
+                subject = json.loads(linked["MANIFEST.json"].read_bytes())["subject"]
+                for artifact in {"EVIDENCE.md", "ARCHITECTURE.md"} & SKILLS[name]:
+                    graph = re.search(r"Graph SHA-256 `([0-9a-f]{64})`", linked[artifact].read_text())
+                    self.assertIsNotNone(graph, artifact)
+                    self.assertEqual(graph[1], subject["graph_sha256"])
+                if name == "sas-validate":
+                    reference = json.loads(linked["TIEOUT.json"].read_bytes())["reference"]
+                    self.assertEqual(reference["original_mvp2_graph_sha256"], subject["graph_sha256"])
+                    case_digest = sha256(linked["mvp3_cases.py"].read_bytes()).hexdigest()
+                    self.assertEqual(case_digest, subject["case_table_sha256"])
+                    self.assertEqual(case_digest, reference["specification_sha256"])
 
     def test_original_consolidated_sample_hash(self):
         self.assertEqual({p.name for p in SAMPLE.iterdir()}, FILES)

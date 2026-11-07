@@ -6,16 +6,20 @@ Open this repository as the agent's working directory. Use
 [`$sas-reconstruct`](skills/sas-reconstruct/SKILL.md) for the fixed synthetic
 trace, [`$sas-specify`](skills/sas-specify/SKILL.md) for requirements review,
 or [`$sas-architect`](skills/sas-architect/SKILL.md) to compare the existing
-Python and Spark proposals. Keep review notes separate from generated evidence.
+Python and Spark proposals. Use [`$sas-analyze`](skills/sas-analyze/SKILL.md)
+to review dependency constraints and conditional optimization ideas, and
+[`$sas-validate`](skills/sas-validate/SKILL.md) to reconcile the public behavioral
+controls with their frozen cases. Return notes in chat or a separate review document.
 For explicit file-based use, ask the agent to read the linked `SKILL.md`.
 
-The three authoritative definitions live in `skills/`. The repository-local
+The five authoritative definitions live in `skills/`. The repository-local
 `.agents/skills -> ../skills` link exposes them to Codex without copying
 instructions or changing user configuration. Live discovery was observed on the
-installed macOS Codex CLI from this repository and its `scripts/` directory.
+installed macOS Codex CLI from this repository.
 The parent workspace does not discover this nested repository automatically.
 Hosts that do not materialize the link can still read the canonical files
-explicitly. [Observed validation and remaining qualification limits](docs/SK1_VALIDATION.md).
+explicitly. [SK-1 validation](docs/SK1_VALIDATION.md) and
+[SK-2 validation](docs/SK2_VALIDATION.md) record observed use and qualification limits.
 
 Skills guide evidence review and bounded reasoning. The deterministic Python
 engine owns reconstruction, validation, hashing and diagnostics. Developers
@@ -176,7 +180,7 @@ tests demonstrate bounded behavior; independent semantic acceptance remains
 
 | Implemented | Planned; requires later approval |
 |---|---|
-| Three fixed-fixture reconstruction, specification and architecture skills | Analysis, validation and handoff skills |
+| Five fixed-fixture reconstruction, specification, architecture, analysis and validation skills | Handoff skill |
 | P0 package, status, frozen baseline and drift checks | Model/provider adapters |
 | Preserved P1 contracts, authorized inventory and byte hashes | P2B protected-gold independent semantic evaluation |
 | Citation, ID, ownership, reference and coverage checks; private synthetic MVP-1 preview | Operational PRD/SPEC, parallelism, ADR/HLD/LLD generation |
