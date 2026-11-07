@@ -34,7 +34,7 @@ class SourceReviewTests(unittest.TestCase):
         directory = self.enterContext(TemporaryDirectory(dir=scratch))
         self.source = Path(directory) / "input.sas"
 
-    def review(self, raw, lines="3:5", expected=None, destination=None, second_lines=None, recover_rules=False, recover_missing=False):
+    def review(self, raw, lines="3:5", expected=None, destination=None, second_lines=None, recover_rules=False, recover_missing=False, recover_sql=False):
         self.source.write_bytes(raw)
         if destination is None:
             destination = Path("/tmp") / f"sas-re-source-{uuid.uuid4().hex}"
@@ -44,6 +44,7 @@ class SourceReviewTests(unittest.TestCase):
             "--lines", lines, *(("--lines", second_lines) if second_lines else ()),
             *(("--recover-status-rules",) if recover_rules else ()),
             *(("--recover-missing-exclusions",) if recover_missing else ()),
+            *(("--recover-sql-gates",) if recover_sql else ()),
         ))
         return run, destination
 
@@ -321,6 +322,103 @@ class SourceReviewTests(unittest.TestCase):
         review = (dest / "README.md").read_text()
         self.assertIn("No direct writer identified within the inspected supported source forms; unresolved effects remain.", review)
         self.assertNotIn("create table", review.lower())
+
+    def sql_review(self, middle, recover_sql=True):
+        data = b"data work.stage; set work.input; keep id; run;"
+        sort = b"proc sort data=work.stage out=work.final; by id; run;"
+        raw = b"\r\n".join([data, *middle, sort])
+        run, dest = self.review(raw, lines="1:1", second_lines=f"{len(middle)+2}:{len(middle)+2}",
+                                recover_sql=recover_sql)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        files = {path.name: path.read_bytes() for path in dest.iterdir()}
+        evidence = json.loads(files["EVIDENCE.json"])
+        findings = evidence["interval_effects"]["findings"]
+        self.assertEqual(evidence["interval_effects"]["sort_reachability"], "UNESTABLISHED")
+        for item in findings:
+            span = item["span"]
+            self.assertEqual(span["sha256"], sha256(raw[span["start"]:span["end"]]).hexdigest())
+            self.assertEqual(span["start"], sum(len(line) + 2 for line in raw.splitlines()[:span["line_start"]-1]))
+        return evidence, findings, files
+
+    def test_sql_gate_recovery_links_positional_bindings_and_guard(self):
+        middle = [
+            b"proc sql noprint;",
+            b"create table work.audit as select id, count(*) as duplicate_count from work.stage group by id having count(*) > 1;",
+            b"select count(*), count(distinct id), sum(case when missing(id) then 1 else 0 end) into :total trimmed, :distinct_ids trimmed, :absent trimmed from work.stage;",
+            b"select count(*) into :repeated trimmed from work.audit;",
+            b"quit;",
+            b"%assert_step(step_name=Audit);",
+            b"%if &total = 0 %then %abort_run(empty);",
+            b"%if &absent ne 0 %then %abort_run(missing);",
+            b"%if &repeated ne 0 %then %abort_run(duplicates);",
+            b"%if &total ne &distinct_ids %then %abort_run(mismatch);",
+            b"%if %upcase(&check_expected) = Y %then %do;",
+            b"%if &total ne &expected %then %abort_run(count mismatch);",
+            b"%end;",
+        ]
+        evidence, findings, files = self.sql_review(middle)
+        self.assertEqual(evidence["review_format"], "source-only-dependency/4")
+        sql = [item for item in findings if "sql_declaration" in item]
+        self.assertEqual([item["sql_declaration"]["kind"] for item in sql],
+                         ["DUPLICATE_GROUP_SIZES", "SCALAR_INTO", "DUPLICATE_GROUP_COUNT"])
+        self.assertEqual(sql[2]["sql_declaration"]["group_query_start"], sql[0]["span"]["start"])
+        self.assertEqual([(b["expression"], b["target"]) for b in sql[1]["sql_declaration"]["bindings"]],
+                         [("COUNT(*)", "total"), ("COUNT(DISTINCT id)", "distinct_ids"),
+                          ("SUM(CASE WHEN MISSING(id) THEN 1 ELSE 0 END)", "absent")])
+        gates = [item for item in findings if "gate_declaration" in item]
+        decl = [item["gate_declaration"] for item in gates]
+        self.assertEqual([(g["variable"], g["operator"], g["operand"]) for g in decl], [
+            ("total", "=", {"literal": "0"}), ("absent", "NE", {"literal": "0"}),
+            ("repeated", "NE", {"literal": "0"}), ("total", "NE", {"variable": "distinct_ids"}),
+            ("check_expected", "=", {"literal": "Y"}), ("total", "NE", {"variable": "expected"}),
+        ])
+        scalar, count = [item["span"]["start"] for item in sql[1:]]
+        self.assertEqual([g["into_sources"] for g in decl if g["action"] == "ABORT_REQUEST"],
+                         [{"total": scalar}, {"absent": scalar}, {"repeated": count},
+                          {"total": scalar, "distinct_ids": scalar}, {"total": scalar}])
+        self.assertEqual(decl[-1]["guard_start"], gates[-2]["span"]["start"])
+        report = files["MIGRATION_REVIEW.md"].decode()
+        for anchor in re.findall(r"\]\(#(bytes-[0-9]+-[0-9]+)\)", report):
+            self.assertIn(f'id="{anchor}"', report)
+        self.assertIn("Counts retained groups.", report)
+        self.assertIn("Producer unresolved for `expected`", report)
+        self.assertEqual(files, self.sql_review(middle)[2])
+        legacy, old, _ = self.sql_review(middle, recover_sql=False)
+        self.assertEqual(legacy["review_format"], "source-only-dependency/1")
+        self.assertEqual(old, [{k: v for k, v in item.items()
+                                if k not in {"sql_declaration", "gate_declaration"}} for item in findings])
+
+    def test_sql_gate_recovery_refuses_unsupported_or_ambiguous_forms(self):
+        for query in (
+            b"select max(id) into :total trimmed from work.stage;",
+            b"select count(*), count(distinct id) into :total trimmed from work.stage;",
+            b"select count(*) into :total trimmed from work.stage where id > 0;",
+            b"select count(*) into :total from work.stage;",
+        ):
+            with self.subTest(query=query):
+                _, findings, _ = self.sql_review([
+                    b"proc sql;", query,
+                    b"select count(*) into :other trimmed from work.stage;",
+                    b"quit;",
+                    b"%if &total = 0 %then %abort_run(empty);",
+                    b"%if &other = 0 %then %abort_run(empty);",
+                    b"%if &&total = 0 %then %abort_run(dynamic);",
+                    b"%if %upcase(&flag) = Y %then %do;",
+                    b"%if &other ne &expected %then %abort_run(mismatch);",
+                ])
+                sql = [item["sql_declaration"] for item in findings if "sql_declaration" in item]
+                self.assertEqual(len(sql), 1)
+                self.assertEqual(sql[0]["bindings"][0]["target"], "other")
+                gates = [item["gate_declaration"] for item in findings if "gate_declaration" in item]
+                self.assertEqual([g["variable"] for g in gates], ["total", "other"])
+                self.assertEqual(gates[0]["into_sources"], {})
+                self.assertIn("other", gates[1]["into_sources"])
+        _, findings, _ = self.sql_review([
+            b"proc sql;", b"select count(*) into :total trimmed from work.stage;", b"quit;",
+            b"%if %upcase(&flag) = y %then %do;",
+            b"%if &total ne &expected %then %abort_run(mismatch);", b"%end;",
+        ])
+        self.assertFalse(any("gate_declaration" in item for item in findings))
 
     def test_interval_inventory_distinguishes_writer_from_unavailable_inspection(self):
         data = b"data work.stage; set work.input; keep id; run;\n"

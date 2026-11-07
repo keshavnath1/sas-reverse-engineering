@@ -62,6 +62,55 @@ def missing_rule_relationships(rules):
     return lines
 
 
+def interval_declarations(item):
+    sql = item.get("sql_declaration")
+    if sql:
+        if sql["kind"] == "DUPLICATE_GROUP_SIZES":
+            return (f" Group by {names([sql['group_by']])}, retain `{sql['having']}`, "
+                    f"and project {names(sql['projection'])}. Counts are per group.")
+        bindings = ", ".join(f"`{b['expression']}` → `:{b['target']} TRIMMED`"
+                             for b in sql["bindings"])
+        purpose = " Counts retained groups." if sql["kind"] == "DUPLICATE_GROUP_COUNT" else ""
+        return f" Positional INTO bindings {bindings}.{purpose}"
+    gate = item.get("gate_declaration")
+    if gate:
+        operand = gate["operand"]
+        right = "&" + operand["variable"] if "variable" in operand else operand["literal"]
+        left = "&" + gate["variable"]
+        if gate["action"] == "GUARD":
+            return f" Optional guard `%UPCASE({left}) {gate['operator']} {right}`."
+        return f" Condition `{left} {gate['operator']} {right}` requests `%abort_run`."
+    return ""
+
+
+def sql_gate_relationships(findings):
+    spans = {item["span"]["start"]: item["span"] for item in findings}
+    lines = []
+    for item in findings:
+        sql = item.get("sql_declaration", {})
+        if "group_query_start" in sql:
+            group = cite("grouped query", spans[sql["group_query_start"]])
+            count = cite("scalar count", item["span"])
+            lines.append(f"- **SOURCE_DECLARED** · {group} → {count}.")
+        gate = item.get("gate_declaration", {})
+        if gate.get("action") != "ABORT_REQUEST":
+            continue
+        condition = cite("condition and potential abort request", item["span"])
+        refs = [cite(f"INTO binding for {name}", spans[start])
+                for name, start in gate["into_sources"].items()]
+        links = " → ".join([", ".join(refs), condition]) if refs else condition
+        if "guard_start" in gate:
+            links += f". Requires {cite('optional guard', spans[gate['guard_start']])}."
+        else:
+            links += "."
+        referenced = {gate["variable"], gate["operand"].get("variable")} - {None}
+        unresolved = referenced - gate["into_sources"].keys()
+        if unresolved:
+            links += f" Producer unresolved for {names(sorted(unresolved))}."
+        lines.append(f"- **SOURCE_DECLARED / EXECUTION_UNVERIFIED** · {links}")
+    return lines
+
+
 def render(evidence):
     data_selection, sort_selection = evidence["selections"]
     data = data_selection["declared_operation"]
@@ -128,8 +177,9 @@ def render(evidence):
     for item in findings:
         trace("Interval finding", item["span"], " ".join(
             f"{field.replace('_', ' ').capitalize()} · {names(values)}."
-            for field, values in item.items() if field != "span" and values
-        ))
+            for field, values in item.items()
+            if field not in {"span", "sql_declaration", "gate_declaration"} and values
+        ) + interval_declarations(item))
     if not findings:
         lines.append("The bounded inventory contains no finding records.")
 
@@ -165,6 +215,7 @@ def render(evidence):
         interval_refs[label] = ", ".join(refs)
         if refs:
             lines.append(f"- **{label}** · {interval_refs[label]}.")
+    lines.extend(sql_gate_relationships(findings))
     outputs = interval_refs["Source-declared outputs"]
     if interval["shared_writer_identified"] is True:
         lines.append(f"- **INFERRED** · An explicit interval output may replace the shared dataset in the {handoff} handoff. See {outputs}.")

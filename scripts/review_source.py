@@ -275,7 +275,7 @@ def inspect_range(raw, first, last, recover_rules=False, recover_missing=False):
     return location, operation, reasons
 
 
-def dependency_review(raw, ranges, source_digest, recover_rules=False, recover_missing=False):
+def dependency_review(raw, ranges, source_digest, recover_rules=False, recover_missing=False, recover_sql=False):
     selections = []
     for first, last in ranges:
         span, operation, reasons = inspect_range(raw, first, last, recover_rules, recover_missing)
@@ -303,7 +303,7 @@ def dependency_review(raw, ranges, source_digest, recover_rules=False, recover_m
     }
     interval = interval_inventory(
         raw, intermediate["start"], intermediate["end"],
-        first_span["line_end"] + 1, data["output"] if matched else None, MAX_SPAN_BYTES,
+        first_span["line_end"] + 1, data["output"] if matched else None, MAX_SPAN_BYTES, recover_sql=recover_sql,
     )
     evidence = {
         **STATUS,
@@ -320,6 +320,9 @@ def dependency_review(raw, ranges, source_digest, recover_rules=False, recover_m
     }
     if recover_missing:
         evidence["review_format"] = "source-only-dependency/3"
+    if recover_sql:
+        evidence.update(review_format="source-only-dependency/4", reference_experiment="NOT_RUN",
+                        historical_source_run_provenance="UNBOUND")
     relationship = (
         f"DATA writes and SORT reads the declared dataset `{data['output']}`."
         if matched else
@@ -364,7 +367,7 @@ def dependency_review(raw, ranges, source_digest, recover_rules=False, recover_m
     for item in interval["findings"]:
         location = item["span"]
         effects = [f"{key}: {', '.join(values)}" for key, values in item.items()
-                   if key != "span" and values]
+                   if key not in {"span", "sql_declaration", "gate_declaration"} and values]
         lines.append(f"- Lines {location['line_start']}–{location['line_end']}, "
                      f"bytes [{location['start']}, {location['end']}). " + ". ".join(effects) + ".")
     lines += [
@@ -374,7 +377,7 @@ def dependency_review(raw, ranges, source_digest, recover_rules=False, recover_m
         "label values, row preservation and ordering against attributable reference outputs.",
         "- Resolve upstream and downstream effects separately. Behavioral evidence is unavailable.",
     ]
-    if recover_rules:
+    if recover_rules or recover_sql:
         lines += ["", "See [MIGRATION_REVIEW.md](MIGRATION_REVIEW.md) for ordered source-rule "
                   "recovery, TRACE links and unresolved behavior."]
     return evidence, ("\n".join(lines) + "\n").encode("utf-8")
@@ -389,6 +392,8 @@ def main():
                         help="opt in to bounded source-only status rule recovery")
     parser.add_argument("--recover-missing-exclusions", action="store_true",
                         help="extend status recovery with ordered MISSING and CMISS exclusions")
+    parser.add_argument("--recover-sql-gates", action="store_true",
+                        help="recover bounded SQL and abort declarations between two ranges")
     parser.add_argument("--destination", required=True, help="fresh /tmp/sas-re-source-<label> directory")
     args = parser.parse_args()
     if args.recover_missing_exclusions and not args.recover_status_rules:
@@ -397,6 +402,8 @@ def main():
         parser.error("--source-sha256 requires 64 hexadecimal digits")
     if len(args.lines) not in (1, 2):
         parser.error("supply one or two --lines ranges")
+    if args.recover_sql_gates and len(args.lines) != 2:
+        parser.error("--recover-sql-gates requires two --lines ranges")
     ranges = []
     for value in args.lines:
         if not re.fullmatch(r"[1-9][0-9]{0,7}:[1-9][0-9]{0,7}", value):
@@ -425,6 +432,7 @@ def main():
         if len(ranges) == 2:
             evidence, readme = dependency_review(
                 raw, ranges, source_digest, args.recover_status_rules, args.recover_missing_exclusions,
+                recover_sql=args.recover_sql_gates,
             )
         else:
             selected_span, operation, reasons = inspect_range(

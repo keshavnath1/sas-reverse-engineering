@@ -13,7 +13,149 @@ def dataset_refs(pattern, text):
     return [".".join(match.groups()) for match in re.finditer(pattern + _DATASET, text)]
 
 
-def inventory(raw, start, end, first_line, shared, max_bytes):
+_NAME = r"[a-z_][a-z0-9_]{0,31}"
+_TABLE = r"work \. " + _NAME
+_GROUPED = re.compile(
+    rf"create table ({_TABLE}) as select id , count \( \* \) as duplicate_count "
+    rf"from ({_TABLE}) group by id having count \( \* \) > 1"
+)
+_SCALAR = re.compile(rf"select (.+) into (.+) from ({_TABLE})")
+_AGGREGATES = {
+    "count ( * )": "COUNT(*)",
+    "count ( distinct id )": "COUNT(DISTINCT id)",
+    "sum ( case when missing ( id ) then 1 else 0 end )":
+        "SUM(CASE WHEN MISSING(id) THEN 1 ELSE 0 END)",
+}
+_GATE = re.compile(rf"% if & ({_NAME}) (=|ne) (0|& {_NAME}) % then "
+                   rf"% abort_run \( (.+) \)")
+_FLAG = re.compile(rf"% if % upcase \( & ({_NAME}) \) = y % then % do")
+
+
+def recover_sql_gates(frames, findings, start):
+    """Annotate existing records with declaration facts, never resolved values."""
+    by_start = {item["span"]["start"] - start: item for item in findings}
+    producers = {}
+    grouped = {}
+    in_sql = False
+    depth = 0
+    pending_guard = None
+    pending_gate = None
+    for frame in frames:
+        if frame["comment"] and not frame["issues"]:
+            continue
+        item = by_start.get(frame["start"])
+        tokens = frame["tokens"]
+        words = [t.lower if t.kind != "string" else "<literal>" for t in tokens]
+        text = " ".join(words)
+        codes = {issue["code"] for issue in frame["issues"]}
+        if words[:2] == ["proc", "sql"]:
+            producers.clear()
+            grouped.clear()
+            in_sql = not codes and text in {"proc sql", "proc sql noprint"} and not depth
+            continue
+        if not codes and text == "quit":
+            in_sql = False
+            continue
+        if in_sql:
+            group = _GROUPED.fullmatch(text) if not codes else None
+            scalar = _SCALAR.fullmatch(text) if codes <= {"UNSUPPORTED_TOKEN"} else None
+            if group and item:
+                output, _ = group.groups()
+                item["sql_declaration"] = {
+                    "kind": "DUPLICATE_GROUP_SIZES",
+                    "projection": ["id", "COUNT(*) AS duplicate_count"],
+                    "group_by": "id", "having": "COUNT(*) > 1",
+                }
+                grouped[output] = None if output in grouped else item["span"]["start"]
+                continue
+            if scalar and item:
+                expressions, targets, table = scalar.groups()
+                expressions = expressions.split(" , ")
+                targets = [re.fullmatch(rf": ({_NAME}) trimmed", target)
+                           for target in targets.split(" , ")]
+                if (len(expressions) == len(targets) and all(targets)
+                        and all(expr in _AGGREGATES for expr in expressions)):
+                    names = [target[1] for target in targets]
+                    if len(set(names)) == len(names):
+                        declaration = {
+                            "kind": "SCALAR_INTO",
+                            "bindings": [{"expression": _AGGREGATES[expr], "target": name,
+                                          "trimmed": True}
+                                         for expr, name in zip(expressions, names)],
+                        }
+                        if grouped.get(table) is not None and expressions == ["count ( * )"]:
+                            declaration["kind"] = "DUPLICATE_GROUP_COUNT"
+                            declaration["group_query_start"] = grouped[table]
+                        item["sql_declaration"] = declaration
+                        for name in names:
+                            # Repeated producers leave the reference ambiguous.
+                            producers[name] = (None if name in producers
+                                               else item["span"]["start"])
+                        continue
+            # An unsupported SQL statement may write a target or replace a table.
+            producers.clear()
+            grouped.clear()
+            if words[:1] in (["proc"], ["%"], ["run"]):
+                in_sql = False
+            else:
+                continue
+
+        adjacent_macros = all(
+            i + 1 < len(tokens) and token.end == tokens[i + 1].start
+            for i, token in enumerate(tokens) if token.text in {"%", "&"}
+        )
+        if not codes and adjacent_macros and text == "% end" and depth:
+            depth -= 1
+            if depth == 0 and pending_guard and pending_gate:
+                guard_item, guard_declaration = pending_guard
+                gate_item, gate_declaration = pending_gate
+                guard_item["gate_declaration"] = guard_declaration
+                gate_declaration["guard_start"] = guard_item["span"]["start"]
+                gate_item["gate_declaration"] = gate_declaration
+            pending_guard = pending_gate = None
+            continue
+
+        if any(pair == ("%", "do") for pair in zip(words, words[1:])):
+            flag = _FLAG.fullmatch(text) if not codes and adjacent_macros and not depth else None
+            # Keyword normalization must not change the case-sensitive operand.
+            if flag and tokens[words.index("=") + 1].text != "Y":
+                flag = None
+            depth += 1
+            pending_guard = (item, {
+                "variable": flag[1], "transform": "UPCASE", "operator": "=",
+                "operand": {"literal": "Y"}, "action": "GUARD",
+            }) if flag and item else None
+            pending_gate = None
+            continue
+
+        gate = _GATE.fullmatch(text) if not codes and adjacent_macros else None
+        if gate and item and re.fullmatch(
+            r"(?:[a-z0-9_=.<>+/-]+|& [a-z_][a-z0-9_]*)(?: (?:[a-z0-9_=.<>+/-]+|& [a-z_][a-z0-9_]*))*",
+            gate[4],
+        ):
+            variable, operator, operand, _ = gate.groups()
+            reference = operand[2:] if operand.startswith("& ") else None
+            declaration = {
+                "variable": variable, "operator": operator.upper(),
+                "operand": {"variable": reference} if reference else {"literal": operand},
+                "action": "ABORT_REQUEST",
+                "into_sources": {name: producers[name] for name in (variable, reference)
+                                 if producers.get(name) is not None},
+            }
+            if not depth:
+                item["gate_declaration"] = declaration
+            elif depth == 1 and pending_guard and not pending_gate:
+                pending_gate = (item, declaration)
+            else:
+                pending_guard = pending_gate = None
+        else:
+            if depth:
+                pending_guard = pending_gate = None
+            if words[:1] == ["%"] and words[:2] != ["%", "assert_step"]:
+                producers.clear()
+
+
+def inventory(raw, start, end, first_line, shared, max_bytes, recover_sql=False):
     span = raw[start:end]
     findings = []
     status = "INSPECTED"
@@ -127,6 +269,9 @@ def inventory(raw, start, end, first_line, shared, max_bytes):
                 unknown.append("STATEMENT_EFFECTS_UNRESOLVED")
             if reads or writes or ods_outputs or unknown:
                 record(location, reads=reads, writes=writes, ods_outputs=ods_outputs, unknown_effects=unknown)
+
+        if recover_sql:
+            recover_sql_gates(frames, findings, start)
 
     reads = {name for item in findings for name in item.get("reads", [])}
     outputs = {name for item in findings for field in ("writes", "ods_outputs") for name in item.get(field, [])}
