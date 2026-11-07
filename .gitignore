@@ -21,6 +21,10 @@ outputs/
 local/
 gold/
 .agents/
+!/.agents/
+/.agents/*
+!/.agents/skills
+/.agents/skills/**
 .codex/
 *.sas
 *.log

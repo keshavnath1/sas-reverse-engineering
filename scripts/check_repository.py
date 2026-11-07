@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -16,6 +17,22 @@ SECRET_PATTERNS = [re.compile(rb"AKIA[0-9A-Z]{16}"),
                    re.compile(rb"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
                    re.compile(rb"gh[pousr]_[A-Za-z0-9]{36,}"),
                    re.compile(rb"sk-proj-[A-Za-z0-9_-]{20,}")]
+SKILL_DISCOVERY_LINK = ".agents/skills"
+
+
+def valid_skill_link(root: Path) -> bool:
+    """Allow only the exact, tracked directory link used for repository skill discovery."""
+    path = root / SKILL_DISCOVERY_LINK
+    # Check parents and the literal pointer before following any link.
+    if any(part.is_symlink() or not part.is_dir() for part in (root / ".agents", root / "skills")):
+        return False
+    if not path.is_symlink() or os.readlink(path) != "../skills":
+        return False
+    entry = subprocess.check_output(
+        ["git", "ls-files", "--stage", "--", SKILL_DISCOVERY_LINK], cwd=root, text=True).split()
+    if len(entry) != 4 or entry[0] != "120000" or entry[2:] != ["0", SKILL_DISCOVERY_LINK]:
+        return False
+    return subprocess.check_output(["git", "show", ":" + SKILL_DISCOVERY_LINK], cwd=root) == b"../skills"
 
 
 def prohibited_path(name: str) -> bool:
@@ -34,6 +51,14 @@ def check(root: Path) -> list[str]:
     errors = []
     for name in filter(None, names):
         path = root / name
+        if name == SKILL_DISCOVERY_LINK:
+            if not valid_skill_link(root):
+                errors.append("Invalid repository skill discovery link")
+            continue
+        if name.startswith("skills/") and any(
+                root.joinpath(*Path(name).parts[:i]).is_symlink() for i in range(1, len(Path(name).parts))):
+            errors.append(f"Symlink in skill definition path: {name}")
+            continue
         if path.is_symlink() or not path.is_file():
             errors.append(f"Non-regular or missing tracked file: {name}")
             continue

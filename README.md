@@ -1,5 +1,28 @@
 # SAS Reverse Engineering and Computation Architecture Planner
 
+## Use the agent skills
+
+Open this repository as the agent's working directory. Use
+[`$sas-reconstruct`](skills/sas-reconstruct/SKILL.md) for the fixed synthetic
+trace, [`$sas-specify`](skills/sas-specify/SKILL.md) for requirements review,
+or [`$sas-architect`](skills/sas-architect/SKILL.md) to compare the existing
+Python and Spark proposals. Keep review notes separate from generated evidence.
+For explicit file-based use, ask the agent to read the linked `SKILL.md`.
+
+The three authoritative definitions live in `skills/`. The repository-local
+`.agents/skills -> ../skills` link exposes them to Codex without copying
+instructions or changing user configuration. Live discovery was observed on the
+installed macOS Codex CLI from this repository and its `scripts/` directory.
+The parent workspace does not discover this nested repository automatically.
+Hosts that do not materialize the link can still read the canonical files
+explicitly. [Observed validation and remaining qualification limits](docs/SK1_VALIDATION.md).
+
+Skills guide evidence review and bounded reasoning. The deterministic Python
+engine owns reconstruction, validation, hashing and diagnostics. Developers
+can continue to invoke it directly with the command below, offline and without
+an AI provider. These skills cover the fixed public fixture and preserve the
+DRAFT / UNVERIFIABLE / BLOCKED / NOT_RUN statuses.
+
 ## Run the offline review
 
 Open the [sample review folder](examples/offline-review/README.md) to read the
