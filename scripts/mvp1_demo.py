@@ -24,12 +24,12 @@ FIXTURE_GRAPH_SHA256 = "385423530208b08635de832bed57698b7278490f2cb7a43f08fd754b
 FILES = ("ADR_NATIVE.md", "ADR_SPARK.md", "ARCHITECTURE.md", "EVIDENCE.md", "MODULES.md", "PRD.md")
 
 
-def scratch_destination(argument, checkpoint="mvp1", *, allow_plain_name=False):
+def scratch_destination(argument, checkpoint="mvp1", *, allow_plain_name=False, name_prefix=None):
     # Only a new direct child of system scratch. Never descend through a
     # caller-selected tree: an evidence store or sealed attempt can have any name.
     parent, leaf = os.path.split(argument)
     scratch = Path("/private/tmp" if sys.platform == "darwin" else "/tmp")
-    prefix = f"sas-re-{checkpoint}-"
+    prefix = name_prefix if name_prefix is not None else f"sas-re-{checkpoint}-"
     valid_name = (re.fullmatch(re.escape(prefix) + r"[A-Za-z0-9_-]{1,64}", leaf) is not None
                   or (allow_plain_name and leaf == prefix[:-1]))
     if parent not in {"/tmp", str(scratch)} or not valid_name:
@@ -41,12 +41,12 @@ def scratch_destination(argument, checkpoint="mvp1", *, allow_plain_name=False):
     return scratch, leaf
 
 
-def render_case(case, fixture, expected_graph_sha256, profile_key, *, additional_status=()):
+def render_case(case, fixture, expected_graph_sha256, profile_key, *, additional_status=(), revision="legacy"):
     """Validate the reconstruction and bind this fixed example to its observed graph."""
     scope, inventory, profile, graph = case
     report = validate_v2(scope, inventory, graph, profile, profile_file_key=profile_key)
     diagnostics = diagnose(graph, expected_graph_sha256)
-    files = generate_preview(graph, diagnostics)
+    files = generate_preview(graph, diagnostics, revision=revision)
     fields = ("artifact_authority", "semantic_verification", "semantic_acceptance",
               "benchmark_execution", *additional_status)
     return files, {"status": "UNVERIFIED", "fixture": fixture, "graph_sha256": diagnostics["parent_graph_sha256"],

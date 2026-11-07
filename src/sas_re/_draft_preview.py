@@ -86,8 +86,13 @@ def _expression(expr):
     return "[expression detail withheld]"
 
 
-def _fact_text(fact):
+def _fact_text(fact, revision="legacy"):
     kind = fact["kind"]
+    if revision == "tf1" and kind == "retain":
+        return f"RETAIN `{_name(fact['target'])}` with initialization `{_expression(fact['initial'])}`."
+    if revision == "tf1" and kind == "sum":
+        return (f"Sum statement `{_name(fact['target'])} + {_expression(fact['expression'])}`. "
+                "The represented SUM state persists across rows and treats a missing addend as zero.")
     if kind == "sort":
         return (f"Sort `{_name(fact['input'])}` into `{_name(fact['output'])}` "
                 f"by {_names(fact['keys'])}.")
@@ -99,6 +104,10 @@ def _fact_text(fact):
         direction = "ascending" if fact["ascending"] else "non-ascending"
         return f"BY keys in declared order: {_names(fact['keys'])} ({direction})."
     if kind == "assignment":
+        if revision == "tf1" and fact["guard"] is not None and fact["guard"]["kind"] == "by_flag":
+            guard = fact["guard"]
+            return (f"IF `{guard['flag'].upper()}.{_name(guard['key'])}` THEN "
+                    f"`{_name(fact['target'])} = {_expression(fact['expression'])}`.")
         guard = " under a represented condition" if fact["guard"] is not None else ""
         return f"Assignment{guard}: `{_name(fact['target'])} = {_expression(fact['expression'])}`."
     if kind == "sql":
@@ -123,8 +132,15 @@ def _fact_text(fact):
     return f"Fact kind `{kind}`. Its semantics require separate review."
 
 
-def _review_test(op):
+def _review_test(op, revision="legacy"):
     kinds = {fact["kind"] for fact in op["facts"]}
+    if revision == "tf1" and "sort" in kinds:
+        return ("Preserve input/output row multisets and counts. Check the output composite-key sequence "
+                "against the order contract, allowing only its declared tie freedom.")
+    if revision == "tf1" and any(f["kind"] == "input" and f["mode"] == "SET" for f in op["facts"]):
+        return ("Preserve the actual input stream, including its producer's chosen tie order. "
+                "Compare initialization, FIRST/LAST key-prefix flags, explicit resets and accumulation "
+                "at each row and partition boundary against an independent reference.")
     if "sort" in kinds:
         return ("Compare the input/output row multiset, counts and the full composite key sequence. "
                 "Challenge equal keys and ordinary numeric missing keys separately.")
@@ -143,8 +159,9 @@ def _review_test(op):
 class _View:
     """Document-local references into the canonical graph; no new factual identities."""
 
-    def __init__(self, graph, diagnostic):
+    def __init__(self, graph, diagnostic, revision="legacy"):
         self.graph = graph
+        self.revision = revision
         self.diagnostic = diagnostic
         self.ops = sorted(graph["operations"], key=lambda op: op["sequence"])
         self.edges = sorted(graph["edges"], key=lambda edge: edge["edge_id"])
@@ -155,7 +172,8 @@ class _View:
         for col in graph["columns"]:
             self.nodes[col["column_id"]] = self.datasets[col["dataset_id"]] + "." + col["name"]
         self.analysis = diagnostic["analysis"]
-        self.multi = len(graph["module_ids"]) > 1
+        # TF-1 uses the detailed layout for single-module subjects as well.
+        self.multi = len(graph["module_ids"]) > 1 or revision == "tf1"
         self.owner = {op["operation_id"]: op["module_id"] for op in self.ops}
 
     def ref(self, identifier):
@@ -207,7 +225,9 @@ class _View:
         lines = []
         for op in self.ops:
             kinds = {"sort", "input", "by", "assignment", "sql", "include"}
-            facts = [f"{_fact_text(f)} ({self.fact_ref(op, i) if self.multi else f'fact {i}'})"
+            if self.revision == "tf1":
+                kinds.update({"retain", "sum"})
+            facts = [f"{_fact_text(f, self.revision)} ({self.fact_ref(op, i) if self.multi else f'fact {i}'})"
                      for i, f in enumerate(op["facts"]) if f["kind"] in kinds]
             owner = f", module `{op['module_id']}`" if self.multi else ""
             outputs = f"writes {self.dataset_names(op['writes'])}."
@@ -220,6 +240,8 @@ class _View:
 
     def document(self, title, lines):
         version = "mvp2-multimodule-preview/1" if self.multi else _VERSION
+        if self.revision == "tf1":
+            version = "two-fixture-preview/1"
         header = [f"# {title}", "", "UNVERIFIED · public synthetic draft", "", "```text", _STATUS,
                   "```", "", f"Graph SHA-256 `{self.diagnostic['parent_graph_sha256']}` · "
                   f"preview `{version}` · diagnostics `{self.diagnostic['algorithm']}`", ""]
@@ -242,7 +264,7 @@ def _prd(v):
             reads_writes = "has no represented dataset accesses. Its effects require further evidence."
         lines.extend([f"### {v.labels[op['operation_id']]} · {op['kind']}", "",
                       f"**OBSERVATION** {ref} {reads_writes}",
-                      "", f"**HYPOTHESIS** Require a candidate to reproduce this boundary. {_review_test(op)}", ""])
+                      "", f"**HYPOTHESIS** Require a candidate to reproduce this boundary. {_review_test(op, v.revision)}", ""])
     for edge in v.edges:
         if edge["type"] == "DATA":
             lines.append(f"**INFERENCE** Treat {v.dataset_names(edge['node_ids'])} on {v.ref(edge['edge_id'])} "
@@ -277,7 +299,7 @@ def _modules(v):
                           "", "**OBSERVATION** The graph records the following facts, in fact-index order.", ""])
             for i, fact in enumerate(op["facts"]):
                 ref = v.fact_ref(op, i) if v.multi else f"Fact {i}"
-                lines.append(f"- {ref} · {_fact_text(fact)} ({_location(fact['span'])})")
+                lines.append(f"- {ref} · {_fact_text(fact, v.revision)} ({_location(fact['span'])})")
             source = v.ref(oid) + " · " if v.multi else ""
             lines.extend(["", f"**OBSERVATION** {source}Order `{order['kind']}`, keys {_names(order['keys'])}, "
                           f"input precondition `{order['precondition']}`, tie order `{order['tie_order']}`. "
@@ -293,7 +315,14 @@ def _modules(v):
                               f"and reset `{effect['reset']}`."])
             if v.multi:
                 lines.extend(_lineage_rows(v, op))
-            lines.extend(["", f"**HYPOTHESIS** Candidate validation: {_review_test(op)}", ""])
+            if v.revision == "tf1":
+                for index, fact in enumerate(op["facts"]):
+                    if fact["kind"] == "sum":
+                        lines.extend(["", f"**INFERENCE** {v.fact_ref(op, index)} accumulates from prior retained "
+                                      "state unless an earlier explicit assignment resets it. Review fact order "
+                                      "and group guards together. Independent behavioral evidence and safe "
+                                      "partition boundaries remain unproved."])
+            lines.extend(["", f"**HYPOTHESIS** Candidate validation: {_review_test(op, v.revision)}", ""])
         issues = [i for i in v.graph["unknowns"] + v.graph["contradictions"]
                   if not i["operation_ids"] or any(op["module_id"] == module and op["operation_id"] in
                                                    i["operation_ids"] for op in v.ops)]
@@ -364,6 +393,13 @@ def _architecture(v):
             if state and v.multi:
                 proof = ("Treat the STATE annotation as conservative. No independently demonstrated cross-row "
                          "value dependence follows from this edge; test the specific grouping and value lineage.")
+            if state and v.revision == "tf1":
+                sums = [v.fact_ref(op, i) for op in v.ops if op['operation_id'] in c['operation_ids']
+                        for i, fact in enumerate(op['facts']) if fact['kind'] == 'sum']
+                if sums:
+                    proof = (f"Source facts {', '.join(sums)} represent retained accumulation across rows. "
+                             "Review initialization and explicit resets with those facts. Independently verified "
+                             "state continuity and safe partition boundaries remain unproved.")
             lines.extend([f"**INFERENCE** Represented cycle at {v.refs(c['operation_ids'])} via {v.refs(c['edge_ids'])}. "
                           + proof, ""])
     for c in v.analysis["conflicts"]:
@@ -431,7 +467,7 @@ def _adr(v, spark):
             design = "Keep effects outside the supplied graph open for source review."
         else:
             design = "Defer this operation until its effects have a reviewed translation and tie-out test."
-        lines.extend([f"**HYPOTHESIS** {v.ref(op['operation_id'])} ({kind}). {design} {_review_test(op)}", ""])
+        lines.extend([f"**HYPOTHESIS** {v.ref(op['operation_id'])} ({kind}). {design} {_review_test(op, v.revision)}", ""])
     ops = {op["operation_id"]: op for op in v.ops}
     for e in v.edges:
         target = ops[e["to_operation_id"]]
@@ -459,9 +495,16 @@ def _adr(v, spark):
             keys = op["order_contract"]["keys"]
             if not keys:
                 continue
+            comparison = "Check the multiset of projected rows within each tied group and the order between groups."
+            if v.revision == "tf1":
+                if op["order_contract"]["kind"] == "INPUT_ORDER":
+                    comparison = "Preserve the actual producer stream, including its chosen order within ties."
+                elif op["kind"] == "PROC_SORT":
+                    comparison = "Preserve rows and apply only the tie freedom established by the SORT contract."
+                elif op["kind"] == "PROC_SQL":
+                    comparison = "Follow this SQL ORDER BY contract with per-key multisets and no invented secondary order."
             lines.extend([f"**HYPOTHESIS** At {v.ref(op['operation_id'])} compare {v.dataset_names(op['writes'])} "
-                          f"by {_names(keys)}. Check the multiset of projected rows within each tied group "
-                          "and the order between groups.", ""])
+                          f"by {_names(keys)}. {comparison}", ""])
     lines.extend(["## Common tie-out and benchmark proposal", "",
                   "**ASSUMPTION** An owner must supply the input population, versioned output reference, "
                   "key/duplicate policy, treatment of tied rows and numerical tolerance. P2B semantic "
@@ -491,6 +534,12 @@ def _decision_matrix(v):
     sql_orders = [f"{v.fact_ref(op, i)} by {_names(f['order_by'])}" for op in v.ops
                   for i, f in enumerate(op["facts"]) if f["kind"] == "sql" and f["order_by"]]
     output_order = " SQL output: " + ", ".join(sql_orders) + "." if sql_orders else ""
+    local_memory = "Budget input, sort scratch and join multiplicity."
+    validation = "Trace duplicates, missing keys and filtering against an independent reference."
+    if v.revision == "tf1" and not sql:
+        output_order = " Input order and preconditions are recorded in the module specifications."
+        local_memory = "Budget input, retained state and output buffers."
+        validation = "Trace initialization, resets, accumulation, missing addends and the actual input stream."
     rows = [
         ("Workload size", f"{ops}. Production rows, bytes and skew: UNKNOWN.",
          "Size a single-host trial including the intermediate.", "Consider distribution only if measured scale warrants it."),
@@ -499,14 +548,14 @@ def _decision_matrix(v):
         ("Partition boundaries", f"STATE: {edge_refs('STATE')}. Safe split keys: UNKNOWN.",
          "Compare chunk boundaries with one continuous scan.", "Vary partition count and split a tied group; compare boundary rows."),
         ("Memory", f"DATA: {edge_refs('DATA')}. Peak bytes, headroom and spill: UNKNOWN.",
-         "Budget input, sort scratch and join multiplicity.", "Budget per-worker skew, shuffle buffers and spill."),
+         local_memory, "Budget per-worker skew, shuffle buffers and spill."),
         ("Data movement", f"Logical handoffs: {edge_refs('DATA')}. Physical transfers: UNKNOWN.",
          "Measure local intermediate materialization.", "Measure repartition and serialization bytes before proposing reuse."),
         ("Operations", f"Workflow: {ops}. Operator capacity, recovery budget and supported deployment: UNKNOWN.",
          "Test local restart at the intermediate.", "Test retry and duplicate-output handling; identify a runtime owner."),
         ("Validation obligations", f"Review {', '.join(sql) or ops} and the [proof obligations](EVIDENCE.md#proof-obligations). "
          "Independent reference and tolerances: UNKNOWN.",
-         "Trace duplicates, missing keys and filtering against an independent reference.",
+         validation,
          "Use the same reference across partitions and retries; reconcile row multisets before timing."),
     ]
     lines = ["", "## Decision matrix", "", "**HYPOTHESIS** Both candidates require the same correctness "
@@ -585,14 +634,16 @@ def _evidence(v):
     return v.document("Evidence and uncertainty", lines)
 
 
-def generate_preview(graph, diagnostic):
+def generate_preview(graph, diagnostic, *, revision="legacy"):
     """Return six deterministic Markdown files for a supplied, small in-memory subject.
 
     The caller supplies stable public synthetic objects. Matching them binds the documents
     to a representation, without authenticating source provenance or semantic truth.
     """
+    if revision not in {"legacy", "tf1"}:
+        raise PreviewError("PREVIEW_REVISION_UNSUPPORTED")
     graph, checked = _subject(graph, diagnostic)
-    view = _View(graph, checked)
+    view = _View(graph, checked, revision)
     return {"PRD.md": _prd(view), "MODULES.md": _modules(view),
             "ARCHITECTURE.md": _architecture(view), "ADR_NATIVE.md": _adr(view, False),
             "ADR_SPARK.md": _adr(view, True), "EVIDENCE.md": _evidence(view)}

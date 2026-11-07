@@ -24,7 +24,7 @@ explicitly. [SK-1 validation](docs/SK1_VALIDATION.md) and
 Skills guide evidence review and bounded reasoning. The deterministic Python
 engine owns reconstruction, validation, hashing and diagnostics. Developers
 can continue to invoke it directly with the command below, offline and without
-an AI provider. These skills cover the fixed public fixture and preserve the
+an AI provider. These skills cover two approved public fixtures and preserve the
 DRAFT / UNVERIFIABLE / BLOCKED / NOT_RUN statuses.
 
 ## Run the offline review
@@ -47,11 +47,29 @@ different interpreter, substitute `.venv/bin/python3.12` from the prepared
 environment. No network, runtime Git command, model provider or SAS execution
 is needed. [Validation and preservation checks](docs/REVIEW_WORKFLOW_VALIDATION.md).
 
-This developer demonstration runs only the fixed public fixture. Reconstruction
-is partial because the include is unresolved. Real-source intake, broader SAS
-syntax, native Windows qualification and independent semantic evaluation need
-separate authorization. Review this package's usability before choosing the
-next capability.
+Select either approved public fixture explicitly with the same developer command.
+
+```bash
+python3.12 -IB scripts/review_workflow.py --fixture mvp2 --destination /tmp/review-mvp2
+python3.12 -IB scripts/review_workflow.py --fixture by-retain-and-sum --destination /tmp/review-state
+```
+
+Explicit selection also permits fresh `/tmp/review-<label>` destinations under
+the same system-scratch and no-overwrite checks. `mvp2` produces the accepted
+ten-file package with legacy rendering and its 17 recorded behavioral controls.
+Omitting `--fixture` produces those exact same bytes. Its preserved README still
+describes the original one-fixture command.
+
+`by-retain-and-sum` produces eight files with revised state explanations, source
+text, declared input and hand-authored expectations. Its manifest declares
+`behavioral_evidence: UNAVAILABLE`. It omits TIEOUT.json and DECISION_REVIEW.md.
+Reconstruction is COMPLETE within the supported profile, while semantic
+acceptance stays BLOCKED. [TF-1 validation](docs/TF1_VALIDATION.md).
+
+The revised renderer distinguishes SORT tie freedom, SET's actual producer stream
+and SQL's own ordering contract. The stateful package selects that revision.
+Real-source intake, broader syntax, native Windows qualification and independent
+semantic evaluation require separate authorization.
 
 ## Review the architecture decision
 
