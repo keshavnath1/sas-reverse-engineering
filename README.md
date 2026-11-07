@@ -176,7 +176,8 @@ tests demonstrate bounded behavior; independent semantic acceptance remains
 
 | Implemented | Planned; requires later approval |
 |---|---|
-| P0 package, status, frozen baseline and drift checks | Agent skills and model/provider adapters |
+| Three fixed-fixture reconstruction, specification and architecture skills | Analysis, validation and handoff skills |
+| P0 package, status, frozen baseline and drift checks | Model/provider adapters |
 | Preserved P1 contracts, authorized inventory and byte hashes | P2B protected-gold independent semantic evaluation |
 | Citation, ID, ownership, reference and coverage checks; private synthetic MVP-1 preview | Operational PRD/SPEC, parallelism, ADR/HLD/LLD generation |
 | Explicit log declarations and unresolved dependencies | Runtime comparisons and workload benchmarks |

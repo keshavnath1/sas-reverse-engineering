@@ -14,19 +14,20 @@ Official Codex guidance specifies repository-local `.agents/skills` roots and su
 | Independent Codex agent, explicitly supplied the three file paths | Followed all three skills. Ran `.venv/bin/python3.12 -IB scripts/review_workflow.py --destination /tmp/sas-re-review-sk1-forward`, exit 0. Checked nine payload hashes and the receipt, traced the module handoff, identified the unsupported final-sequence requirement and open business intent, and kept Spark selection and BY splitting blocked. This tested file-guided use in the existing session. |
 | Desktop skill picker, implicit model selection and native Windows | Untested. On a checkout that materializes the symlink as a regular file, use the canonical skill path explicitly. Native Windows evidence I/O remains BLOCKED. |
 
-The independent forward test found ambiguity between sample links and a fresh output directory. The two review skills now explicitly direct fresh-run review to files from that same package. The reviewing agent reread the final instructions and confirmed the clarification.
+The independent forward test found ambiguity between sample links and a fresh output directory. The two review skills now explicitly direct fresh-run review to files from that same package. The reviewing agent reread and confirmed that clarification. Live exact-body loading was repeated after final prose edits.
 
-Final skill SHA-256 values:
+The final skill files have these SHA-256 values.
 
 ```text
-sas-reconstruct  4cd3df139849e33f5b71228a3ce557ac7eaf6dc0bdf363b646940ce000a941a5
-sas-specify      35b7e39680ed98b9bdc09975b89c6353cc6aa1f0cfc0ab09c44c2922fbd10102
-sas-architect    217204c5aef009895c8eaa1e40597887f6c54b76f8015c06ee4260f7529f3e6f
+sas-reconstruct  d1f6b55071074c016d7de410d41f732d822d252f33fe85b0b4f098320910eb3c
+sas-specify      3b65e951ffcce9e09abbf36c88504e49ebca9d9f55619688f6e089ef17bb8de0
+sas-architect    e4d3802fb1ca3ac6ec0bc3172a029dc29f294e13bf45deb444225c858f257eaa
 ```
 
 ## Deterministic validation and preservation
 
 - macOS 26.6.2 (25G83), ARM64, CPython 3.12.5. The clean baseline `51f1a735fd245ce40c1baad803d7401b93def4a6` passed 774/774. Candidate `.venv/bin/python -m unittest discover -s tests -v` passed **781/781**. The seven focused checks passed with `-p test_sk1_skills.py`.
+- GitHub Actions on Ubuntu 24.04.5 x64 and CPython 3.12.5 passed at implementation commit `9d2fc6cab8f76c13aa4a737c2fbcf33061988bf0`. `python -m unittest discover -s tests -v` passed 781/781 in 41.233 seconds. After wheel installation, `python -m unittest discover -s "$GITHUB_WORKSPACE/tests" -v` passed 781/781 in 40.442 seconds. Repository guard, package build/install, demonstrations and remote downstream drift check passed. This run preceded the final prose-only edits and this validation update. [Executed CI run](https://github.com/keshavnath1/sas-reverse-engineering/actions/runs/42325205085)
 - Metadata, real entry points and document links passed. The command extracted from the skill produced the same ten files and graph subject. Simulated Windows refused before creating the destination. Static and simulated checks confer no live-agent or Windows qualification.
 - The guard positive control passed. Independent adversarial checks refused nine staged/working-tree target, mode, ancestor and unrelated-file substitutions. The initial focused guard test failed before its exact-link exception was implemented and passed afterward. Other private paths and symlinks remain excluded.
 - The bundled skill-creator `quick_validate.py` was attempted for all three skills and exited 1 because its Python environment lacked PyYAML. No dependency was installed. The repository tests validate the deliberately simple frontmatter, and the actual Codex parser discovered all three final files without errors.
