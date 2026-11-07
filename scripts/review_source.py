@@ -180,7 +180,7 @@ def inspect_span(span, first, start, recover_rules=False, recover_missing=False)
     }, []
 
 
-def review_text(evidence):
+def review_text(evidence, *, dependency_anchors=False):
     source = evidence["source"]
     span = source["selected_span"]
     lines = [
@@ -202,10 +202,15 @@ def review_text(evidence):
         lines.extend(logistic_lines(operation))
     elif operation["kind"] == "DATA_STEP":
         columns = ", ".join(f"`{name}`" for name in operation["selected_columns"])
+        input_anchor = output_anchor = ""
+        if dependency_anchors:
+            spans = operation["declaration_spans"]
+            input_anchor = f'<a id="{anchor(spans["input"])}"></a>'
+            output_anchor = f'<a id="{anchor(spans["output"])}"></a>'
         lines += [
             "## Declared dependency map", "",
-            f"Unresolved upstream → `{operation['input']}` → DATA step "
-            f"→ `{operation['output']}` → unresolved downstream.", "",
+            f"Unresolved upstream → {input_anchor}`{operation['input']}` → DATA step "
+            f"→ {output_anchor}`{operation['output']}` → unresolved downstream.", "",
             f"KEEP declares {len(operation['selected_columns'])} output selections: {columns}.",
             "Input and output schemas, row selection, selected values and label derivation remain unknown.", "",
             "## Unsupported statement register", "",
@@ -230,9 +235,10 @@ def review_text(evidence):
         ]
     else:
         keys = ", ".join(f"`{key}`" for key in operation["ordering_keys"])
+        marker = f'<a id="{anchor(operation["span"])}"></a>' if dependency_anchors else ""
         lines += [
             "## Declared dependency map", "",
-            f"Unresolved upstream → `{operation['input']}` → SORT by {keys} ascending "
+            f"{marker}Unresolved upstream → `{operation['input']}` → SORT by {keys} ascending "
             f"→ `{operation['output']}` → unresolved downstream.", "",
             "## Draft requirements and architecture", "",
             f"- Confirm the input descriptor, including the type and storage length of {keys} "
@@ -389,7 +395,7 @@ def dependency_review(raw, ranges, source_digest, recover_rules=False, recover_m
 
 
 def single_review(raw, selected_range, source_digest, *, recover_rules=False,
-                  recover_missing=False, recover_logistic=False):
+                  recover_missing=False, recover_logistic=False, dependency_anchors=False):
     selected_span, operation, reasons = inspect_range(
         raw, *selected_range, recover_rules=recover_rules,
         recover_missing=recover_missing, recover_logistic=recover_logistic,
@@ -420,7 +426,7 @@ def single_review(raw, selected_range, source_digest, *, recover_rules=False,
     if recover_logistic:
         evidence.update(review_format="source-only-logistic/1", reference_experiment="NOT_RUN",
                         historical_source_run_provenance="UNBOUND")
-    readme = review_text(evidence)
+    readme = review_text(evidence, dependency_anchors=dependency_anchors)
     return evidence, readme
 
 

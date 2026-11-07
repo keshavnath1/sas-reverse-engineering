@@ -18,6 +18,21 @@ SCRIPT = ROOT / "scripts/review_intake.py"
 
 @unittest.skipUnless(sys.platform in ("darwin", "linux"), "Existing POSIX evidence workflow")
 class IntakeReviewTests(unittest.TestCase):
+    def two_sources(self, root, *, consumer_input="stage"):
+        declarations = []
+        for name, mode, raw in (
+            ("a_consumer.sas.txt", "sort",
+             f"proc sort data=work.{consumer_input} out=work.ordered; by id; run;\n".encode()),
+            ("z_producer.sas.txt", "data",
+             b"data work.stage; set work.raw; if x < 0 then delete; keep id x; run;\r\n"),
+        ):
+            (root / name).write_bytes(raw)
+            declarations.append({"path": name, "sha256": sha256(raw).hexdigest(),
+                                 "ranges": [[1, 1]], "mode": mode})
+        scope = {"version": 2, "scope": "public-synthetic", "sources": declarations}
+        (root / "scope.json").write_text(json.dumps(scope))
+        return scope
+
     def invoke(self, intake, destination=None):
         if destination is None:
             destination = Path("/tmp") / f"sas-re-int1-{uuid.uuid4().hex}"
@@ -145,7 +160,7 @@ class IntakeReviewTests(unittest.TestCase):
             scope["sources"][0][key] = value
 
         cases = [
-            (lambda s, _: s.update(version=2), b"INTAKE_MANIFEST_VERSION_UNSUPPORTED"),
+            (lambda s, _: s.update(version=3), b"INTAKE_MANIFEST_VERSION_UNSUPPORTED"),
             (lambda s, _: s.update(mode="execute"), b"INTAKE_REVIEW_MODE_UNSUPPORTED"),
             (lambda s, _: s.update(mode="sort"), b"INTAKE_RANGES_INVALID_FOR_MODE"),
             (lambda s, _: s["sources"].append(s["sources"][0]), b"INTAKE_MULTIPLE_SOURCES_UNSUPPORTED"),
@@ -186,3 +201,78 @@ class IntakeReviewTests(unittest.TestCase):
             evidence = json.loads((dest / "EVIDENCE.json").read_bytes())
             self.assertEqual(evidence["syntax_recognition"], "UNSUPPORTED")
             self.assertIn("MACRO_MARKER_OUTSIDE_SCOPE", evidence["reason_codes"])
+
+    def test_two_sources_link_declared_accesses_without_resolving_lineage(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp).resolve()
+            scope = self.two_sources(root)
+            packages = []
+            for _ in range(2):
+                run, dest = self.invoke(root)
+                self.assertEqual(run.returncode, 0, run.stderr)
+                packages.append({p.name: p.read_bytes() for p in dest.iterdir()})
+            self.assertEqual(*packages)
+            files = packages[0]
+            manifest = json.loads(files["MANIFEST.json"])
+            for name in files.keys() - {"MANIFEST.json"}:
+                self.assertEqual(manifest["files"][name]["sha256"], sha256(files[name]).hexdigest())
+            self.assertEqual(manifest["package_revision"], "public-intake-review/3")
+            self.assertEqual(manifest["copilot_review"], "NOT_TESTED")
+            self.assertEqual(manifest["semantic_acceptance"], "BLOCKED")
+            match, = manifest["cross_file_dependencies"]
+            self.assertEqual(match["dataset"], "work.stage")
+            self.assertEqual(match["classification"], "POTENTIAL")
+            self.assertEqual((match["execution_order"], match["dataset_version"]),
+                             ("UNRESOLVED", "UNRESOLVED"))
+            for key, spec in zip(("reader", "writer"), scope["sources"]):
+                ref = match[key]
+                self.assertEqual(ref["path"], spec["path"])
+                review = next(item for item in manifest["sources"] if item["path"] == ref["path"])
+                self.assertEqual(review["coverage"][0]["start"], 0)
+                evidence = json.loads(files[review["evidence"]])
+                self.assertEqual(evidence["source"]["sha256"], spec["sha256"])
+                op = evidence["declared_operation"]
+                span = op["span"] if key == "reader" else op["declaration_spans"]["output"]
+                raw = (root / spec["path"]).read_bytes()
+                selected = evidence["source"]["selected_span"]
+                self.assertEqual(selected["sha256"],
+                                 sha256(raw[selected["start"]:selected["end"]]).hexdigest())
+                self.assertLessEqual(selected["start"], span["start"])
+                self.assertLessEqual(span["end"], selected["end"])
+                if key == "writer":
+                    self.assertEqual(span["sha256"], sha256(raw[span["start"]:span["end"]]).hexdigest())
+                self.assertEqual(ref["anchor"], f"bytes-{span['start']}-{span['end']}")
+                self.assertIn(f'id="{ref["anchor"]}"', files[review["review"]].decode())
+                self.assertIn(f'({review["review"]}#{ref["anchor"]})', files["README.md"].decode())
+            self.assertEqual(json.loads(files["SOURCE_2.json"])["syntax_recognition"], "PARTIAL")
+
+    def test_two_sources_with_unmatched_names_report_unresolved(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp).resolve()
+            self.two_sources(root, consumer_input="independent")
+            run, dest = self.invoke(root)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            manifest = json.loads((dest / "MANIFEST.json").read_bytes())
+            self.assertEqual(manifest["cross_file_dependencies"], [])
+            self.assertEqual(manifest["cross_file_resolution"], "UNRESOLVED")
+
+    def test_two_source_refusals_leave_no_package(self):
+        cases = [
+            (lambda s, _: s["sources"].pop(), b"INTAKE_TWO_SOURCES_REQUIRED"),
+            (lambda s, _: s["sources"].append(s["sources"][0]), b"INTAKE_TWO_SOURCES_REQUIRED"),
+            (lambda s, _: s["sources"][1].update(path="A_CONSUMER.sas.txt"), b"INTAKE_FILE_NAME_UNSUPPORTED"),
+            (lambda s, _: s["sources"][1].update(path="../escape.sas"), b"UNSAFE_PATH"),
+            (lambda s, _: s["sources"][1].update(mode="fit"), b"INTAKE_REVIEW_MODE_UNSUPPORTED"),
+            (lambda s, _: s["sources"][1].update(ranges=[[2, 2]]), b"LINE_RANGE_OUTSIDE_SOURCE"),
+            (lambda s, p: (p / s["sources"][1]["path"]).write_bytes(b"changed"), b"SOURCE_SHA256_MISMATCH"),
+        ]
+        for change, reason in cases:
+            with self.subTest(reason=reason), TemporaryDirectory() as temp:
+                root = Path(temp).resolve()
+                scope = self.two_sources(root)
+                change(scope, root)
+                (root / "scope.json").write_text(json.dumps(scope))
+                run, dest = self.invoke(root)
+                self.assertEqual(run.returncode, 2, run.stderr)
+                self.assertIn(reason, run.stderr)
+                self.assertFalse(dest.exists())
