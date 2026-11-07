@@ -24,13 +24,15 @@ FIXTURE_GRAPH_SHA256 = "385423530208b08635de832bed57698b7278490f2cb7a43f08fd754b
 FILES = ("ADR_NATIVE.md", "ADR_SPARK.md", "ARCHITECTURE.md", "EVIDENCE.md", "MODULES.md", "PRD.md")
 
 
-def scratch_destination(argument, checkpoint="mvp1"):
+def scratch_destination(argument, checkpoint="mvp1", *, allow_plain_name=False):
     # Only a new direct child of system scratch. Never descend through a
     # caller-selected tree: an evidence store or sealed attempt can have any name.
     parent, leaf = os.path.split(argument)
     scratch = Path("/private/tmp" if sys.platform == "darwin" else "/tmp")
     prefix = f"sas-re-{checkpoint}-"
-    if parent not in {"/tmp", str(scratch)} or not re.fullmatch(re.escape(prefix) + r"[A-Za-z0-9_-]{1,64}", leaf):
+    valid_name = (re.fullmatch(re.escape(prefix) + r"[A-Za-z0-9_-]{1,64}", leaf) is not None
+                  or (allow_plain_name and leaf == prefix[:-1]))
+    if parent not in {"/tmp", str(scratch)} or not valid_name:
         raise ValueError(f"choose a new /tmp/{prefix}<label> directory")
     require_safe_root(scratch)
     info = scratch.stat()
@@ -62,8 +64,9 @@ def synthetic_preview(scratch):
         return render_case(case, FIXTURE, FIXTURE_GRAPH_SHA256, PROFILE_KEY)
 
 
-def write_bundle(scratch, leaf, files):
-    if set(files) != set(FILES):
+def write_bundle(scratch, leaf, files, *, names=FILES):
+    if (set(files) != set(names) or len(files) != len(names)
+            or not all(re.fullmatch(r"[A-Z][A-Z0-9_]*\.(md|json)", name) for name in names)):
         raise ValueError("unexpected preview file manifest")
     destination = scratch / leaf
     destination.mkdir(mode=0o700)  # Exclusive, including when an existing name is a symlink.
@@ -75,7 +78,7 @@ def write_bundle(scratch, leaf, files):
         raise
     created = []
     try:
-        for name in FILES:
+        for name in names:
             fd = os.open(name, os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW, 0o600, dir_fd=directory)
             created.append(name)
             with os.fdopen(fd, "wb") as output:
@@ -90,7 +93,7 @@ def write_bundle(scratch, leaf, files):
     finally:
         os.close(directory)
     return [{"name": name, "bytes": len(files[name]), "sha256": hashlib.sha256(files[name]).hexdigest()}
-            for name in FILES]
+            for name in names]
 
 
 def run_demo(checkpoint, description, preview):

@@ -1,6 +1,13 @@
 # Open decisions and compatibility risks
 
-**Current checkpoint, 2026-11-06.** The user accepted MVP-3 as public synthetic
+**Current checkpoint.** The user accepted the MVP-4 demonstration at
+`4a19ea1242e8aba685bef3dd53c222f6fde8d6b8` and authorized consolidation
+of the existing stages into [one offline developer command](../README.md#run-the-offline-review).
+Review usability before selecting the next capability against the six product
+objectives. Real intake, expanded syntax, Windows qualification and independent
+evaluation remain separate decisions.
+
+**Historical checkpoint, 2026-11-06.** The user accepted MVP-3 as public synthetic
 development at `8e9c0484a21c1fa8211f7a5418bac62a4bc1bd48` and approved the
 [MVP-4 decision review](../examples/mvp4/DECISION_REVIEW.md). Runtime selection
 remains BLOCKED. The include scope, independent reference outputs, tie and numeric

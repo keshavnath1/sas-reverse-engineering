@@ -23,12 +23,15 @@ REFERENCES = {
 }
 
 
-def fixed_review():
-    require_evidence_io()
+def verify_references():
     for name, expected in REFERENCES.items():
         if sha256((ROOT / name).read_bytes()).hexdigest() != expected:
             raise ReviewBindingError("REFERENCED_DOCUMENT_MISMATCH")
 
+
+def fixed_review():
+    require_evidence_io()
+    verify_references()
     sys.path[:0] = [str(ROOT / "scripts"), str(ROOT / "tests")]
     try:
         from mvp3_tieout import build_report

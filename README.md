@@ -1,5 +1,31 @@
 # SAS Reverse Engineering and Computation Architecture Planner
 
+## Run the offline review
+
+Open the [sample review folder](examples/offline-review/README.md) to read the
+workflow, compare the native Python and Spark proposals, and trace each decision
+to synthetic source and behavioral controls.
+
+To regenerate all ten files, run this from the development checkout with its
+prepared Python 3.12 environment active:
+
+```bash
+python3.12 -IB scripts/review_workflow.py --destination /tmp/sas-re-review
+```
+
+The command prints the path to the generated README and the SHA-256 of
+`MANIFEST.json`. Choose a new direct child of system scratch for each run,
+named `sas-re-review` or `sas-re-review-<label>`. If your shell selects a
+different interpreter, substitute `.venv/bin/python3.12` from the prepared
+environment. No network, runtime Git command, model provider or SAS execution
+is needed. [Validation and preservation checks](docs/REVIEW_WORKFLOW_VALIDATION.md).
+
+This developer demonstration runs only the fixed public fixture. Reconstruction
+is partial because the include is unresolved. Real-source intake, broader SAS
+syntax, native Windows qualification and independent semantic evaluation need
+separate authorization. Review this package's usability before choosing the
+next capability.
+
 ## Review the architecture decision
 
 The [MVP-4 decision review](examples/mvp4/DECISION_REVIEW.md) connects all 17

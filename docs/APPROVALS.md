@@ -326,3 +326,9 @@ within its public synthetic development scope and authorized MVP-4 only. Its
 [decision review](../examples/mvp4/DECISION_REVIEW.md) links the accepted controls
 to the existing draft alternatives. Runtime selection, execution, semantic
 certification and migration approval remain separate decisions. Stop at MVP-4.
+
+The user accepted MVP-4 at `4a19ea1242e8aba685bef3dd53c222f6fde8d6b8`
+within its synthetic engineering scope and authorized a single
+[offline developer workflow](../examples/offline-review/README.md) for the same
+fixture. The grant covers consolidation and validation only. Stop for usability
+review before choosing another product capability.
