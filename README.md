@@ -71,6 +71,31 @@ and SQL's own ordering contract. The stateful package selects that revision.
 Real-source intake, broader syntax, native Windows qualification and independent
 semantic evaluation require separate authorization.
 
+## Review an authorized SAS SORT span
+
+On the existing POSIX developer setup, supply one authorized SAS file outside
+the checkout, its expected SHA-256 and an inclusive line range.
+
+```bash
+python3.12 -IB scripts/review_source.py \
+  --source "$AUTHORIZED_SAS_PATH" --source-sha256 "$EXPECTED_SHA256" \
+  --lines 10:12 --destination /tmp/sas-re-source-sort
+```
+
+Use an absolute source path with real directory components and a fresh destination.
+The command hashes the original file with the existing 8 MiB read limit and
+parses at most 64 KiB from the selected lines. It accepts one bounded SORT block
+and refuses macro markers in that span. The review includes a dependency map,
+draft requirements and conditional architecture considerations. Its evidence
+register records original byte offsets, source and span hashes, and declared
+identifiers. It carries no source excerpts or local input path.
+
+Exit 0 means a partial source-only review was written. Exit 2 means refusal.
+For a verified source and valid range with unsupported syntax, the command
+writes the bound diagnostic package and exits 2. A hash mismatch produces no
+package. Key schema and execution behavior are UNKNOWN, supported-profile
+reconstruction is NOT_RUN, and behavioral evidence is UNAVAILABLE.
+
 ## Review the architecture decision
 
 The [MVP-4 decision review](examples/mvp4/DECISION_REVIEW.md) connects all 17
