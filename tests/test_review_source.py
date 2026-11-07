@@ -3,6 +3,7 @@
 from hashlib import sha256
 import json
 from pathlib import Path
+import re
 import sys
 from tempfile import TemporaryDirectory
 import unittest
@@ -198,6 +199,60 @@ class SourceReviewTests(unittest.TestCase):
         self.assertEqual(again.returncode, 0, again.stderr)
         for name in ("README.md", "EVIDENCE.json"):
             self.assertEqual((dest / name).read_bytes(), (other / name).read_bytes())
+
+    def test_migration_review_links_to_existing_source_records(self):
+        data = (b"data work.stage;\r\nset work.input;\r\n"
+                b"if missing(id) then delete;\r\nkeep id default;\r\nrun;\r\n")
+        middle = (b"proc sql;\r\ncreate table work.audit as select id from work.stage;\r\n"
+                  b"quit;\r\n%if &n = 0 %then %abort_run(empty);\r\n")
+        sort = b"proc sort data=work.stage out=work.final; by id; run;"
+        raw = data + middle + sort
+        run, dest = self.review(raw, lines="1:5", second_lines="10:10")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual({file.name for file in dest.iterdir()},
+                         {"README.md", "EVIDENCE.json", "MIGRATION_REVIEW.md"})
+        evidence = json.loads((dest / "EVIDENCE.json").read_bytes())
+        report = (dest / "MIGRATION_REVIEW.md").read_text()
+        trace, rest = report.split("## MAP", 1)
+        mapping, obligations = rest.split("## Behavioral obligations", 1)
+        data, sort = evidence["selections"]
+        operation = data["declared_operation"]
+        spans = [
+            data["selected_span"], sort["selected_span"],
+            *operation["declaration_spans"].values(),
+            *(gap["span"] for gap in operation["unsupported_statements"]),
+            sort["declared_operation"]["span"], sort["declared_operation"]["ordering_span"],
+            *(finding["span"] for finding in evidence["interval_effects"]["findings"]),
+        ]
+        expected = {f"bytes-{span['start']}-{span['end']}" for span in spans}
+        self.assertCountEqual(re.findall(r'id="(bytes-[0-9]+-[0-9]+)"', trace), expected)
+        for section in (mapping, obligations):
+            references = set(re.findall(r"\]\(#(bytes-[0-9]+-[0-9]+)\)", section))
+            self.assertTrue(references)
+            self.assertLessEqual(references, expected)
+        for item in operation["unsupported_statements"]:
+            gap = item["span"]
+            reference = f"bytes-{gap['start']}-{gap['end']}"
+            self.assertIn(gap["sha256"], trace)
+            self.assertIn(f"](#{reference})", obligations)
+        for finding in evidence["interval_effects"]["findings"]:
+            span = finding["span"]
+            self.assertIn(f"](#bytes-{span['start']}-{span['end']})", mapping)
+        self.assertIn("SOURCE_DECLARED / EXECUTION_UNVERIFIED", mapping)
+        self.assertIn("SORT reachability is UNESTABLISHED", mapping)
+        self.assertIn("No direct writer identified", mapping)
+        self.assertIn("`Default` derivation", obligations)
+        self.assertIn("HYPOTHETICAL", obligations)
+        self.assertNotIn("work.audit", mapping + obligations)
+        self.assertNotIn("if missing(id)", report)
+        self.assertNotIn("PASS", report)
+        for key in ("artifact_authority", "behavioral_evidence", "semantic_verification",
+                    "semantic_acceptance", "benchmark_execution"):
+            self.assertIn(f"{key}: {evidence[key]}", report)
+        again, other = self.review(raw, lines="1:5", second_lines="10:10")
+        self.assertEqual(again.returncode, 0, again.stderr)
+        self.assertEqual((dest / "MIGRATION_REVIEW.md").read_bytes(),
+                         (other / "MIGRATION_REVIEW.md").read_bytes())
 
     def test_nonmatching_connection_and_ambiguous_selection(self):
         data = b"data work.target; set work.input; keep id; run;\n"

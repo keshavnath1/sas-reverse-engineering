@@ -15,6 +15,7 @@ from sas_re.sas_subset import parse_source
 ROOT = Path(__file__).resolve().parents[1]
 # Isolated Python excludes the script directory.
 sys.path.insert(0, str(ROOT / "scripts"))
+from migration_review import render as render_migration_review
 from mvp1_demo import scratch_destination, write_bundle
 from source_interval import inventory as interval_inventory
 
@@ -399,6 +400,8 @@ def main():
             "README.md": readme,
             "EVIDENCE.json": (json.dumps(evidence, indent=2, sort_keys=True) + "\n").encode("utf-8"),
         }
+        if len(ranges) == 2:
+            files["MIGRATION_REVIEW.md"] = render_migration_review(evidence)
         write_bundle(scratch, leaf, files, names=tuple(files))
     except FileExistsError:
         parser.exit(2, "BLOCKED: destination exists\n")

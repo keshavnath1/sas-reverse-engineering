@@ -118,6 +118,11 @@ parse. Consult `interval_effects` for the bounded inspection status, hash,
 finding spans and possible writers. Runtime dataset identity, version and SORT
 reachability remain unverified.
 
+Open `MIGRATION_REVIEW.md` in the two-range package for TRACE citations, MAP
+relationships, behavioral proof obligations and conditional architecture
+options. It presents the same source-only evidence, with behavioral evidence
+UNAVAILABLE and semantic acceptance BLOCKED.
+
 ## Review the architecture decision
 
 The [MVP-4 decision review](examples/mvp4/DECISION_REVIEW.md) connects all 17
