@@ -52,3 +52,49 @@ Both pinned subjects used the configured MIG-5/MIG-6/MOD-2 route at implementati
 | Publication and replay manifest | `d9fd82381568e6a261f181af390ad639a5752ab9289fd56b0a275b74d609373b` | `0849473180bf13953c6f80baeb613c339326aa4ed06cdfcbdb502e36a95a7c98` |
 
 The publications and receipts were retained in local scratch. Both runs recorded SAS reference execution as `NOT_RUN`, semantic verification as `UNVERIFIABLE` and semantic acceptance as `BLOCKED`.
+
+## Live GitHub Copilot Agent run
+
+A fresh public synthetic INTAKE produced a configured MIG-2 proposal. The
+VS Code Copilot Agent session showed reads of all five local skills and
+wrote one draft with five deliverables and 16 proposed claims. The source
+and evidence copies, plan, reviewed YAML and public row fixture matched
+the operator inputs byte for byte. [Operator guide](../examples/intg1/README.md)
+
+| Skill | Captured deliverable |
+| --- | --- |
+| `sas-reconstruct` | DATA input, output and projection, SORT input, output and ascending key, and unresolved runtime order and dataset version. |
+| `sas-specify` | Local Python MIG-2 requirements for projection, ascending order, stable ties and duplicate multiplicity, with the four expected public rows. |
+| `sas-analyze` | A potential handoff through `work.live_stage`, with runtime execution order and dataset continuity unresolved. |
+| `sas-validate` | Source declaration checks, exact public row comparison, and independent SAS reference obligations. |
+| `sas-architect` | A bounded local Python ADR, with distributed alternatives deferred pending workload and benchmark evidence. |
+
+The version 2 record assembled from the raw Copilot draft returned
+`BLOCK`. GATE-1 reported 45 unresolved evidence references and seven
+classification conflicts. The draft used workspace prefixes, cited
+plan, YAML and row files outside the gate's evidence set, and grouped
+declarations across source files.
+
+The operator preserved the raw draft and prepared a separate corrected
+record. It uses package-relative citations, separates declarations by
+source, and retains candidate policy and public expectations in review
+prose. The corrected record returned `REVIEW_REQUIRED` with zero
+blockers and only `BOUND_HUMAN_APPROVAL_REQUIRED` pending. Keshav then
+approved its exact SHA-256 in a separate approval record.
+
+GATE-1 returned `PASS` on publication and replay. MIG-2 matched all four
+public expected rows, including duplicate multiplicity and stable ties.
+The fresh replay matched all seven filenames and file bytes, including
+the manifest. SAS reference execution was `NOT_RUN`, semantic
+verification was `UNVERIFIABLE` and semantic acceptance was `BLOCKED`.
+
+| Retained artifact | SHA-256 |
+| --- | --- |
+| Raw Copilot draft | `fd484db2f755072a2cc14edd7fdda256673b1926c24ec7457dfbe72c6c096054` |
+| Claim record blocked by GATE-1 | `4c37fe563b8d922a513956ce4e7fae0a0739a0f7605cf9458b1616887732a6bf` |
+| Corrected and approved claim record | `9df69114e53cb23ef7a56ba1b2961f1221d4858bc04b01c15f7de75cb7c76aee` |
+| Separate approval | `8dd3d4f3a3b41c22be374706eb972045a356b15d46dda4a29078587e660b08f6` |
+| Proposed modernization plan | `bfd2e86ec8953ff9e4fd9b68815718b0bb5fd01670985d26bf4e2e143b745ed1` |
+| Publication and replay manifest | `9adfcf573f0d7991bb83290f4baa70f97a270de409f98cba1cb112a2dc72f703` |
+
+The exact drafts, approval, gate receipts and publications were retained in local scratch.
