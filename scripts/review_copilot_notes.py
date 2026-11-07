@@ -16,7 +16,7 @@ from review_intake import identity, json_bytes
 LIMIT = 262144
 
 
-def citation_index(package, manifest_sha256):
+def load_review_payloads(package, manifest_sha256):
     raw = secure_read(package, "MANIFEST.json", LIMIT)
     if identity(raw)["sha256"] != manifest_sha256:
         raise ValueError("REVIEW_MANIFEST_SHA256_MISMATCH")
@@ -38,8 +38,13 @@ def citation_index(package, manifest_sha256):
             raise ValueError("REVIEW_PACKAGE_PAYLOAD_MISMATCH")
         payloads[name] = payload
 
+    return manifest, payloads
+
+
+def citation_index(package, manifest_sha256):
+    manifest, payloads = load_review_payloads(package, manifest_sha256)
     citations = {}
-    for index, source in enumerate(sources, 1):
+    for index, source in enumerate(manifest["sources"], 1):
         path = source["path"]
         if (path in citations or source["evidence"] != f"SOURCE_{index}.json"
                 or source["review"] != f"SOURCE_{index}.md"):
