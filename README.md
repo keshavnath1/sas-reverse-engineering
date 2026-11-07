@@ -123,6 +123,24 @@ relationships, behavioral proof obligations and conditional architecture
 options. It presents the same source-only evidence, with behavioral evidence
 UNAVAILABLE and semantic acceptance BLOCKED.
 
+For bounded status-rule recovery, add `--recover-status-rules`. This opts
+DATA reviews into source-only format version 2. Immediately after SET, it
+recognizes one character-literal NOT IN filter with conditional DELETE,
+followed by a guarded numeric-literal assignment and its immediately linked
+ELSE IF assignment. Both guards must use the filter variable and assign the
+same target. Standalone comments may separate the statements. Membership lists
+are limited to 16 literals, with quoted tokens at most 258 characters long.
+Malformed, reordered or broader forms remain unresolved.
+
+The ordered records retain source spans and parser reasons. Their list positions
+describe which earlier predicate must be false before a later rule is reached.
+DELETE terminates the current row iteration and suppresses its output. A false
+result for both assignment guards leaves the pair without an assignment.
+Later unresolved statements can still exclude or change the row. MISSING and
+CMISS stay unresolved, and source recovery supplies no output rows or behavioral
+verdicts. Original-byte identities, unknown schemas and verification gates still
+apply. Calls without the flag retain their earlier package bytes.
+
 ## Review the architecture decision
 
 The [MVP-4 decision review](examples/mvp4/DECISION_REVIEW.md) connects all 17

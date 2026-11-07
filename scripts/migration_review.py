@@ -1,6 +1,10 @@
 """Render the existing two-range source evidence for migration planning."""
 
 
+import html
+import json
+
+
 def location(span):
     return (f"lines {span['line_start']}–{span['line_end']}, "
             f"bytes [{span['start']}, {span['end']})")
@@ -18,6 +22,20 @@ def names(values):
     return ", ".join(f"`{value}`" for value in values)
 
 
+def rule_description(rule):
+    predicate, action = rule["predicate"], rule["action"]
+    values = predicate.get("values", [predicate.get("value")])
+    # Literal spelling is data. Escape Markdown/HTML without interpreting it.
+    quoted = ", ".join("`" + html.escape(json.dumps(value, ensure_ascii=True))
+                       .replace("`", "&#96;").replace("|", "&#124;") + "`" for value in values)
+    condition = f"`{predicate['variable']}` {predicate['operator']} {quoted}"
+    if action["kind"] == "DELETE":
+        effect = "terminate the current row iteration and suppress its output"
+    else:
+        effect = f"assign numeric literal `{action['lexeme']}` to `{action['target']}`"
+    return f"SOURCE_RECOGNIZED · If {condition}, {effect}. Execution UNVERIFIED."
+
+
 def render(evidence):
     data_selection, sort_selection = evidence["selections"]
     data = data_selection["declared_operation"]
@@ -26,6 +44,8 @@ def render(evidence):
     gaps = data["unsupported_statements"]
     interval = evidence["interval_effects"]
     findings = interval["findings"]
+    recovery = data.get("status_rule_recovery")
+    rules = recovery["rules"] if recovery else []
     connection = evidence["connection"]
     middle = evidence["intervening_span"]
 
@@ -61,6 +81,10 @@ def render(evidence):
     trace("KEEP", declarations["keep"],
           f"{len(data['selected_columns'])} declared output selections ({names(data['selected_columns'])}). "
           "Column values and types remain unknown.")
+    if recovery:
+        lines.extend(["", f"Ordered source-rule recovery **{recovery['status']}**.", ""])
+    for rule in rules:
+        trace("Ordered source rule", rule["span"], rule_description(rule))
     for gap in gaps:
         trace("Unsupported transformation", gap["span"],
               f"{names(gap['reason_codes'])}. `{gap['effect']}`.")
@@ -92,6 +116,16 @@ def render(evidence):
         f"{evidence['boundaries']['upstream']} and {evidence['boundaries']['downstream']}, respectively. "
         f"See {cite('SET input', declarations['input'])} and {cite('SORT output', sort['span'])}.",
     ])
+    if rules:
+        exclusion, first, alternative = [cite("source rule", rule["span"]) for rule in rules]
+        lines.extend([
+            f"- **SOURCE_RECOGNIZED / UNVERIFIED** · {exclusion} precedes {first} and {alternative}. "
+            "A true exclusion guard ends this row before either assignment.",
+            f"- {alternative} is reached only if {first}'s guard is false. "
+            "A true first guard skips the linked alternative.",
+            f"- If both guards are false, the pair makes no assignment "
+            f"({recovery['fallthrough']}). Later unresolved effects may still exclude or change an assigned row.",
+        ])
     interval_refs = {}
     for label, fields in (
         ("Source-declared reads", ("reads",)),
@@ -116,10 +150,17 @@ def render(evidence):
     ordering = cite("SORT BY", sort["ordering_span"])
     gap_refs = ", ".join(cite(f"gap at line {gap['span']['line_start']}", gap["span"]) for gap in gaps)
     row_evidence = cite("SET input", declarations["input"])
+    if rules:
+        row_evidence += ", " + ", ".join(cite("recovered rule", rule["span"]) for rule in rules)
     if gap_refs:
         row_evidence += f", {gap_refs}"
     interval_ref = "[bounded interval findings](#intervening-source-findings)"
     control_refs = interval_refs["Potential control gates and macro-dependent effects"] or interval_ref
+    derivation_refs = gap_refs
+    if rules:
+        derivation_refs = ", ".join(cite("recovered rule", rule["span"]) for rule in rules)
+        if gap_refs:
+            derivation_refs += ", " + gap_refs
     label = "`Default` derivation" if "default" in data["selected_columns"] else "Selected value derivation"
     lines.extend([
         "", "## Behavioral obligations and validation plan", "",
@@ -129,7 +170,7 @@ def render(evidence):
         "| --- | --- | --- |",
         f"| Row eligibility and filter order | {row_evidence} | Compare input and prepared rows, including "
         "surviving and excluded identities and cases where more than one rule could apply. |",
-        f"| {label} | {keep}" + (f", {gap_refs}" if gaps else "") +
+        f"| {label} | {keep}" + (f", {derivation_refs}" if derivation_refs else "") +
         " | Obtain prepared output values and reference rows for each applicable branch, including fallthrough. |",
         f"| Missing-value handling | {row_evidence}, {ordering} | Obtain descriptors and reference rows "
         "for applicable character and numeric missing cases, including missing sort keys. |",

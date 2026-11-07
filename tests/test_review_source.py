@@ -14,6 +14,16 @@ from test_review_workflow import ROOT, call, remove_destination
 
 SCRIPT = ROOT / "scripts/review_source.py"
 SORT = b"proc sort data=work.a out=work.b;\r\n  by id;\r\nrun;"
+STATUS_UNIT = (
+    b"if category not in ('A','B','C') then delete;\r\n"
+    b"if category = 'A' then label = 1;\r\n"
+    b"else if category = 'B' then label = 0;\r\n"
+)
+LATER_GAPS = (
+    b"if missing(key) then delete;\r\n"
+    b"if cmiss(x, y) > 0 then delete;\r\n"
+    b"if cmiss(z) > 0 then delete;\r\n"
+)
 PREFIX = "/* café */\r\n%unreviewed_driver;\r\n".encode()
 
 
@@ -24,7 +34,7 @@ class SourceReviewTests(unittest.TestCase):
         directory = self.enterContext(TemporaryDirectory(dir=scratch))
         self.source = Path(directory) / "input.sas"
 
-    def review(self, raw, lines="3:5", expected=None, destination=None, second_lines=None):
+    def review(self, raw, lines="3:5", expected=None, destination=None, second_lines=None, recover_rules=False):
         self.source.write_bytes(raw)
         if destination is None:
             destination = Path("/tmp") / f"sas-re-source-{uuid.uuid4().hex}"
@@ -32,6 +42,7 @@ class SourceReviewTests(unittest.TestCase):
         run = call(destination, script=SCRIPT, extra=(
             "--source", str(self.source), "--source-sha256", expected or sha256(raw).hexdigest(),
             "--lines", lines, *(("--lines", second_lines) if second_lines else ()),
+            *(("--recover-status-rules",) if recover_rules else ()),
         ))
         return run, destination
 
@@ -325,3 +336,131 @@ class SourceReviewTests(unittest.TestCase):
                 else:
                     self.assertEqual(effects["status"], "UNAVAILABLE")
                     self.assertEqual(effects["findings"][0]["unknown_effects"], ["INTERVAL_NOT_UTF8"])
+
+
+    def test_status_rules_preserve_order_polarity_linkage_and_later_gaps(self):
+        header = b"data work.stage;\r\nset work.input;\r\n"
+        raw = PREFIX + header + STATUS_UNIT + LATER_GAPS + b"keep key label;\r\nrun;"
+        run, dest = self.review(raw, lines="3:12", recover_rules=True)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        evidence = json.loads((dest / "EVIDENCE.json").read_bytes())
+        operation = evidence["declared_operation"]
+        recovery = operation["status_rule_recovery"]
+        rules = recovery["rules"]
+        self.assertEqual(recovery["status"], "RECOVERED")
+        self.assertEqual(recovery["fallthrough"], "NO_ASSIGNMENT_BY_PAIR")
+        self.assertEqual(recovery["execution_verification"], "UNVERIFIED")
+        self.assertEqual([rule["predicate"] for rule in rules], [
+            {"variable": "category", "operator": "NOT IN", "values": ["A", "B", "C"]},
+            {"variable": "category", "operator": "=", "value": "A"},
+            {"variable": "category", "operator": "=", "value": "B"},
+        ])
+        # C exercises representable fallthrough. Nonmembers take DELETE.
+        # These are source relationships, with no candidate row evaluation.
+        self.assertEqual([rule["when"] for rule in rules], [
+            [],
+            [{"rule_index": 0, "predicate_result": False}],
+            [{"rule_index": 0, "predicate_result": False},
+             {"rule_index": 1, "predicate_result": False}],
+        ])
+        self.assertEqual(rules[0]["action"], {
+            "kind": "DELETE", "scope": "CURRENT_ROW_ITERATION",
+            "on_match": "SKIP_REMAINING_STATEMENTS_AND_SUPPRESS_OUTPUT",
+        })
+        self.assertEqual([r["action"] for r in rules[1:]], [
+            {"kind": "ASSIGN_NUMERIC_LITERAL", "target": "label", "lexeme": "1"},
+            {"kind": "ASSIGN_NUMERIC_LITERAL", "target": "label", "lexeme": "0"},
+        ])
+        gaps = operation["unsupported_statements"]
+        self.assertEqual(len(gaps), 3)
+        start = len(PREFIX + header)
+        for record, statement, line in zip(rules + gaps,
+                                           (STATUS_UNIT + LATER_GAPS).splitlines(), range(5, 11), strict=True):
+            span = record["span"]
+            self.assertEqual(span, {
+                "line_start": line, "line_end": line, "start": start, "end": start + len(statement),
+                "sha256": sha256(statement).hexdigest(),
+            })
+            self.assertEqual(raw[span["start"]:span["end"]], statement)
+            start += len(statement) + 2
+        for gap in gaps:
+            self.assertIn("UNRESOLVED", gap["effect"])
+        for rule in rules:
+            self.assertEqual(rule["classification"], "SOURCE_RECOGNIZED")
+            self.assertTrue(rule["parser_reason_codes"])
+        self.assertEqual(evidence["review_format"], "source-only-data/2")
+        self.assertEqual(evidence["source"]["sha256"], sha256(raw).hexdigest())
+        self.assertEqual(evidence["syntax_recognition"], "PARTIAL")
+        self.assertEqual(operation["selected_column_values_and_derivation"], "UNKNOWN")
+        report = (dest / "README.md").read_text()
+        for phrase in ("NOT IN", "NO_ASSIGNMENT_BY_PAIR", "Later unresolved", "Execution UNVERIFIED"):
+            self.assertIn(phrase, report)
+        for file in dest.iterdir():
+            self.assertNotIn(b"PASS", file.read_bytes())
+        again, other = self.review(raw, lines="3:12", recover_rules=True)
+        self.assertEqual(again.returncode, 0, again.stderr)
+        self.assertEqual({p.name: p.read_bytes() for p in dest.iterdir()},
+                         {p.name: p.read_bytes() for p in other.iterdir()})
+
+    def test_status_rule_ambiguous_or_unsupported_units_remain_gaps(self):
+        variants = [
+            STATUS_UNIT.replace(b"not in", b"in"),
+            STATUS_UNIT.replace(b"then delete", b"then output"),
+            STATUS_UNIT.replace(b"else if", b"if"),
+            STATUS_UNIT.replace(b"else if", b"label=7; else if"),
+            STATUS_UNIT.replace(b"else if", b"else if other=0 then"),
+            STATUS_UNIT.replace(b"label = 0", b"other = 0"),
+            STATUS_UNIT.replace(b"label = 0", b"label = label+1"),
+            STATUS_UNIT.replace(b"label = 0", b"label = ."),
+            STATUS_UNIT + b"else label=9;\r\n",
+            b"if key=0 then delete;\r\n" + STATUS_UNIT,
+            STATUS_UNIT.replace(b"'A','B','C'", b"('A','B'),'C'"),
+        ]
+        for unit in variants:
+            with self.subTest(unit=unit):
+                raw = b"data work.stage; set work.input; " + unit + b"keep key label; run;"
+                lines = f"1:{len(raw.splitlines())}"
+                baseline, old = self.review(raw, lines=lines)
+                run, dest = self.review(raw, lines=lines, recover_rules=True)
+                self.assertEqual(baseline.returncode, 0, baseline.stderr)
+                self.assertEqual(run.returncode, 0, run.stderr)
+                before = json.loads((old / "EVIDENCE.json").read_bytes())["declared_operation"]
+                after = json.loads((dest / "EVIDENCE.json").read_bytes())["declared_operation"]
+                self.assertEqual(after["status_rule_recovery"]["status"], "UNRESOLVED")
+                self.assertEqual(after["status_rule_recovery"]["rules"], [])
+                self.assertEqual(before["unsupported_statements"], after["unsupported_statements"])
+
+    def test_status_rule_review_links_reuse_trace_and_sort_stays_unchanged(self):
+        # Doubled quote, Unicode and punctuation exercise literal decoding and safe presentation.
+        unit = STATUS_UNIT.replace(b"'A'", "'Aé''|<b>'".encode())
+        data = b"data work.stage;\r\nset work.input;\r\n" + unit + LATER_GAPS + b"keep key label;\r\nrun;\r\n"
+        sort = b"proc sort data=work.stage out=work.sorted; by key; run;"
+        raw = data + sort
+        run, dest = self.review(raw, lines="1:10", second_lines="11:11", recover_rules=True)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        e = json.loads((dest / "EVIDENCE.json").read_bytes())
+        self.assertEqual(e["review_format"], "source-only-dependency/2")
+        rules = e["selections"][0]["declared_operation"]["status_rule_recovery"]["rules"]
+        self.assertEqual(rules[0]["predicate"]["values"][0], "Aé'|<b>")
+        report = (dest / "MIGRATION_REVIEW.md").read_text()
+        trace, mapping = report.split("## MAP")
+        for rule in rules:
+            span = rule["span"]
+            anchor = f"bytes-{span['start']}-{span['end']}"
+            self.assertEqual(trace.count(f'id="{anchor}"'), 1)
+            self.assertIn(f"](#{anchor})", mapping)
+        self.assertNotIn("<b>", report)
+        self.assertNotIn("NOT IN", mapping)
+        self.assertIn("NO_ASSIGNMENT_BY_PAIR", mapping)
+        self.assertIn("Later unresolved effects", mapping)
+        self.assertEqual(e["semantic_acceptance"], "BLOCKED")
+        self.assertEqual(e["behavioral_evidence"], "UNAVAILABLE")
+        self.assertEqual(e["supported_profile_reconstruction"], "NOT_RUN")
+        for recover in (False, True):
+            run, output = self.review(raw, lines="11:11", recover_rules=recover)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            files = {p.name: p.read_bytes() for p in output.iterdir()}
+            if not recover:
+                original = files
+            else:
+                self.assertEqual(files, original)
