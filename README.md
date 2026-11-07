@@ -108,9 +108,15 @@ To review a DATA step and a later SORT together, repeat `--lines` with two
 disjoint ranges in source order. For example, use `--lines 10:20 --lines 30:32`.
 The command hashes the file once and analyzes the two selected ranges separately.
 Matching dataset identifiers yield a SOURCE_DECLARED / EXECUTION_UNVERIFIED
-connection. Different identifiers leave the connection UNRESOLVED. The bytes
-between the ranges are UNEXAMINED, and runtime dataset identity and version
-remain unknown. The package retains each operation's original span and findings.
+connection. Different identifiers leave the connection UNRESOLVED. The package
+retains each operation's original span and findings.
+
+The combined review also inventories explicit dataset references and unresolved
+macro or control effects in up to 64 KiB between the selections. The legacy
+`intervening_span` field still marks that region outside the selected-operation
+parse. Consult `interval_effects` for the bounded inspection status, hash,
+finding spans and possible writers. Runtime dataset identity, version and SORT
+reachability remain unverified.
 
 ## Review the architecture decision
 

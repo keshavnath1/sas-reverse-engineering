@@ -211,3 +211,62 @@ class SourceReviewTests(unittest.TestCase):
             run, dest = self.review(raw, lines="1:1", second_lines=second)
             self.assertEqual(run.returncode, 2, run.stderr)
             self.assertFalse(dest.exists())
+
+    def test_interval_inventory_binds_reads_outputs_and_control_gates(self):
+        data = b"data work.stage; set work.input; keep id; run;\r\n"
+        middle = [
+            b"proc sql noprint;",
+            b"create table work.audit as select id from work.stage;",
+            b"select count(*) into :n from work.stage;",
+            b"quit;",
+            b"%check_step;",
+            b"%if &n = 0 %then %abort_run(empty);",
+            b"ods output Summary=work.summary;",
+            b"proc means data=work.stage;",
+            b"run;",
+        ]
+        interval = b"\r\n".join(middle) + b"\r\n"
+        sort = b"proc sort data=work.stage out=work.final; by id; run;"
+        run, dest = self.review(data + interval + sort, lines="1:1", second_lines="11:11")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        evidence = json.loads((dest / "EVIDENCE.json").read_bytes())
+        self.assertEqual(evidence["connection"]["classification"], "SOURCE_DECLARED")
+        self.assertEqual(evidence["connection"]["execution_verification"], "EXECUTION_UNVERIFIED")
+        effects = evidence["interval_effects"]
+        self.assertEqual(effects["sha256"], sha256(interval).hexdigest())
+        self.assertEqual(effects["direct_reads"], ["work.stage"])
+        self.assertEqual(effects["other_outputs"], ["work.audit", "work.summary"])
+        self.assertIs(effects["shared_writer_identified"], False)
+        self.assertEqual(effects["sort_reachability"], "UNESTABLISHED")
+        findings = {item["span"]["line_start"]: item for item in effects["findings"]}
+        self.assertEqual(findings[3]["writes"], ["work.audit"])
+        self.assertEqual(findings[4]["reads"], ["work.stage"])
+        self.assertEqual(findings[6]["unknown_effects"], ["MACRO_DEPENDENT_EFFECTS"])
+        self.assertIn("POTENTIAL_ABORT", findings[7]["control_gates"])
+        self.assertEqual(findings[8]["ods_outputs"], ["work.summary"])
+        for line, item in findings.items():
+            original = middle[line - 2]
+            start = len(data) + sum(len(part) + 2 for part in middle[:line - 2])
+            self.assertEqual(item["span"], {
+                "start": start, "end": start + len(original), "line_start": line,
+                "line_end": line, "sha256": sha256(original).hexdigest(),
+            })
+        review = (dest / "README.md").read_text()
+        self.assertIn("No direct writer identified within the inspected supported source forms; unresolved effects remain.", review)
+        self.assertNotIn("create table", review.lower())
+
+    def test_interval_inventory_distinguishes_writer_from_unavailable_inspection(self):
+        data = b"data work.stage; set work.input; keep id; run;\n"
+        sort = b"proc sort data=work.stage out=work.final; by id; run;"
+        for middle, expected in ((b"data work.stage; set work.other; run;\n", True),
+                                 (b"\xff\n", None)):
+            with self.subTest(writer=expected):
+                run, dest = self.review(data + middle + sort, lines="1:1", second_lines="3:3")
+                self.assertEqual(run.returncode, 0, run.stderr)
+                effects = json.loads((dest / "EVIDENCE.json").read_bytes())["interval_effects"]
+                self.assertIs(effects["shared_writer_identified"], expected)
+                if expected:
+                    self.assertEqual(effects["findings"][0]["writes"], ["work.stage"])
+                else:
+                    self.assertEqual(effects["status"], "UNAVAILABLE")
+                    self.assertEqual(effects["findings"][0]["unknown_effects"], ["INTERVAL_NOT_UTF8"])

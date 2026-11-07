@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 # Isolated Python excludes the script directory.
 sys.path.insert(0, str(ROOT / "scripts"))
 from mvp1_demo import scratch_destination, write_bundle
+from source_interval import inventory as interval_inventory
 
 MAX_SPAN_BYTES = 64 * 1024
 STATUS = {
@@ -253,11 +254,17 @@ def dependency_review(raw, ranges, source_digest):
         "sort_input": sort["input"],
     }
     first_span, last_span = (item["selected_span"] for item in selections)
+    # Retain the RS-4 operation-parse boundary. The separate inventory
+    # describes the limited inspection of these same intervening bytes.
     intermediate = {
         "status": "UNEXAMINED",
         "start": first_span["end"],
         "end": last_span["start"],
     }
+    interval = interval_inventory(
+        raw, intermediate["start"], intermediate["end"],
+        first_span["line_end"] + 1, data["output"] if matched else None, MAX_SPAN_BYTES,
+    )
     evidence = {
         **STATUS,
         "review_format": "source-only-dependency/1",
@@ -268,6 +275,7 @@ def dependency_review(raw, ranges, source_digest):
         "selections": selections,
         "connection": connection,
         "intervening_span": intermediate,
+        "interval_effects": interval,
         "boundaries": BOUNDARIES,
     }
     relationship = (
@@ -287,8 +295,8 @@ def dependency_review(raw, ranges, source_digest):
         f"DATA reads `{data['input']}` and writes `{data['output']}`.",
         f"SORT reads `{sort['input']}` and writes `{sort['output']}` by {keys} ascending.",
         f"{connection['classification']} / EXECUTION_UNVERIFIED. {relationship}", "",
-        f"Intervening bytes [{intermediate['start']}, {intermediate['end']}) are UNEXAMINED. "
-        "Statements there may write the intermediate dataset or introduce other effects. "
+        f"Intervening bytes [{intermediate['start']}, {intermediate['end']}) are outside the selected operations. "
+        "The limited inventory below records recognizable references and unresolved effects. "
         "Runtime dataset identity, version and successful execution remain unknown.", "",
         f"KEEP declares {len(data['selected_columns'])} output selections ({columns}).",
         "Input and output schemas, key type, row survival and label derivation remain unknown.", "",
@@ -300,6 +308,23 @@ def dependency_review(raw, ranges, source_digest):
         lines.append(f"- Lines {location['line_start']}–{location['line_end']}. {reasons}.")
     if not data["unsupported_statements"]:
         lines.append("The review recovered the declared input, output and selection.")
+    lines += [
+        "", "## Intervening source effects", "",
+        f"Inventory {interval['status']}. Interval SHA-256 {interval['sha256']}.",
+        "Explicit reads: " + (", ".join(interval["direct_reads"]) or "none identified") + ".",
+        "Explicit outputs other than the shared dataset: " + (", ".join(interval["other_outputs"]) or "none identified") + ".",
+        "SORT reachability remains unestablished.",
+    ]
+    if interval["shared_writer_identified"] is True:
+        lines.append("An explicit output targets the shared dataset and may replace it.")
+    elif interval["shared_writer_identified"] is False:
+        lines.append("No direct writer identified within the inspected supported source forms; unresolved effects remain.")
+    for item in interval["findings"]:
+        location = item["span"]
+        effects = [f"{key}: {', '.join(values)}" for key, values in item.items()
+                   if key != "span" and values]
+        lines.append(f"- Lines {location['line_start']}–{location['line_end']}, "
+                     f"bytes [{location['start']}, {location['end']}). " + ". ".join(effects) + ".")
     lines += [
         "", "## Candidate requirements and proof obligations", "",
         "- Bind the prepared dataset version to both operations and account for intervening effects.",
