@@ -3,7 +3,8 @@
 from hashlib import sha256
 import re
 
-from sas_re.sas_subset import _Source, _Syntax, _frames
+from sas_re.sas_subset import _Cursor, _Source, _Syntax, _frames
+from source_rules import character_literal
 
 
 _DATASET = r"(work) \. ([a-z_][a-z0-9_]{0,31})(?= |$)"
@@ -153,6 +154,138 @@ def recover_sql_gates(frames, findings, start):
                 pending_guard = pending_gate = None
             if words[:1] == ["%"] and words[:2] != ["%", "assert_step"]:
                 producers.clear()
+
+
+def inspect_logistic(raw, first_line, start, max_bytes):
+    """Recognize only the bounded ODS / LOGISTIC / status-check sequence."""
+    if len(raw) > max_bytes:
+        return None, ["SPAN_SIZE_LIMIT"]
+
+    try:
+        source = _Source(raw, "logistic")
+        frames = [frame for frame in _frames(source) if not frame["comment"] or frame["issues"]]
+        if len(frames) != 8 or any(frame["issues"] for frame in frames):
+            raise _Syntax("LOGISTIC_SEQUENCE_UNSUPPORTED")
+        ods, proc, classes, model, output, run, check, close = frames
+
+        def cursor(frame, *prefix):
+            c = _Cursor(frame["tokens"], source)
+            for token in prefix:
+                c.take(token)
+            return c
+
+        def work_table(c):
+            c.take("work")
+            c.take(".")
+            return "work." + c.name()
+
+        def span(frame, last=None, include_newline=False):
+            end = (last or frame)["end"]
+            if include_newline:
+                newline = re.match(r"[ \t]*(?:\r\n|\r|\n)", source.text[end:])
+                if newline:
+                    end += newline.end()
+            location = source.span(frame["start"], end)
+            a, b = location["start"], location["end"]
+            return {
+                "start": start + a, "end": start + b,
+                "line_start": first_line + location["line_start"] - 1,
+                "line_end": first_line + location["line_end"] - 1,
+                "sha256": sha256(raw[a:b]).hexdigest(),
+            }
+
+        c = cursor(ods, "ods", "output")
+        destinations = {}
+        while c.peek():
+            table = c.name()
+            if table in destinations:
+                raise _Syntax("LOGISTIC_ODS_TARGETS_UNSUPPORTED")
+            c.take("=")
+            destinations[table] = work_table(c)
+        if set(destinations) != {"parameterestimates", "fitstatistics", "association",
+                                 "classlevelinfo", "convergencestatus"}:
+            raise _Syntax("LOGISTIC_ODS_TARGETS_UNSUPPORTED")
+
+        c = cursor(proc, "proc", "logistic", "data", "=")
+        input_table = work_table(c)
+        c.take("descending")
+        c.finish()
+
+        c = cursor(classes, "class")
+        levels = []
+        while not c.accept("/"):
+            variable = c.name()
+            c.take("(")
+            c.take("ref")
+            c.take("=")
+            reference = character_literal(c)
+            if any(mark in reference for mark in "%&"):
+                raise _Syntax("LOGISTIC_DYNAMIC_REFERENCE_UNSUPPORTED")
+            c.take(")")
+            levels.append({"variable": variable, "reference": reference})
+        c.take("param")
+        c.take("=")
+        c.take("ref")
+        c.finish()
+
+        c = cursor(model, "model")
+        response = c.name()
+        c.take("=")
+        predictors = []
+        while c.peek():
+            predictors.append(c.name())
+        class_names = {level["variable"] for level in levels}
+        if (len(levels) != 5 or len(class_names) != 5 or len(predictors) != 17
+                or len(set(predictors)) != 17 or not class_names <= set(predictors)
+                or response in predictors):
+            raise _Syntax("LOGISTIC_TERMS_UNSUPPORTED")
+
+        c = cursor(output, "output", "out", "=")
+        output_table = work_table(c)
+        c.take("xbeta")
+        c.take("=")
+        eta = c.name()
+        c.take("predicted")
+        c.take("=")
+        probability = c.name()
+        c.finish()
+        if len({eta, probability, response, *predictors}) != 20:
+            raise _Syntax("LOGISTIC_OUTPUT_COLUMNS_AMBIGUOUS")
+        if len({input_table, output_table, *destinations.values()}) != 7:
+            raise _Syntax("LOGISTIC_DATASETS_AMBIGUOUS")
+
+        cursor(run, "run").finish()
+        cursor(close, "ods", "output", "close").finish()
+        c = cursor(check, "%", "assert_step", "(", "step_name", "=")
+        if check["tokens"][0].end != check["tokens"][1].start:
+            raise _Syntax("LOGISTIC_STEP_CHECK_UNSUPPORTED")
+        label_start = c.i
+        while c.peek() and not c.peek(")"):
+            c.name()
+        if c.i == label_start:
+            raise _Syntax("LOGISTIC_STEP_CHECK_UNSUPPORTED")
+        c.take(")")
+        c.finish()
+    except UnicodeDecodeError:
+        return None, ["SPAN_NOT_UTF8"]
+    except _Syntax as error:
+        return None, [error.code if error.code != "UNSUPPORTED_SYNTAX" else "LOGISTIC_SYNTAX_UNSUPPORTED"]
+
+    return {
+        "kind": "PROC_LOGISTIC",
+        "span": span(proc, run, include_newline=True),
+        "input": input_table,
+        "header": {"span": span(proc), "options": ["DESCENDING"]},
+        "class": {"span": span(classes), "parameterization": "REF", "levels": levels},
+        "model": {"span": span(model), "response": response, "predictors": predictors,
+                  "non_class_predictors": [name for name in predictors if name not in class_names],
+                  "options": []},
+        "output": output_table,
+        "score_columns": {"span": span(output), "xbeta": eta, "predicted": probability},
+        "ods_output": {"span": span(ods), "datasets": destinations, "close_span": span(close)},
+        "step_check": {"span": span(check), "macro": "assert_step", "effects": "UNRESOLVED"},
+        "execution_verification": "EXECUTION_UNVERIFIED",
+    }, []
 
 
 def inventory(raw, start, end, first_line, shared, max_bytes, recover_sql=False):

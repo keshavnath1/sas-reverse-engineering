@@ -16,10 +16,10 @@ ROOT = Path(__file__).resolve().parents[1]
 # Isolated Python excludes the script directory.
 sys.path.insert(0, str(ROOT / "scripts"))
 from migration_review import (
-    anchor, missing_rule_relationships, render as render_migration_review, rule_description,
+    anchor, logistic_lines, missing_rule_relationships, render as render_migration_review, rule_description,
 )
 from mvp1_demo import scratch_destination, write_bundle
-from source_interval import inventory as interval_inventory
+from source_interval import inspect_logistic, inventory as interval_inventory
 from source_rules import recover as recover_status_rules
 
 MAX_SPAN_BYTES = 64 * 1024
@@ -198,6 +198,8 @@ def review_text(evidence):
     operation = evidence["declared_operation"]
     if operation is None:
         lines += ["**Unsupported span.** Review reason codes in the evidence register."]
+    elif operation["kind"] == "PROC_LOGISTIC":
+        lines.extend(logistic_lines(operation))
     elif operation["kind"] == "DATA_STEP":
         columns = ", ".join(f"`{name}`" for name in operation["selected_columns"])
         lines += [
@@ -264,10 +266,13 @@ def review_text(evidence):
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
-def inspect_range(raw, first, last, recover_rules=False, recover_missing=False):
+def inspect_range(raw, first, last, recover_rules=False, recover_missing=False, recover_logistic=False):
     start, end = line_span(raw, first, last)
     span = raw[start:end]
-    operation, reasons = inspect_span(span, first, start, recover_rules, recover_missing)
+    if recover_logistic:
+        operation, reasons = inspect_logistic(span, first, start, MAX_SPAN_BYTES)
+    else:
+        operation, reasons = inspect_span(span, first, start, recover_rules, recover_missing)
     location = {
         "line_start": first, "line_end": last, "start": start, "end": end,
         "sha256": sha256(span).hexdigest(),
@@ -394,6 +399,8 @@ def main():
                         help="extend status recovery with ordered MISSING and CMISS exclusions")
     parser.add_argument("--recover-sql-gates", action="store_true",
                         help="recover bounded SQL and abort declarations between two ranges")
+    parser.add_argument("--recover-logistic", action="store_true",
+                        help="recover one bounded ODS and PROC LOGISTIC fit-to-score range")
     parser.add_argument("--destination", required=True, help="fresh /tmp/sas-re-source-<label> directory")
     args = parser.parse_args()
     if args.recover_missing_exclusions and not args.recover_status_rules:
@@ -404,6 +411,9 @@ def main():
         parser.error("supply one or two --lines ranges")
     if args.recover_sql_gates and len(args.lines) != 2:
         parser.error("--recover-sql-gates requires two --lines ranges")
+    if args.recover_logistic and (len(args.lines) != 1 or args.recover_status_rules
+                                  or args.recover_missing_exclusions or args.recover_sql_gates):
+        parser.error("--recover-logistic requires one --lines range and no other recovery flags")
     ranges = []
     for value in args.lines:
         if not re.fullmatch(r"[1-9][0-9]{0,7}:[1-9][0-9]{0,7}", value):
@@ -437,7 +447,7 @@ def main():
         else:
             selected_span, operation, reasons = inspect_range(
                 raw, *ranges[0], recover_rules=args.recover_status_rules,
-                recover_missing=args.recover_missing_exclusions,
+                recover_missing=args.recover_missing_exclusions, recover_logistic=args.recover_logistic,
             )
             is_data = operation is not None and operation["kind"] == "DATA_STEP"
             syntax = "SUPPORTED" if operation else "UNSUPPORTED"
@@ -462,6 +472,9 @@ def main():
                 evidence["review_format"] = "source-only-data/2"
             if is_data and args.recover_missing_exclusions:
                 evidence["review_format"] = "source-only-data/3"
+            if args.recover_logistic:
+                evidence.update(review_format="source-only-logistic/1", reference_experiment="NOT_RUN",
+                                historical_source_run_provenance="UNBOUND")
             readme = review_text(evidence)
         files = {
             "README.md": readme,

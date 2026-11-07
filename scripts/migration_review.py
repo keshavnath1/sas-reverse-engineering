@@ -111,6 +111,49 @@ def sql_gate_relationships(findings):
     return lines
 
 
+def logistic_lines(operation):
+    """Project the selected operation onto the existing TRACE/MAP citations."""
+    header, classes, model = (operation[key] for key in ("header", "class", "model"))
+    scores, ods, check = (operation[key] for key in ("score_columns", "ods_output", "step_check"))
+    refs = ", ".join(
+        f"`{level['variable']}` REF="
+        + "`" + html.escape(json.dumps(level["reference"], ensure_ascii=True)).replace("`", "&#96;") + "`"
+        for level in classes["levels"]
+    )
+    facts = (
+        ("Fit input", header["span"], f"`{operation['input']}` · {names(header['options'])}."),
+        ("CLASS", classes["span"], f"`PARAM=REF`. {refs}."),
+        ("MODEL", model["span"], f"Response `{model['response']}`. Ordered terms "
+         f"{names(model['predictors'])}. No explicit MODEL options."),
+        ("Scored output", scores["span"], f"`{operation['output']}` · "
+         f"XBETA → `{scores['xbeta']}`, PREDICTED → `{scores['predicted']}`."),
+        ("ODS destinations", ods["span"], ", ".join(
+            f"`{table}` → `{dataset}`" for table, dataset in ods["datasets"].items()
+        ) + "."),
+        ("Step check", check["span"], f"`%{check['macro']}` · effects {check['effects']}."),
+        ("ODS close", ods["close_span"], ""),
+    )
+    lines = ["## TRACE", ""]
+    for label, span, detail in facts:
+        lines.append(f'- <a id="{anchor(span)}"></a>**{label}** · {location(span)}. '
+                     f"SHA-256 `{span['sha256']}`. {detail}".rstrip())
+    fit = cite("fit input", header["span"])
+    return lines + [
+        "", "## MAP", "",
+        f"- **SOURCE_DECLARED / EXECUTION_UNVERIFIED** · {fit} → PROC LOGISTIC "
+        f"→ {cite('scored output', scores['span'])}.",
+        f"- **SOURCE_DECLARED / EXECUTION_UNVERIFIED** · PROC LOGISTIC "
+        f"→ {cite('ODS destinations', ods['span'])}.",
+        f"- **UNRESOLVED** · {cite('step check', check['span'])} follows the procedure.",
+        "- The prepared-export CSV belongs to a separate branch. This declaration "
+        "establishes no ordering for the fitting input.",
+        "", "## Reference obligations", "",
+        "Verify response-event orientation, effective design columns, eligible rows, "
+        "convergence, coefficients and keyed scores with attributable reference evidence. "
+        "Unspecified statistical settings and runtime dataset versions remain unresolved.",
+    ]
+
+
 def render(evidence):
     data_selection, sort_selection = evidence["selections"]
     data = data_selection["declared_operation"]

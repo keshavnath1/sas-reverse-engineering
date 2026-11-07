@@ -27,6 +27,20 @@ LATER_GAPS = (
 PREFIX = "/* café */\r\n%unreviewed_driver;\r\n".encode()
 
 
+# Public declarations only. No coefficients, scores or expected SAS results.
+LOGISTIC = (
+    b"ods output ParameterEstimates=work.coefs FitStatistics=work.fit "
+    b"Association=work.assoc ClassLevelInfo=work.levels ConvergenceStatus=work.status;",
+    b"proc logistic data=work.training descending;",
+    b"class a(ref='Base A') b(ref='B''s') c(ref='C') d(ref='D') e(ref='E') / param=ref;",
+    b"model label=x12 x1 x11 x2 x10 x3 x9 x4 x8 x5 x7 x6 e a d b c;",
+    b"output out=work.scores xbeta=eta predicted=phat;",
+    b"run;",
+    b"%assert_step(step_name=Public fit and score);",
+    b"ods output close;",
+)
+
+
 @unittest.skipUnless(sys.platform in ("darwin", "linux"), "Existing POSIX scratch writer")
 class SourceReviewTests(unittest.TestCase):
     def setUp(self):
@@ -34,7 +48,7 @@ class SourceReviewTests(unittest.TestCase):
         directory = self.enterContext(TemporaryDirectory(dir=scratch))
         self.source = Path(directory) / "input.sas"
 
-    def review(self, raw, lines="3:5", expected=None, destination=None, second_lines=None, recover_rules=False, recover_missing=False, recover_sql=False):
+    def review(self, raw, lines="3:5", expected=None, destination=None, second_lines=None, recover_rules=False, recover_missing=False, recover_sql=False, recover_logistic=False):
         self.source.write_bytes(raw)
         if destination is None:
             destination = Path("/tmp") / f"sas-re-source-{uuid.uuid4().hex}"
@@ -45,8 +59,85 @@ class SourceReviewTests(unittest.TestCase):
             *(("--recover-status-rules",) if recover_rules else ()),
             *(("--recover-missing-exclusions",) if recover_missing else ()),
             *(("--recover-sql-gates",) if recover_sql else ()),
+            *(("--recover-logistic",) if recover_logistic else ()),
         ))
         return run, destination
+
+    def test_logistic_contract_binds_ordered_facts_to_original_bytes(self):
+        raw = PREFIX + b"\r\n".join(LOGISTIC) + b"\r\n"
+        run, dest = self.review(raw, lines="3:10", recover_logistic=True)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        files = {p.name: p.read_bytes() for p in dest.iterdir()}
+        e = json.loads(files["EVIDENCE.json"])
+        self.assertEqual(e["review_format"], "source-only-logistic/1")
+        self.assertEqual(e["semantic_acceptance"], "BLOCKED")
+        self.assertEqual(e["behavioral_evidence"], "UNAVAILABLE")
+        op = e["declared_operation"]
+        self.assertEqual((op["kind"], op["input"], op["output"], op["execution_verification"]),
+                         ("PROC_LOGISTIC", "work.training", "work.scores", "EXECUTION_UNVERIFIED"))
+        self.assertEqual(op["header"]["options"], ["DESCENDING"])
+        expected = "x12 x1 x11 x2 x10 x3 x9 x4 x8 x5 x7 x6".split()
+        self.assertEqual(op["model"]["response"], "label")
+        self.assertEqual(op["model"]["predictors"], expected + list("eadbc"))
+        self.assertEqual(op["model"]["non_class_predictors"], expected)
+        self.assertEqual(op["model"]["options"], [])
+        self.assertEqual(op["class"]["parameterization"], "REF")
+        self.assertEqual(op["class"]["levels"], [
+            {"variable": v, "reference": r}
+            for v, r in zip("abcde", ("Base A", "B's", "C", "D", "E"))
+        ])
+        self.assertEqual([op["score_columns"][k] for k in ("xbeta", "predicted")], ["eta", "phat"])
+        self.assertEqual(op["ods_output"]["datasets"], {
+            "parameterestimates": "work.coefs", "fitstatistics": "work.fit",
+            "association": "work.assoc", "classlevelinfo": "work.levels",
+            "convergencestatus": "work.status",
+        })
+        self.assertEqual(op["step_check"]["effects"], "UNRESOLVED")
+        for key, i in (("header", 1), ("class", 2), ("model", 3), ("score_columns", 4),
+                       ("ods_output", 0), ("step_check", 6)):
+            start = len(PREFIX) + sum(len(line) + 2 for line in LOGISTIC[:i])
+            self.assertEqual(op[key]["span"], {
+                "start": start, "end": start + len(LOGISTIC[i]), "line_start": i + 3,
+                "line_end": i + 3, "sha256": sha256(LOGISTIC[i]).hexdigest(),
+            })
+        self.assertEqual(raw[op["span"]["start"]:op["span"]["end"]],
+                         b"\r\n".join(LOGISTIC[1:6]) + b"\r\n")
+        self.assertEqual(e["source"]["selected_span"]["sha256"], sha256(raw[len(PREFIX):]).hexdigest())
+        report = files["README.md"].decode()
+        self.assertIn("## TRACE", report)
+        self.assertIn("## MAP", report)
+        self.assertIn("SOURCE_DECLARED / EXECUTION_UNVERIFIED", report)
+        for ref in re.findall(r"\]\(#(bytes-[0-9]+-[0-9]+)\)", report):
+            self.assertEqual(report.count(f'id="{ref}"'), 1)
+        again, second = self.review(raw, lines="3:10", recover_logistic=True)
+        self.assertEqual(again.returncode, 0, again.stderr)
+        self.assertEqual(files, {p.name: p.read_bytes() for p in second.iterdir()})
+        legacy, old = self.review(raw, lines="3:10")
+        self.assertEqual(legacy.returncode, 2)
+        self.assertIsNone(json.loads((old / "EVIDENCE.json").read_bytes())["declared_operation"])
+
+    def test_logistic_refuses_unknown_or_ambiguous_forms(self):
+        original = b"\n".join(LOGISTIC)
+        for before, after in (
+            (b" descending", b""),
+            (b"param=ref", b"param=effect"),
+            (b"Base A", b"&dynamic"),
+            (b"x12 x1", b"x1 x1"),
+            (b"d b c;", b"d b c / link=probit;"),
+            (b"predicted=phat", b"predicted=eta"),
+            (b"work.status", b"work.fit"),
+            (b"%assert_step", b"%unknown_step"),
+            (b"ods output close;", b"ods output close"),
+        ):
+            with self.subTest(variant=after):
+                raw = original.replace(before, after)
+                run, dest = self.review(raw, lines="1:8", recover_logistic=True)
+                self.assertEqual(run.returncode, 2, run.stderr)
+                e = json.loads((dest / "EVIDENCE.json").read_bytes())
+                self.assertEqual(e["syntax_recognition"], "UNSUPPORTED")
+                self.assertIsNone(e["declared_operation"])
+                self.assertTrue(e["reason_codes"])
+                self.assertEqual(e["source"]["selected_span"]["sha256"], sha256(raw).hexdigest())
 
     def test_supported_span_is_bound_to_original_bytes_and_deterministic(self):
         raw = PREFIX + SORT
