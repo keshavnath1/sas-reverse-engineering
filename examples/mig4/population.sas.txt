@@ -1,0 +1,14 @@
+data work.prepared; set work.samples; keep id; run;
+proc sql noprint;
+create table work.dupes as select id, count(*) as duplicate_count from work.prepared group by id having count(*) > 1;
+select count(*), count(distinct id), sum(case when missing(id) then 1 else 0 end) into :prepared_rows trimmed, :unique_ids trimmed, :missing_ids trimmed from work.prepared;
+select count(*) into :duplicate_ids trimmed from work.dupes;
+quit;
+%if &prepared_rows = 0 %then %abort_run(empty);
+%if &missing_ids ne 0 %then %abort_run(missing);
+%if &duplicate_ids ne 0 %then %abort_run(duplicates);
+%if &prepared_rows ne &unique_ids %then %abort_run(mismatch);
+%if %upcase(&check_expected) = Y %then %do;
+%if &prepared_rows ne &expected_prepared_rows %then %abort_run(count mismatch);
+%end;
+proc sort data=work.prepared out=work.ordered; by id; run;
