@@ -1,0 +1,15 @@
+data work.ready;
+  set work.sample;
+  if amount < 0 then delete;
+  keep id amount;
+run;
+
+proc sql noprint;
+  create table work.audit as select id, count(*) as duplicate_count from work.ready group by id having count(*) > 1;
+  select count(*) into :repeated trimmed from work.audit;
+quit;
+%if &repeated ne 0 %then %abort_run(duplicates);
+
+proc sort data=work.ready out=work.ordered;
+  by id;
+run;
