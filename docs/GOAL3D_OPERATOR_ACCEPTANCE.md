@@ -35,3 +35,20 @@ Both publications contained `MANIFEST.json`, `GATE.json`, `PLAN.json`, `MODERNIZ
 | Semantic acceptance | BLOCKED |
 | Benchmark execution | NOT_RUN |
 | Historical SAS run provenance | UNBOUND |
+
+## Pinned INTG-3 operator runs
+
+Both pinned subjects used the configured MIG-5/MIG-6/MOD-2 route at implementation commit `3baca6c1f9d9962bdac19652d0e36b80c2245dae`. Each reviewed YAML pair produced `PLAN_PROPOSED`. Before approval, both GATE-1 receipts showed `REVIEW_REQUIRED` with zero blockers and `BOUND_HUMAN_APPROVAL_REQUIRED` as the sole pending item. Keshav then approved each exact version 2 claim record, and separate approval files bound the two digests. [Pinned operator guide](../examples/intg3a/README.md)
+
+| Scenario | GATE-1 and engineering comparison | Candidate outcome | Replay |
+| --- | --- | --- | --- |
+| `passes` | Both PASS on publication and replay. | `PROCEED`. CSV IDs were `[0, 1]`. Fixed scoring retained pre-sort ID order `[1, 0]` and passed its numeric comparison. | All 18 filenames and file bytes matched, including the manifest. |
+| `duplicates` | Both PASS on publication and replay. | Expected candidate `BLOCK` at gate 3. The publication contained diagnostics and their bindings. Export, sorted rows, design and scores were absent. | All 10 filenames and file bytes matched, including the manifest. |
+
+| Bound artifact | `passes` SHA-256 | `duplicates` SHA-256 |
+| --- | --- | --- |
+| Pinned subject manifest | `f1159f3f397c640d867401d1be4e3eb2bd232dd2fdcf068247088847fb48f864` | `57fb8c0a4b2dec668f5363a48f120ebb5bb405c3ec9ecd39c8d6eefde2fbd477` |
+| Exact approved claim record | `99b43c30cfde23007210467bda9c69ab42a2bf552ecc76275c0bcaa16765a851` | `85d12742a6580ff27a2ff7ea404ce5ec340d0aaa99f5bda04de2924f2cddcf95` |
+| Publication and replay manifest | `d9fd82381568e6a261f181af390ad639a5752ab9289fd56b0a275b74d609373b` | `0849473180bf13953c6f80baeb613c339326aa4ed06cdfcbdb502e36a95a7c98` |
+
+The publications and receipts were retained in local scratch. Both runs recorded SAS reference execution as `NOT_RUN`, semantic verification as `UNVERIFIABLE` and semantic acceptance as `BLOCKED`.
