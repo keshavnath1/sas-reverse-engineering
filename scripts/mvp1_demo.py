@@ -64,9 +64,10 @@ def synthetic_preview(scratch):
         return render_case(case, FIXTURE, FIXTURE_GRAPH_SHA256, PROFILE_KEY)
 
 
-def write_bundle(scratch, leaf, files, *, names=FILES):
+def write_bundle(scratch, leaf, files, *, names=FILES, allow_csv=False):
+    suffixes = "md|json|csv" if allow_csv else "md|json"
     if (set(files) != set(names) or len(files) != len(names)
-            or not all(re.fullmatch(r"[A-Z][A-Z0-9_]*\.(md|json)", name) for name in names)):
+            or not all(re.fullmatch(rf"[A-Z][A-Z0-9_]*\.({suffixes})", name) for name in names)):
         raise ValueError("unexpected preview file manifest")
     destination = scratch / leaf
     destination.mkdir(mode=0o700)  # Exclusive, including when an existing name is a symlink.
