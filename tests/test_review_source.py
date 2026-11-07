@@ -34,7 +34,7 @@ class SourceReviewTests(unittest.TestCase):
         directory = self.enterContext(TemporaryDirectory(dir=scratch))
         self.source = Path(directory) / "input.sas"
 
-    def review(self, raw, lines="3:5", expected=None, destination=None, second_lines=None, recover_rules=False):
+    def review(self, raw, lines="3:5", expected=None, destination=None, second_lines=None, recover_rules=False, recover_missing=False):
         self.source.write_bytes(raw)
         if destination is None:
             destination = Path("/tmp") / f"sas-re-source-{uuid.uuid4().hex}"
@@ -43,6 +43,7 @@ class SourceReviewTests(unittest.TestCase):
             "--source", str(self.source), "--source-sha256", expected or sha256(raw).hexdigest(),
             "--lines", lines, *(("--lines", second_lines) if second_lines else ()),
             *(("--recover-status-rules",) if recover_rules else ()),
+            *(("--recover-missing-exclusions",) if recover_missing else ()),
         ))
         return run, destination
 
@@ -464,3 +465,140 @@ class SourceReviewTests(unittest.TestCase):
                 original = files
             else:
                 self.assertEqual(files, original)
+
+
+    def test_six_rules_preserve_prerequisites_spans_and_trace_links(self):
+        later = (b"IF MISSING(key) THEN DELETE;\r\n"
+                 b"IF CMISS(Numeric_Value,\r\n Category_Value) > 0 THEN DELETE;\r\n"
+                 b"IF CMISS(other_name) > 0 THEN DELETE;\r\n")
+        data = b"data work.stage;\r\nset work.input;\r\n" + STATUS_UNIT + later + b"keep key label;\r\nrun;\r\n"
+        raw = PREFIX + data + b"proc sort data=work.stage out=work.sorted; by key; run;"
+        run, dest = self.review(raw, lines="3:13", second_lines="14:14",
+                                recover_rules=True, recover_missing=True)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        e = json.loads((dest / "EVIDENCE.json").read_bytes())
+        d = e["selections"][0]["declared_operation"]
+        recovery = d["status_rule_recovery"]
+        rules = recovery["rules"]
+        self.assertEqual(len(rules), 6)
+        self.assertEqual(recovery["status"], "RECOVERED")
+        self.assertEqual(recovery["fallthrough"], "NO_ASSIGNMENT_BY_PAIR")
+        # These exact references keep both branches and no-assignment fallthrough
+        # eligible for rule 3. Only earlier exclusions gate rules 4 and 5.
+        self.assertEqual([[p["rule_index"] for p in r["when"]] for r in rules],
+                         [[], [0], [0, 1], [0], [0, 3], [0, 3, 4]])
+        self.assertTrue(all(p["predicate_result"] is False for r in rules for p in r["when"]))
+        self.assertEqual([r["predicate"] for r in rules[3:]], [
+            {"function": "MISSING", "arguments": ["key"], "evaluation": "DIRECT"},
+            {"function": "CMISS", "arguments": ["numeric_value", "category_value"],
+             "evaluation": "COMPARISON", "operator": ">", "value_lexeme": "0"},
+            {"function": "CMISS", "arguments": ["other_name"],
+             "evaluation": "COMPARISON", "operator": ">", "value_lexeme": "0"},
+        ])
+        for rule in rules[3:]:
+            self.assertEqual(rule["action"], rules[0]["action"])
+            self.assertEqual(rule["action"]["scope"], "CURRENT_ROW_ITERATION")
+            self.assertEqual(rule["action"]["on_match"], "SKIP_REMAINING_STATEMENTS_AND_SUPPRESS_OUTPUT")
+        self.assertEqual(d["unsupported_statements"], [])
+        for field in ("input_schema", "output_schema", "row_selection", "selected_column_values_and_derivation"):
+            self.assertEqual(d[field], "UNKNOWN")
+        self.assertEqual(e["review_format"], "source-only-dependency/3")
+        self.assertEqual(e["source"]["sha256"], sha256(raw).hexdigest())
+        self.assertEqual(e["review_status"], "PARTIAL")
+        self.assertEqual(e["supported_profile_reconstruction"], "NOT_RUN")
+        self.assertEqual(e["semantic_verification"], "UNVERIFIABLE")
+        self.assertEqual(e["semantic_acceptance"], "BLOCKED")
+        self.assertEqual(e["behavioral_evidence"], "UNAVAILABLE")
+        old_run, old_dest = self.review(raw, lines="3:13", second_lines="14:14", recover_rules=True)
+        self.assertEqual(old_run.returncode, 0, old_run.stderr)
+        old = json.loads((old_dest / "EVIDENCE.json").read_bytes())
+        original = old["selections"][0]["declared_operation"]
+        self.assertEqual(rules[:3], original["status_rule_recovery"]["rules"])
+        for rule, gap in zip(rules[3:], original["unsupported_statements"], strict=True):
+            self.assertEqual(rule["span"], gap["span"])
+            self.assertEqual(rule["parser_reason_codes"], gap["reason_codes"])
+            span = rule["span"]
+            self.assertEqual(sha256(raw[span["start"]:span["end"]]).hexdigest(), span["sha256"])
+            self.assertEqual(span["line_start"], raw[:span["start"]].count(b"\n") + 1)
+            self.assertEqual(span["line_end"], raw[:span["end"]].count(b"\n") + 1)
+        report = (dest / "MIGRATION_REVIEW.md").read_text()
+        trace, rest = report.split("## MAP")
+        for rule in rules:
+            span = rule["span"]
+            anchor = f"bytes-{span['start']}-{span['end']}"
+            self.assertEqual(trace.count(f'id="{anchor}"'), 1)
+            self.assertIn(f"](#{anchor})", rest)
+        self.assertNotIn("numeric_value", rest)
+        self.assertIn("Either label branch or no-assignment fallthrough", rest)
+        self.assertIn("without establishing lazy evaluation", rest)
+        for file in dest.iterdir():
+            self.assertNotIn(b"PASS", file.read_bytes())
+        again, other = self.review(raw, lines="3:13", second_lines="14:14",
+                                   recover_rules=True, recover_missing=True)
+        self.assertEqual(again.returncode, 0, again.stderr)
+        self.assertEqual({p.name: p.read_bytes() for p in dest.iterdir()},
+                         {p.name: p.read_bytes() for p in other.iterdir()})
+
+    def test_missing_exclusion_recovery_stops_at_first_unsupported_statement(self):
+        cases = [
+            (b"if missing(key+1) then delete;\r\n", 0),
+            (b"/* /* nested */ if missing(key) then delete;\r\n", 0),
+            (b"if missing(key) then do; delete; end;\r\n", 0),
+            (b"if missing(key) then delete; else label=8;\r\n", 0),
+            (b"if cmiss(of x y)>0 then delete;\r\n", 1),
+            (b"if cmiss(x-y)>0 then delete;\r\n", 1),
+            (b"if cmiss(x,y)>1 then delete;\r\n", 1),
+            (b"if cmiss(x,y)>0 and key=1 then delete;\r\n", 1),
+            (b"if cmiss(x) ? 0 then delete;\r\n", 1),
+            (b"if cmiss(x)>0 then delete; /* comment */ else label=8;\r\n", 1),
+            (b"if cmiss()>0 then delete;\r\n", 2),
+            (b"label=9;\r\n", 2),
+        ]
+        statements = LATER_GAPS.splitlines(keepends=True)
+        for unsupported, index in cases:
+            with self.subTest(statement=unsupported, position=index):
+                middle = b"".join(statements[:index] + [unsupported] + statements[index + 1:])
+                raw = b"data work.stage;\r\nset work.input;\r\n" + STATUS_UNIT + middle + b"keep key label;\r\nrun;"
+                lines = f"1:{len(raw.splitlines())}"
+                old_run, old_dest = self.review(raw, lines=lines)
+                run, dest = self.review(raw, lines=lines, recover_rules=True, recover_missing=True)
+                self.assertEqual(old_run.returncode, 0, old_run.stderr)
+                self.assertEqual(run.returncode, 0, run.stderr)
+                before = json.loads((old_dest / "EVIDENCE.json").read_bytes())["declared_operation"]
+                e = json.loads((dest / "EVIDENCE.json").read_bytes())
+                after = e["declared_operation"]
+                recovery = after["status_rule_recovery"]
+                self.assertEqual(len(recovery["rules"]), 3 + index)
+                self.assertEqual(recovery["status"], "PARTIAL")
+                spans = [r["span"] for r in recovery["rules"]]
+                self.assertEqual(after["unsupported_statements"],
+                                 [g for g in before["unsupported_statements"] if g["span"] not in spans])
+                self.assertTrue(after["unsupported_statements"])
+                report = (dest / "README.md").read_text()
+                for ref in re.findall(r"\]\(#(bytes-[0-9]+-[0-9]+)\)", report):
+                    self.assertIn(f'id="{ref}"', report)
+
+    def test_sm2_package_hashes_remain_frozen_with_separate_missing_opt_in(self):
+        raw = (b"data work.stage;\r\nset work.input;\r\n" + STATUS_UNIT + LATER_GAPS
+               + b"keep key label;\r\nrun;\r\n"
+               + b"proc sort data=work.stage out=work.sorted; by key; run;")
+        # Independently captured from baseline 98f25e7 before this extension.
+        expected = {
+            "data": {
+                "EVIDENCE.json": "42155e278813f3e0dfe02eb4fd2ef91d0ba1ce1af28ec24e88b38e4c56de35cd",
+                "README.md": "3a6d2a726d50c9b726a361143b45b6ad10e257c335313bd1e03a9c0ee503e382",
+            },
+            "combined": {
+                "EVIDENCE.json": "c43e367d4af75e85fc1643a3a74675f34774d6d5e0c1d47307d6ea71cb327c0b",
+                "README.md": "a235a538c28c183d8f37ab7c2800b3b9ca8d6085436d4089328fffee6f27a7dd",
+                "MIGRATION_REVIEW.md": "d59c7f6eaa9030d3256c30b24d1e01893ae63e59c2a0aca57bfc74d2440acf65",
+            },
+        }
+        for mode, second in (("data", None), ("combined", "11:11")):
+            run, dest = self.review(raw, lines="1:10", second_lines=second, recover_rules=True)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            self.assertEqual({p.name: sha256(p.read_bytes()).hexdigest() for p in dest.iterdir()}, expected[mode])
+        run, dest = self.review(raw, lines="1:10", recover_missing=True)
+        self.assertEqual(run.returncode, 2)
+        self.assertIn(b"requires --recover-status-rules", run.stderr)
+        self.assertFalse(dest.exists())

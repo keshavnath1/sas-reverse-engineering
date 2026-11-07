@@ -24,16 +24,42 @@ def names(values):
 
 def rule_description(rule):
     predicate, action = rule["predicate"], rule["action"]
-    values = predicate.get("values", [predicate.get("value")])
-    # Literal spelling is data. Escape Markdown/HTML without interpreting it.
-    quoted = ", ".join("`" + html.escape(json.dumps(value, ensure_ascii=True))
-                       .replace("`", "&#96;").replace("|", "&#124;") + "`" for value in values)
-    condition = f"`{predicate['variable']}` {predicate['operator']} {quoted}"
+    if "function" in predicate:
+        condition = f"{predicate['function']}({names(predicate['arguments'])})"
+        if predicate["evaluation"] == "COMPARISON":
+            condition += f" {predicate['operator']} {predicate['value_lexeme']}"
+    else:
+        values = predicate.get("values", [predicate.get("value")])
+        # Literal spelling is data. Escape Markdown/HTML without interpreting it.
+        quoted = ", ".join("`" + html.escape(json.dumps(value, ensure_ascii=True))
+                           .replace("`", "&#96;").replace("|", "&#124;") + "`" for value in values)
+        condition = f"`{predicate['variable']}` {predicate['operator']} {quoted}"
     if action["kind"] == "DELETE":
         effect = "terminate the current row iteration and suppress its output"
     else:
         effect = f"assign numeric literal `{action['lexeme']}` to `{action['target']}`"
     return f"SOURCE_RECOGNIZED · If {condition}, {effect}. Execution UNVERIFIED."
+
+
+def missing_rule_relationships(rules):
+    lines = []
+    for index, rule in enumerate(rules[3:], start=3):
+        prerequisites = ", ".join(
+            cite("earlier predicate", rules[item["rule_index"]]["span"])
+            for item in rule["when"]
+        )
+        lines.append(f"- {cite('Exclusion', rule['span'])} follows "
+                     f"{cite('preceding statement', rules[index - 1]['span'])} in source order. "
+                     f"It requires false results from {prerequisites}. A true result ends this row "
+                     "and skips the remaining statements.")
+    if lines:
+        lines += [
+            "- Either label branch or no-assignment fallthrough can reach the missing-value checks "
+            "after the branch pair. The first exclusion has no label-branch predicate prerequisite.",
+            "- Argument types, evaluated missing counts and actual row survival remain unknown. "
+            "The evidence establishes statement order without establishing lazy evaluation inside CMISS.",
+        ]
+    return lines
 
 
 def render(evidence):
@@ -117,7 +143,7 @@ def render(evidence):
         f"See {cite('SET input', declarations['input'])} and {cite('SORT output', sort['span'])}.",
     ])
     if rules:
-        exclusion, first, alternative = [cite("source rule", rule["span"]) for rule in rules]
+        exclusion, first, alternative = [cite("source rule", rule["span"]) for rule in rules[:3]]
         lines.extend([
             f"- **SOURCE_RECOGNIZED / UNVERIFIED** · {exclusion} precedes {first} and {alternative}. "
             "A true exclusion guard ends this row before either assignment.",
@@ -126,6 +152,7 @@ def render(evidence):
             f"- If both guards are false, the pair makes no assignment "
             f"({recovery['fallthrough']}). Later unresolved effects may still exclude or change an assigned row.",
         ])
+    lines.extend(missing_rule_relationships(rules))
     interval_refs = {}
     for label, fields in (
         ("Source-declared reads", ("reads",)),

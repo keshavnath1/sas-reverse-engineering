@@ -141,6 +141,23 @@ CMISS stay unresolved, and source recovery supplies no output rows or behavioral
 verdicts. Original-byte identities, unknown schemas and verification gates still
 apply. Calls without the flag retain their earlier package bytes.
 
+Add `--recover-missing-exclusions` alongside `--recover-status-rules`
+to extend the list to six ordered source rules. This separate opt-in uses
+source-only review format version 3. It accepts one direct
+`IF MISSING(name) THEN DELETE;` followed by two
+`IF CMISS(name, name, ...) > 0 THEN DELETE;` statements.
+Arguments must be explicit ordinary identifiers, with at most 32 per CMISS call.
+Each function, argument order, predicate form and original span is retained.
+
+Recovery stops at the first unsupported or ambiguous exclusion. That statement
+and subsequent exclusions remain separate gaps. Supported prefixes are kept,
+with recovery marked PARTIAL until all six rules are recognized. MISSING is
+reached after either label branch or no-assignment fallthrough. Each later
+CMISS requires all earlier exclusions to be false. The command records these
+prerequisites without evaluating rows, inferring variable types or asserting
+lazy evaluation inside CMISS. Calls using only the SM-2 flag retain format
+version 2 and their earlier output bytes.
+
 ## Review the architecture decision
 
 The [MVP-4 decision review](examples/mvp4/DECISION_REVIEW.md) connects all 17

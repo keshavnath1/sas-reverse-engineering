@@ -1,6 +1,7 @@
 """Bounded source-rule recovery using the existing SAS statement/token framing.
 
-This helper describes a single contiguous filter and branch pair after SET.
+This helper describes a contiguous filter and branch pair after SET, with
+optional ordered missing-value exclusions.
 It never evaluates observations or supplies canonical semantic facts.
 """
 
@@ -38,19 +39,22 @@ def assignment(cursor, linked):
     }
 
 
-def recover(span):
+def recover(span, include_missing=False):
     """Return transient records, or no recovery for unsupported/ambiguous syntax."""
     try:
         source = _Source(span, "source")
         framed = _frames(source)
-        if any(frame["issues"] for frame in framed):
+        if not include_missing and any(frame["issues"] for frame in framed):
             return []
-        frames = [frame for frame in framed if not frame["comment"]]
+        # A malformed comment is a recovery barrier too.
+        frames = [frame for frame in framed if not frame["comment"] or frame["issues"]]
+        if any(frame["issues"] for frame in frames[:5]):
+            return []
         # Requiring the first three statements after SET prevents an unknown
         # intervening statement from being treated as transparent control flow.
         if (len(frames) < 7 or frames[0]["tokens"][0].lower != "data"
                 or frames[1]["tokens"][0].lower != "set"
-                or frames[5]["tokens"][0].lower == "else"):
+                or (frames[5]["tokens"] and frames[5]["tokens"][0].lower == "else")):
             return []
         cursors = [_Cursor(frame["tokens"], source) for frame in frames[2:5]]
         exclusion, first, alternative = cursors
@@ -87,6 +91,54 @@ def recover(span):
         ]
         for rule, frame in zip(rules, frames[2:5], strict=True):
             rule["span"] = source.span(frame["start"], frame["end"])
+        if include_missing:
+            append_missing_exclusions(source, frames, rules)
         return rules
     except (UnicodeDecodeError, _Syntax):
         return []
+
+
+def missing_predicate(cursor, function):
+    cursor.take("if")
+    cursor.take(function.lower())
+    cursor.take("(")
+    arguments = [cursor.name()]
+    if function == "CMISS":
+        while cursor.accept(","):
+            if len(arguments) == 32:
+                raise _Syntax()
+            arguments.append(cursor.name())
+    cursor.take(")")
+    predicate = {"function": function, "arguments": arguments, "evaluation": "DIRECT"}
+    if function == "CMISS":
+        cursor.take(">")
+        cursor.take("0")
+        predicate.update(evaluation="COMPARISON", operator=">", value_lexeme="0")
+    cursor.take("then")
+    cursor.take("delete")
+    cursor.finish()
+    return predicate
+
+
+def append_missing_exclusions(source, frames, rules):
+    """Append a recognized prefix only, preserving barriers and original order."""
+    for position, function in enumerate(("MISSING", "CMISS", "CMISS"), start=5):
+        if position >= len(frames) or frames[position]["issues"]:
+            break
+        following = frames[position + 1]["tokens"] if position + 1 < len(frames) else []
+        if following and following[0].lower == "else":
+            break
+        frame = frames[position]
+        try:
+            predicate = missing_predicate(_Cursor(frame["tokens"], source), function)
+        except _Syntax:
+            break
+        # Assignment branch results must not gate these exclusions.
+        prerequisites = [0, *range(3, len(rules))]
+        rules.append({
+            "span": source.span(frame["start"], frame["end"]),
+            "predicate": predicate,
+            "action": dict(rules[0]["action"]),
+            "when": [{"rule_index": index, "predicate_result": False}
+                     for index in prerequisites],
+        })

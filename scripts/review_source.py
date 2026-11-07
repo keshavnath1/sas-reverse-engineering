@@ -15,7 +15,9 @@ from sas_re.sas_subset import parse_source
 ROOT = Path(__file__).resolve().parents[1]
 # Isolated Python excludes the script directory.
 sys.path.insert(0, str(ROOT / "scripts"))
-from migration_review import render as render_migration_review, rule_description
+from migration_review import (
+    anchor, missing_rule_relationships, render as render_migration_review, rule_description,
+)
 from mvp1_demo import scratch_destination, write_bundle
 from source_interval import inventory as interval_inventory
 from source_rules import recover as recover_status_rules
@@ -59,7 +61,7 @@ def original_location(location, first, start):
     }
 
 
-def inspect_data(parsed, span, first, start, recover_rules=False):
+def inspect_data(parsed, span, first, start, recover_rules=False, recover_missing=False):
     operation, = parsed["operations"]
     statements = [item for item in parsed["statements"] if item["classification"] != "COMMENT"]
     if ([item["classification"] for item in (statements[0], statements[-1])]
@@ -123,7 +125,7 @@ def inspect_data(parsed, span, first, start, recover_rules=False):
         "output_schema": "UNKNOWN",
     }
     if recover_rules:
-        rules = recover_status_rules(span)
+        rules = recover_status_rules(span, include_missing=recover_missing)
         for rule in rules:
             rule["span"] = bound_location(rule["span"])
             gap = next(item for item in unsupported if item["span"] == rule["span"])
@@ -135,6 +137,8 @@ def inspect_data(parsed, span, first, start, recover_rules=False):
             "fallthrough": "NO_ASSIGNMENT_BY_PAIR" if rules else "UNKNOWN",
             "execution_verification": "UNVERIFIED",
         }
+        if recover_missing and rules and len(rules) < 6:
+            result["status_rule_recovery"]["status"] = "PARTIAL"
         recovered_spans = [rule["span"] for rule in rules]
         result["unsupported_statements"] = [
             gap for gap in unsupported if gap["span"] not in recovered_spans
@@ -142,7 +146,7 @@ def inspect_data(parsed, span, first, start, recover_rules=False):
     return result, []
 
 
-def inspect_span(span, first, start, recover_rules=False):
+def inspect_span(span, first, start, recover_rules=False, recover_missing=False):
     if len(span) > MAX_SPAN_BYTES:
         return None, ["SPAN_SIZE_LIMIT"]
     # Keep macro processing outside this entry point, including literal LET.
@@ -154,7 +158,7 @@ def inspect_span(span, first, start, recover_rules=False):
         return None, ["SPAN_NOT_UTF8"]
     operations = parsed["operations"]
     if len(operations) == 1 and operations[0]["kind"] == "DATA_STEP":
-        return inspect_data(parsed, span, first, start, recover_rules)
+        return inspect_data(parsed, span, first, start, recover_rules, recover_missing)
     if parsed["issues"]:
         return None, sorted({issue["code"] for issue in parsed["issues"]})
     statements = [item["classification"] for item in parsed["statements"]
@@ -246,7 +250,8 @@ def review_text(evidence):
         lines += ["", "## Ordered source rules", "", f"Recovery {recovery['status']}. Execution UNVERIFIED.", ""]
         for rule in recovery["rules"]:
             location = rule["span"]
-            lines.append(f"- Lines {location['line_start']}–{location['line_end']}, "
+            marker = f'<a id="{anchor(location)}"></a>' if evidence["review_format"].endswith("/3") else ""
+            lines.append(f"- {marker}Lines {location['line_start']}–{location['line_end']}, "
                          f"bytes [{location['start']}, {location['end']}), SHA-256 `{location['sha256']}`. "
                          + rule_description(rule))
         if recovery["rules"]:
@@ -255,13 +260,14 @@ def review_text(evidence):
                       "Neither branch matching yields NO_ASSIGNMENT_BY_PAIR. "
                       "Later unresolved statements may still exclude or change an assigned row. "
                       "Schema and comparison behavior require independent reference evidence."]
+        lines.extend(missing_rule_relationships(recovery["rules"]))
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
-def inspect_range(raw, first, last, recover_rules=False):
+def inspect_range(raw, first, last, recover_rules=False, recover_missing=False):
     start, end = line_span(raw, first, last)
     span = raw[start:end]
-    operation, reasons = inspect_span(span, first, start, recover_rules)
+    operation, reasons = inspect_span(span, first, start, recover_rules, recover_missing)
     location = {
         "line_start": first, "line_end": last, "start": start, "end": end,
         "sha256": sha256(span).hexdigest(),
@@ -269,10 +275,10 @@ def inspect_range(raw, first, last, recover_rules=False):
     return location, operation, reasons
 
 
-def dependency_review(raw, ranges, source_digest, recover_rules=False):
+def dependency_review(raw, ranges, source_digest, recover_rules=False, recover_missing=False):
     selections = []
     for first, last in ranges:
-        span, operation, reasons = inspect_range(raw, first, last, recover_rules)
+        span, operation, reasons = inspect_range(raw, first, last, recover_rules, recover_missing)
         selections.append({"selected_span": span, "declared_operation": operation,
                            "reason_codes": reasons})
     data, sort = (item["declared_operation"] for item in selections)
@@ -312,6 +318,8 @@ def dependency_review(raw, ranges, source_digest, recover_rules=False):
         "interval_effects": interval,
         "boundaries": BOUNDARIES,
     }
+    if recover_missing:
+        evidence["review_format"] = "source-only-dependency/3"
     relationship = (
         f"DATA writes and SORT reads the declared dataset `{data['output']}`."
         if matched else
@@ -379,8 +387,12 @@ def main():
     parser.add_argument("--lines", required=True, action="append", help="inclusive FIRST:LAST, repeat for DATA then SORT")
     parser.add_argument("--recover-status-rules", action="store_true",
                         help="opt in to bounded source-only status rule recovery")
+    parser.add_argument("--recover-missing-exclusions", action="store_true",
+                        help="extend status recovery with ordered MISSING and CMISS exclusions")
     parser.add_argument("--destination", required=True, help="fresh /tmp/sas-re-source-<label> directory")
     args = parser.parse_args()
+    if args.recover_missing_exclusions and not args.recover_status_rules:
+        parser.error("--recover-missing-exclusions requires --recover-status-rules")
     if not re.fullmatch(r"[0-9a-fA-F]{64}", args.source_sha256):
         parser.error("--source-sha256 requires 64 hexadecimal digits")
     if len(args.lines) not in (1, 2):
@@ -411,9 +423,14 @@ def main():
         if source_digest != args.source_sha256.lower():
             parser.exit(2, "source_identity: REFUSED (SOURCE_SHA256_MISMATCH)\n")
         if len(ranges) == 2:
-            evidence, readme = dependency_review(raw, ranges, source_digest, args.recover_status_rules)
+            evidence, readme = dependency_review(
+                raw, ranges, source_digest, args.recover_status_rules, args.recover_missing_exclusions,
+            )
         else:
-            selected_span, operation, reasons = inspect_range(raw, *ranges[0], recover_rules=args.recover_status_rules)
+            selected_span, operation, reasons = inspect_range(
+                raw, *ranges[0], recover_rules=args.recover_status_rules,
+                recover_missing=args.recover_missing_exclusions,
+            )
             is_data = operation is not None and operation["kind"] == "DATA_STEP"
             syntax = "SUPPORTED" if operation else "UNSUPPORTED"
             if is_data and operation["unsupported_statements"]:
@@ -435,6 +452,8 @@ def main():
             }
             if is_data and args.recover_status_rules:
                 evidence["review_format"] = "source-only-data/2"
+            if is_data and args.recover_missing_exclusions:
+                evidence["review_format"] = "source-only-data/3"
             readme = review_text(evidence)
         files = {
             "README.md": readme,
