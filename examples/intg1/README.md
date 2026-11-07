@@ -77,6 +77,50 @@ handoffs. Save drafts and review records outside the evidence package.
 Python generates the evidence locally. The operator hands it to Copilot
 and records the human decision before candidate publication.
 
+## Check reviewed configuration
+
+Run the planner against the same scoped INTAKE and review package.
+
+```bash
+python3.12 -IB scripts/plan_modernization.py --intake "$intake" --package "$package"
+```
+
+The planner prints JSON. A fresh draft returns `REVIEW_REQUIRED` with
+the pending fields and supported choices. Copy the drafts outside the
+package, review the choices, set each document's status to `REVIEWED`,
+and supply the copies with `--profile` and `--tie-out`. Use the JSON syntax
+emitted by the version 1 YAML drafts. Preserve their bindings and authority
+fields. The planner rebuilds the selected evidence and checks the package
+bytes and both bindings before proposing a plan. Regenerate the drafts if
+the source, scope or supporting inputs change.
+
+| Reviewed field | MIG-2 value |
+| --- | --- |
+| `target.runtime`, `target.distributed` | `"python"`, `false` |
+| `execution.multiplicity_policy` | `"PRESERVE"` |
+| `execution.ordering_policy` | `"ASCENDING_KEY_STABLE_TIES"` |
+| `execution.category_policy` | `"NOT_APPLICABLE"` |
+| `checks.source_coverage` | `"REVIEWED"` |
+| `checks.population_and_multiplicity`, `checks.ordering_and_output`, `checks.numeric_tolerance` | `"EXACT"` for the public engineering comparison |
+
+The profile expresses operator policy. The report links source declarations
+separately and retains unresolved runtime obligations. `PLAN_PROPOSED`
+exits 0 and returns a deterministic plan with the exact configuration file
+identities. Pending choices exit 1. Stale inputs, contradictory choices and
+unsupported candidate scopes exit 2 without a plan.
+
+A pinned INTG-3 subject prepared by `review_mig5.py` has its own route.
+Pass that package with `--package` and omit `--intake`. Use `--emit-drafts`
+to print both version 1 drafts as a JSON mapping, then save each named
+object in its own YAML file. MIG-5 uses `ORIGINAL_INPUT_ORDER`. The pinned
+downstream route uses `EXPORT_ASCENDING_ID_SCORE_ORIGINAL_PRE_SORT`,
+`PINNED_MOD2_MAPPING` and `PINNED_MOD2_TOLERANCE` for its existing fixed
+scoring contract. Both routes replay the pinned subject before planning.
+
+The planner reports the proposed route and leaves publication to the
+existing continuation. Follow the separate GATE-1 and human approval steps
+below for MIG-2 or the pinned INTG-3 operator workflow for MIG-5.
+
 ## 2. Review the claims and approve the exact record
 
 Save a `claims.json` outside the evidence package using the
