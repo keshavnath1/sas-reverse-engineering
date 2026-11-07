@@ -31,10 +31,10 @@ class IntegratedReviewTests(unittest.TestCase):
         self.addCleanup(remove_destination, path)
         return path
 
-    def build_package(self):
+    def build_package(self, *extra):
         path = self.destination("int1")
         result = call(path, script=ROOT / "scripts/review_intake.py",
-                      extra=("--intake", str(self.intake)))
+                      extra=("--intake", str(self.intake), *extra))
         self.assertEqual(result.returncode, 0, result.stderr)
         return path.resolve()
 
@@ -119,11 +119,11 @@ class IntegratedReviewTests(unittest.TestCase):
         proposal = json.loads(discovery.stdout)["proposed_scope"]
         self.assertIsNotNone(proposal, discovery.stdout)
         scope.write_text(json.dumps(proposal), encoding="utf-8")
-        self.package = self.build_package()
+        self.package = self.build_package("--modernization-drafts")
         self.assert_paused("REVIEW_REQUIRED", "COPILOT_CLAIM_RECORD_REQUIRED")
 
         before = snapshot(self.package)
-        self.assertEqual(before, snapshot(self.build_package()))
+        self.assertEqual(before, snapshot(self.build_package("--modernization-drafts")))
         self.write_claims()
         bundles = []
         for _ in range(2):

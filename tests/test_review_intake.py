@@ -34,11 +34,11 @@ class IntakeReviewTests(unittest.TestCase):
         (root / "scope.json").write_text(json.dumps(scope))
         return scope
 
-    def invoke(self, intake, destination=None):
+    def invoke(self, intake, destination=None, *, extra=()):
         if destination is None:
             destination = Path("/tmp") / f"sas-re-int1-{uuid.uuid4().hex}"
             self.addCleanup(remove_destination, destination)
-        return call(destination, script=SCRIPT, extra=("--intake", str(intake))), destination
+        return call(destination, script=SCRIPT, extra=("--intake", str(intake), *extra)), destination
 
     def inventory(self, root):
         result = subprocess.run([sys.executable, "-IB", str(SCRIPT), "--intake", str(root),
@@ -61,9 +61,23 @@ class IntakeReviewTests(unittest.TestCase):
             self.assertEqual(discovered["blockers"], [])
             self.assertEqual(discovered["inventory"][0]["syntax_recognition"], "SUPPORTED")
             scope_path.write_text(json.dumps(discovered["proposed_scope"]))
-            run, destination = self.invoke(root)
+            run, destination = self.invoke(root, extra=("--modernization-drafts",))
             self.assertEqual(run.returncode, 0, run.stderr)
-            manifest = json.loads((destination / "MANIFEST.json").read_bytes())
+            manifest_raw = (destination / "MANIFEST.json").read_bytes()
+            manifest = json.loads(manifest_raw)
+            replay, replay_destination = self.invoke(root, extra=("--modernization-drafts",))
+            self.assertEqual(replay.returncode, 0, replay.stderr)
+            for name in ("migration-profile.yaml", "tie-out.yaml", "MODERNIZATION_REVIEW.md"):
+                self.assertEqual((destination / name).read_bytes(),
+                                 (replay_destination / name).read_bytes())
+            for name in ("migration-profile.yaml", "tie-out.yaml"):
+                draft = json.loads((destination / name).read_bytes())
+                self.assertEqual(draft["status"], "DRAFT")
+                self.assertEqual(draft["binding"]["manifest_sha256"], sha256(manifest_raw).hexdigest())
+                self.assertEqual(draft["binding"]["inputs"], manifest["inputs"])
+                for evidence_name, digest in draft["binding"]["evidence"].items():
+                    self.assertEqual(digest["sha256"],
+                                     sha256((destination / evidence_name).read_bytes()).hexdigest())
             for name, role in (("run.log", "log"), ("run.lst", "listing"),
                                ("settings.json", "configuration")):
                 raw = (root / name).read_bytes()
@@ -243,8 +257,11 @@ class IntakeReviewTests(unittest.TestCase):
             self.assertIn("Declared dependency map", (dest / "README.md").read_text())
             scope["sources"][0]["ranges"] = [[1, 1]]
             (root / "scope.json").write_text(json.dumps(scope))
-            run, dest = self.invoke(root)
+            run, dest = self.invoke(root, extra=("--modernization-drafts",))
             self.assertEqual(run.returncode, 2)
+            draft = json.loads((dest / "migration-profile.yaml").read_bytes())
+            self.assertEqual(draft["source_review_status"], "BLOCKED")
+            self.assertEqual(draft["target"]["runtime"], "PENDING")
             evidence = json.loads((dest / "EVIDENCE.json").read_bytes())
             self.assertEqual(evidence["syntax_recognition"], "UNSUPPORTED")
             self.assertIn("MACRO_MARKER_OUTSIDE_SCOPE", evidence["reason_codes"])

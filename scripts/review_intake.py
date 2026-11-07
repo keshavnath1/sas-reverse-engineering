@@ -1,6 +1,7 @@
 """Review an explicitly scoped public synthetic intake directory."""
 
 import argparse
+from contextlib import suppress
 from hashlib import sha256
 import json
 import os
@@ -371,13 +372,80 @@ def build_review(intake):
     return files
 
 
+def modernization_drafts(files):
+    """Create review inputs bound to the existing evidence package."""
+    manifest = _parse_json(files["MANIFEST.json"])
+    binding = {
+        "manifest_sha256": identity(files["MANIFEST.json"])["sha256"],
+        "inputs": manifest["inputs"],
+        "evidence": {name: digest for name, digest in manifest["files"].items()
+                     if name.endswith(".json")},
+    }
+    common = {"version": 1, "status": "DRAFT", "binding": binding,
+              "source_review_status": manifest.get("review_status", "PARTIAL")}
+    profile = {
+        **common,
+        "target": {"runtime": "PENDING", "distributed": "PENDING"},
+        "execution": {"multiplicity_policy": "PENDING", "ordering_policy": "PENDING",
+                      "category_policy": "PENDING"},
+        "approval": {"architecture": "REQUIRED", "business_intent": "REQUIRED"},
+    }
+    tie_out = {
+        **common,
+        "checks": {
+            "source_coverage": "REVIEW_REQUIRED",
+            "population_and_multiplicity": "PENDING",
+            "ordering_and_output": "PENDING",
+            "numeric_tolerance": "PENDING",
+        },
+        "reference": {
+            "sas_execution": manifest["reference_experiment"],
+            "semantic_verification": manifest["semantic_verification"],
+            "semantic_acceptance": manifest["semantic_acceptance"],
+        },
+    }
+    handoff = f"""# INTAKE modernization review
+
+Review manifest SHA-256 `{binding['manifest_sha256']}`.
+Start with [source review and TRACE/MAP links](README.md) and verify the
+input identities and coverage in [MANIFEST.json](MANIFEST.json).
+
+Review [migration-profile.yaml](migration-profile.yaml) and
+[tie-out.yaml](tie-out.yaml) with the operator. Resolve pending decisions
+against this subject's evidence.
+
+| Skill | Draft to produce |
+| --- | --- |
+| sas-reconstruct | Cite selected source spans and record unsupported or uninspected constructs. |
+| sas-specify | Derive draft requirements and list open business decisions. |
+| sas-analyze | Trace declared dependencies and label potential handoffs and unresolved execution order. |
+| sas-validate | Define public engineering checks and separate SAS reference obligations. |
+| sas-architect | Compare applicable architecture options and record candidate fit and limitations. |
+
+Save the five deliverables outside this package. Follow the INTG-1 operator
+guide for the GATE-1 claim record and separate byte-bound human approval.
+The YAML files are review drafts. The existing continuation checks candidate
+eligibility against the declared source and the reviewed evidence.
+"""
+    # JSON is a YAML 1.2 subset and keeps serialization deterministic.
+    return {
+        "MIGRATION_PROFILE.json": json_bytes(profile),
+        "TIE_OUT.json": json_bytes(tie_out),
+        "MODERNIZATION_REVIEW.md": handoff.encode("utf-8"),
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     parser.add_argument("--intake", required=True, type=Path, help="authorized public synthetic directory")
     output = parser.add_mutually_exclusive_group(required=True)
     output.add_argument("--destination", help="fresh /tmp/sas-re-int1-<label> directory")
     output.add_argument("--inventory", action="store_true", help="print a draft inventory and scope proposal")
+    parser.add_argument("--modernization-drafts", action="store_true",
+                        help="include draft configuration and a five-skill review handoff")
     args = parser.parse_args()
+    if args.inventory and args.modernization_drafts:
+        parser.error("--modernization-drafts requires --destination")
     try:
         require_evidence_io()
         if args.inventory:
@@ -390,7 +458,28 @@ def main():
         intake = args.intake.absolute()
         ensure_disjoint(destination, [intake])
         files = build_review(intake)
+        if args.modernization_drafts:
+            files.update(modernization_drafts(files))
         write_bundle(scratch, leaf, files, names=tuple(files))
+        if args.modernization_drafts:
+            # The existing writer creates a fresh, private directory and accepts JSON.
+            # Give the JSON-compatible YAML drafts their public filenames there.
+            names = {"MIGRATION_PROFILE.json": "migration-profile.yaml",
+                     "TIE_OUT.json": "tie-out.yaml"}
+            try:
+                directory = os.open(destination, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+                try:
+                    for old, new in names.items():
+                        os.rename(old, new, src_dir_fd=directory, dst_dir_fd=directory)
+                finally:
+                    os.close(directory)
+            except OSError:
+                for name in (*files, *names.values()):
+                    with suppress(OSError):
+                        (destination / name).unlink()
+                with suppress(OSError):
+                    destination.rmdir()
+                raise
     except FileExistsError:
         parser.exit(2, "BLOCKED: destination exists\n")
     except EvidenceError as error:
@@ -399,7 +488,8 @@ def main():
         parser.exit(2, f"REFUSED: {error}\n")
     except OSError:
         parser.exit(2, "REFUSED: FILE_IO_REFUSED\n")
-    print(json.dumps({"open": str(destination / "README.md"),
+    entry = "MODERNIZATION_REVIEW.md" if args.modernization_drafts else "README.md"
+    print(json.dumps({"open": str(destination / entry),
                       "manifest_sha256": sha256(files["MANIFEST.json"]).hexdigest()}))
     return 2 if json.loads(files["MANIFEST.json"]).get("review_status") == "BLOCKED" else 0
 

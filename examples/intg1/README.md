@@ -36,19 +36,27 @@ intake=examples/mig2/public-input
 rows=examples/mig2/CASES.json
 rows_sha=f797f50799e89ee9e8d4de15e5ad718136606b1acc4e852d21f4abc86da7bb64
 python3.12 -IB scripts/review_intake.py --intake "$intake" \
-  --destination /tmp/sas-re-int1-intg1-example
+  --destination /tmp/sas-re-int1-intg1-example --modernization-drafts
 ```
 
-Set `package` to the directory containing the `README.md` shown in the
+Set `package` to the directory containing the review entry point shown in the
 receipt. Use its physical path, typically under `/private/tmp` on macOS
 and `/tmp` on Linux. A new public workload can replace the example if it
 meets the [INT-3 and MIG-2 input contract](../mig2/README.md). Keep the
 evidence package unchanged.
 
+With `--modernization-drafts`, open `MODERNIZATION_REVIEW.md` for the
+five-skill handoff. The two YAML drafts use JSON syntax, a subset of YAML
+1.2, and carry the evidence manifest hash and input and evidence identities.
+Compare these bindings against the current package before using the drafts.
+Regenerate for a changed scope. The drafts record pending decisions and are
+operator review inputs. The existing candidate uses the scoped evidence and
+GATE-1 record as its execution inputs.
+
 Stop here for the operator to open a real GitHub Copilot Agent session.
 Supply `scope.json`, both declared SAS source files, and the package's
 `MANIFEST.json`, `README.md`, `SOURCE_1.json`, `SOURCE_2.json` and their
-matching Markdown reports. Point the agent to the repository's
+matching Markdown reports, plus the modernization handoff and drafts when generated. Point the agent to the repository's
 `sas-reconstruct`, `sas-specify`, `sas-analyze`, `sas-validate` and
 `sas-architect` instructions under `.agents/skills/` and confirm which
 instructions the session actually uses.
