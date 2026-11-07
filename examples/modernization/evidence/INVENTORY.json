@@ -1,0 +1,83 @@
+{
+  "attempt_id": "intake-p2a",
+  "dependencies": [
+    {
+      "dependency_id": "include-0",
+      "from_file_key": "synthetic:main.sas.txt",
+      "kind": "INCLUDE",
+      "status": "DECLARED",
+      "to_file_key": "synthetic:enrich.sas.txt"
+    },
+    {
+      "dependency_id": "include-1",
+      "from_file_key": "synthetic:main.sas.txt",
+      "kind": "INCLUDE",
+      "status": "DECLARED",
+      "to_file_key": "synthetic:settings.sas.txt"
+    }
+  ],
+  "files": [
+    {
+      "encoding": "utf-8",
+      "file_id": "file_68766d8d4face3463420863cb45c728ce06992aa3162fceae40e885eb48fbae2",
+      "file_key": "synthetic:enrich.sas.txt",
+      "kind": "INCLUDE",
+      "line_count": 6,
+      "module_id": "main",
+      "newline": "LF",
+      "path": "enrich.sas.txt",
+      "root_id": "synthetic",
+      "sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32",
+      "size_bytes": 203
+    },
+    {
+      "encoding": "utf-8",
+      "file_id": "file_dd1659f9c35dff74526f292a529512cf6881281496ff8c17c8a4e53364a99e0f",
+      "file_key": "synthetic:main.sas.txt",
+      "kind": "SAS",
+      "line_count": 15,
+      "module_id": "main",
+      "newline": "LF",
+      "path": "main.sas.txt",
+      "root_id": "synthetic",
+      "sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a",
+      "size_bytes": 378
+    },
+    {
+      "encoding": "utf-8",
+      "file_id": "file_cdd9922a2dd6f287d8a9a19a0fa5313e1ea9eb858d9c0e0660d54ce5cd629a08",
+      "file_key": "synthetic:profile.json",
+      "kind": "CONFIG",
+      "line_count": 81,
+      "module_id": "main",
+      "newline": "LF",
+      "path": "profile.json",
+      "root_id": "synthetic",
+      "sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063",
+      "size_bytes": 1370
+    },
+    {
+      "encoding": "utf-8",
+      "file_id": "file_51ac4e3f512edc948ba729943e05244527ce437710d04ddce32b3c41a1793ee9",
+      "file_key": "synthetic:settings.sas.txt",
+      "kind": "INCLUDE",
+      "line_count": 1,
+      "module_id": "main",
+      "newline": "LF",
+      "path": "settings.sas.txt",
+      "root_id": "synthetic",
+      "sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a",
+      "size_bytes": 22
+    }
+  ],
+  "log_associations": [],
+  "module_ids": [
+    "main"
+  ],
+  "run_id": "public-p2a",
+  "schema_version": "1.0",
+  "scope_sha256": "1f9afa79f16564363c96c6647c03e2e9345325720465ef0ee6ef433ff8ee8d77",
+  "source_fingerprint": "37c134b5feeaf7ebd61d998c01db3d4dc5c2935de7fcf72853621b24b4681229",
+  "unknowns": [],
+  "workspace_id": "public-intake"
+}

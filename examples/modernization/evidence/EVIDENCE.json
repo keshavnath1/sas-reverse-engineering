@@ -1,0 +1,2505 @@
+{
+  "artifact_authority": "DRAFT",
+  "attempt_id": "intake-p2a",
+  "benchmark_execution": "NOT_RUN",
+  "columns": [
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063",
+          "file_key": "synthetic:profile.json",
+          "line_end": 81,
+          "line_start": 1,
+          "source_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063"
+        }
+      ],
+      "column_id": "col_6f4275e895a9f6a2a78de1cfc87b695ebbf234b52724c6ec5df5bda306830270",
+      "dataset_id": "ds_49cd1b62388192984f2702b8a76b09fcb56723e6d2233c3a25d19d72a10b6dad",
+      "length": 8,
+      "module_id": "main",
+      "name": "group",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063",
+          "file_key": "synthetic:profile.json",
+          "line_end": 81,
+          "line_start": 1,
+          "source_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063"
+        }
+      ],
+      "column_id": "col_f21730d61806fc82f326024d3129665b188dea437dafca957de9a55db7be7308",
+      "dataset_id": "ds_49cd1b62388192984f2702b8a76b09fcb56723e6d2233c3a25d19d72a10b6dad",
+      "length": 8,
+      "module_id": "main",
+      "name": "subkey",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063",
+          "file_key": "synthetic:profile.json",
+          "line_end": 81,
+          "line_start": 1,
+          "source_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063"
+        }
+      ],
+      "column_id": "col_a93099f8e68679dcf70a228cd2d74fbbfc6c6fc3813020db1f6cf6cc1b46a51d",
+      "dataset_id": "ds_49cd1b62388192984f2702b8a76b09fcb56723e6d2233c3a25d19d72a10b6dad",
+      "length": 8,
+      "module_id": "main",
+      "name": "amount",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063",
+          "file_key": "synthetic:profile.json",
+          "line_end": 81,
+          "line_start": 1,
+          "source_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063"
+        }
+      ],
+      "column_id": "col_e303102d6a074092afec4c430b5c4df21dcd6282344b4a5f741e4bc0fe83e8d8",
+      "dataset_id": "ds_47d5db9cab064477b43c0a964a83bc745cdbaa2a27cfe1fa3715d7621f4f709f",
+      "length": 8,
+      "module_id": "main",
+      "name": "group",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063",
+          "file_key": "synthetic:profile.json",
+          "line_end": 81,
+          "line_start": 1,
+          "source_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063"
+        }
+      ],
+      "column_id": "col_524b6a18b9f1153decacab38cddae9e06cc05b05ad742535da314cc3ab2ec636",
+      "dataset_id": "ds_47d5db9cab064477b43c0a964a83bc745cdbaa2a27cfe1fa3715d7621f4f709f",
+      "length": 8,
+      "module_id": "main",
+      "name": "weight",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "4abe18fbc10b5a1f683ad5606d726b628686a6be614be2b432864ef6caa44e94",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 11,
+          "line_start": 2,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b",
+      "dataset_id": "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f",
+      "length": 8,
+      "module_id": "main",
+      "name": "group",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "4abe18fbc10b5a1f683ad5606d726b628686a6be614be2b432864ef6caa44e94",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 11,
+          "line_start": 2,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_c64b6ff35df023d17e2334e7ded8dcc567c7f761783f1e90b1d5d506552d6b57",
+      "dataset_id": "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f",
+      "length": 8,
+      "module_id": "main",
+      "name": "subkey",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "4abe18fbc10b5a1f683ad5606d726b628686a6be614be2b432864ef6caa44e94",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 11,
+          "line_start": 2,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_c99239e958979a31259ca35475adc1b85d9960681362d6370a61079dedea8fb7",
+      "dataset_id": "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f",
+      "length": 8,
+      "module_id": "main",
+      "name": "amount",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "4abe18fbc10b5a1f683ad5606d726b628686a6be614be2b432864ef6caa44e94",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 11,
+          "line_start": 2,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09",
+      "dataset_id": "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f",
+      "length": 8,
+      "module_id": "main",
+      "name": "balance",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "4abe18fbc10b5a1f683ad5606d726b628686a6be614be2b432864ef6caa44e94",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 11,
+          "line_start": 2,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_a2cf7e9b0b6acd4e8daabe8c6cfbb1c95b28d60ec423298433af83fdc7ce4b36",
+      "dataset_id": "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f",
+      "length": 8,
+      "module_id": "main",
+      "name": "previous",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "4abe18fbc10b5a1f683ad5606d726b628686a6be614be2b432864ef6caa44e94",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 11,
+          "line_start": 2,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_ea441647ec242ffe17f731094d56beaa076140c0edf1d998f2fb0c674c1076e5",
+      "dataset_id": "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f",
+      "length": 8,
+      "module_id": "main",
+      "name": "marker",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "2ea8618d5f81b0ccc642b291786d4e9a89c58feb192e9f06a5921aad6c366cf5",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 14,
+          "line_start": 12,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_ce160f61a9956cf09b294694b3d64d0a5dd6c993bdd09c6d576ef9acd0ead6ae",
+      "dataset_id": "ds_cc67902616574bee496597c39ef9ea4c0e19ac11f0326860bd0729321a1b1ea2",
+      "length": 8,
+      "module_id": "main",
+      "name": "group",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "2ea8618d5f81b0ccc642b291786d4e9a89c58feb192e9f06a5921aad6c366cf5",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 14,
+          "line_start": 12,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_acc0a1c97dfa7e506fa866a59dd88c09f182d3319dce2f4a3efd44870d52785f",
+      "dataset_id": "ds_cc67902616574bee496597c39ef9ea4c0e19ac11f0326860bd0729321a1b1ea2",
+      "length": 8,
+      "module_id": "main",
+      "name": "subkey",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "2ea8618d5f81b0ccc642b291786d4e9a89c58feb192e9f06a5921aad6c366cf5",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 14,
+          "line_start": 12,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_006bbceb7b0d26084c52044e4332ec136f8fc6c9f82264260554ed5ee6673cc9",
+      "dataset_id": "ds_cc67902616574bee496597c39ef9ea4c0e19ac11f0326860bd0729321a1b1ea2",
+      "length": 8,
+      "module_id": "main",
+      "name": "amount",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "2ea8618d5f81b0ccc642b291786d4e9a89c58feb192e9f06a5921aad6c366cf5",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 14,
+          "line_start": 12,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_bacfc7b21c098356baa37d4ccbe4ae13b03a5e7d0870ea95fe6ffec8be9d25ff",
+      "dataset_id": "ds_cc67902616574bee496597c39ef9ea4c0e19ac11f0326860bd0729321a1b1ea2",
+      "length": 8,
+      "module_id": "main",
+      "name": "balance",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "2ea8618d5f81b0ccc642b291786d4e9a89c58feb192e9f06a5921aad6c366cf5",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 14,
+          "line_start": 12,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_96a72021156702c16416c7b9453a2d7cb8b27c33c3066b893be1bbd0c88e8c12",
+      "dataset_id": "ds_cc67902616574bee496597c39ef9ea4c0e19ac11f0326860bd0729321a1b1ea2",
+      "length": 8,
+      "module_id": "main",
+      "name": "previous",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "2ea8618d5f81b0ccc642b291786d4e9a89c58feb192e9f06a5921aad6c366cf5",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 14,
+          "line_start": 12,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "column_id": "col_e662b2c3c597688fb7f2a8415691444a153d2f0d4ad8cd7f87364e44a98f2c7f",
+      "dataset_id": "ds_cc67902616574bee496597c39ef9ea4c0e19ac11f0326860bd0729321a1b1ea2",
+      "length": 8,
+      "module_id": "main",
+      "name": "marker",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 6,
+          "line_start": 1,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        }
+      ],
+      "column_id": "col_b514260024a6bfd42cbb614826bd45b96a0872b5449d1cd066db7a0999af58f5",
+      "dataset_id": "ds_58ba2f22aa6207038111633c194998b8f1a843df6cce73d0b86cfe39d61f2645",
+      "length": 8,
+      "module_id": "main",
+      "name": "group",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 6,
+          "line_start": 1,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        }
+      ],
+      "column_id": "col_6850a2b9515553d6381479b881040cd1c07cf1c83ba3d5538dea7d2cc86b97fb",
+      "dataset_id": "ds_58ba2f22aa6207038111633c194998b8f1a843df6cce73d0b86cfe39d61f2645",
+      "length": 8,
+      "module_id": "main",
+      "name": "balance",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 6,
+          "line_start": 1,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        }
+      ],
+      "column_id": "col_b2c02b24f8499385ad71f8ecb5c223625a0ca1063dcda7b3919828194fe37722",
+      "dataset_id": "ds_58ba2f22aa6207038111633c194998b8f1a843df6cce73d0b86cfe39d61f2645",
+      "length": 8,
+      "module_id": "main",
+      "name": "weight",
+      "semantic_verification": "UNVERIFIABLE",
+      "type": "NUMERIC"
+    }
+  ],
+  "contradictions": [],
+  "coverage": {
+    "column_count": 20,
+    "contradiction_count": 0,
+    "covered_source_file_count": 3,
+    "dataset_count": 5,
+    "edge_count": 4,
+    "file_count": 4,
+    "log_observation_count": 0,
+    "operation_count": 6,
+    "unknown_count": 0
+  },
+  "datasets": [
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063",
+          "file_key": "synthetic:profile.json",
+          "line_end": 81,
+          "line_start": 1,
+          "source_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063"
+        }
+      ],
+      "dataset_id": "ds_49cd1b62388192984f2702b8a76b09fcb56723e6d2233c3a25d19d72a10b6dad",
+      "module_id": "main",
+      "name": "work.raw",
+      "role": "INPUT",
+      "semantic_verification": "UNVERIFIABLE"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063",
+          "file_key": "synthetic:profile.json",
+          "line_end": 81,
+          "line_start": 1,
+          "source_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063"
+        }
+      ],
+      "dataset_id": "ds_47d5db9cab064477b43c0a964a83bc745cdbaa2a27cfe1fa3715d7621f4f709f",
+      "module_id": "main",
+      "name": "work.lookup",
+      "role": "INPUT",
+      "semantic_verification": "UNVERIFIABLE"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "4abe18fbc10b5a1f683ad5606d726b628686a6be614be2b432864ef6caa44e94",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 11,
+          "line_start": 2,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "dataset_id": "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f",
+      "module_id": "main",
+      "name": "work.running",
+      "role": "OUTPUT",
+      "semantic_verification": "UNVERIFIABLE"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "2ea8618d5f81b0ccc642b291786d4e9a89c58feb192e9f06a5921aad6c366cf5",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 14,
+          "line_start": 12,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "dataset_id": "ds_cc67902616574bee496597c39ef9ea4c0e19ac11f0326860bd0729321a1b1ea2",
+      "module_id": "main",
+      "name": "work.export_order",
+      "role": "OUTPUT",
+      "semantic_verification": "UNVERIFIABLE"
+    },
+    {
+      "citations": [
+        {
+          "excerpt_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 6,
+          "line_start": 1,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        }
+      ],
+      "dataset_id": "ds_58ba2f22aa6207038111633c194998b8f1a843df6cce73d0b86cfe39d61f2645",
+      "module_id": "main",
+      "name": "work.enriched",
+      "role": "OUTPUT",
+      "semantic_verification": "UNVERIFIABLE"
+    }
+  ],
+  "edges": [
+    {
+      "classification": "INFERENCE",
+      "edge_id": "edge_688d358b0652a7cea8f2beebd2c8f34fabbc6317ad8dc275d8237423f0ecf7ab",
+      "evidence_operation_ids": [
+        "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709"
+      ],
+      "from_operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "node_ids": [
+        "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09",
+        "col_a2cf7e9b0b6acd4e8daabe8c6cfbb1c95b28d60ec423298433af83fdc7ce4b36",
+        "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b",
+        "col_c64b6ff35df023d17e2334e7ded8dcc567c7f761783f1e90b1d5d506552d6b57",
+        "col_c99239e958979a31259ca35475adc1b85d9960681362d6370a61079dedea8fb7",
+        "col_ea441647ec242ffe17f731094d56beaa076140c0edf1d998f2fb0c674c1076e5",
+        "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f"
+      ],
+      "semantic_verification": "UNVERIFIABLE",
+      "to_operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "type": "STATE"
+    },
+    {
+      "classification": "INFERENCE",
+      "edge_id": "edge_44ee624e30a6e9661ed7e4333c0be234a96c04bc25ab0270197eacc60e78c1f2",
+      "evidence_operation_ids": [
+        "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+        "op_cf9531d088288c56631d9f1a5e37f148a2f68633c332f25e4cc4bd91cfd73608"
+      ],
+      "from_operation_id": "op_cf9531d088288c56631d9f1a5e37f148a2f68633c332f25e4cc4bd91cfd73608",
+      "node_ids": [],
+      "semantic_verification": "UNVERIFIABLE",
+      "to_operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "type": "STATE"
+    },
+    {
+      "classification": "INFERENCE",
+      "edge_id": "edge_ce486b2107c5f0fb49bd5445ce940b8f549ec4dfe1bf04e5d5b94d7fb273cd69",
+      "evidence_operation_ids": [
+        "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+        "op_e552e3aece6f2acc2fdc2dd7f6673a1e2bc37670c02d9f4ad3b5cafc4782ebbd"
+      ],
+      "from_operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "node_ids": [
+        "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09",
+        "col_a2cf7e9b0b6acd4e8daabe8c6cfbb1c95b28d60ec423298433af83fdc7ce4b36",
+        "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b",
+        "col_c64b6ff35df023d17e2334e7ded8dcc567c7f761783f1e90b1d5d506552d6b57",
+        "col_c99239e958979a31259ca35475adc1b85d9960681362d6370a61079dedea8fb7",
+        "col_ea441647ec242ffe17f731094d56beaa076140c0edf1d998f2fb0c674c1076e5",
+        "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f"
+      ],
+      "semantic_verification": "UNVERIFIABLE",
+      "to_operation_id": "op_e552e3aece6f2acc2fdc2dd7f6673a1e2bc37670c02d9f4ad3b5cafc4782ebbd",
+      "type": "DATA"
+    },
+    {
+      "classification": "INFERENCE",
+      "edge_id": "edge_25eb6baa9edd684a9d0000e860221b7cb7ebd7ef3f3959bb39bb7ac84d14cf90",
+      "evidence_operation_ids": [
+        "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+        "op_8b440a6473e5c67b365eee40a9d187c69ad9675340963cae95e4b55635dd5cf6"
+      ],
+      "from_operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "node_ids": [
+        "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09",
+        "col_a2cf7e9b0b6acd4e8daabe8c6cfbb1c95b28d60ec423298433af83fdc7ce4b36",
+        "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b",
+        "col_c64b6ff35df023d17e2334e7ded8dcc567c7f761783f1e90b1d5d506552d6b57",
+        "col_c99239e958979a31259ca35475adc1b85d9960681362d6370a61079dedea8fb7",
+        "col_ea441647ec242ffe17f731094d56beaa076140c0edf1d998f2fb0c674c1076e5",
+        "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f"
+      ],
+      "semantic_verification": "UNVERIFIABLE",
+      "to_operation_id": "op_8b440a6473e5c67b365eee40a9d187c69ad9675340963cae95e4b55635dd5cf6",
+      "type": "DATA"
+    }
+  ],
+  "interpretation_profile": "sas94-synthetic-v1",
+  "inventory_schema_version": "1.0",
+  "log_observations": [],
+  "module_ids": [
+    "main"
+  ],
+  "operations": [
+    {
+      "cardinality": "NOT_APPLICABLE",
+      "citations": [
+        {
+          "excerpt_sha256": "0e59c406a56fe6690d1b8140b67c9708441be2f415cae7a178aa50ffa0c7f565",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 1,
+          "line_start": 1,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "classification": "INFERENCE",
+      "control_lineage": [],
+      "facts": [
+        {
+          "kind": "include",
+          "path": "settings.sas.txt",
+          "span": {
+            "byte_sha256": "98ae183a9dcfd127f84070205150126dd0156bf692d892fd289d8273965e4a99",
+            "citation": {
+              "excerpt_sha256": "0e59c406a56fe6690d1b8140b67c9708441be2f415cae7a178aa50ffa0c7f565",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 1,
+              "line_start": 1,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 28,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 1,
+            "line_start": 1,
+            "start": 0
+          },
+          "target_file_key": "synthetic:settings.sas.txt"
+        }
+      ],
+      "interpretation_rules": [],
+      "kind": "INCLUDE",
+      "lineage": [],
+      "module_id": "main",
+      "numeric_policy": {
+        "exactness": "BOUNDED_SYNTHETIC_PRECONDITIONS",
+        "expression_order": "SOURCE_TREE_NO_REASSOCIATION",
+        "missing_arithmetic": "PROPAGATE_EXCEPT_SUM_STATEMENT",
+        "missing_join": "SAS_ORDINARY_MISSING_EQUALS_MISSING",
+        "missing_order": "ORDINARY_MISSING_BELOW_FINITE",
+        "runtime_equivalence": "NOT_ASSERTED",
+        "storage": "SAS_NUMERIC_8"
+      },
+      "operation_id": "op_4a4a9719ac8b38349a97f5634a5f08acd888086e804e0e3307cb8b0abd1ba2c7",
+      "order_contract": {
+        "keys": [],
+        "kind": "UNSPECIFIED",
+        "precondition": "NOT_REQUIRED",
+        "requires_sorted_inputs": false,
+        "tie_order": "UNSPECIFIED"
+      },
+      "reads": [],
+      "semantic_verification": "UNVERIFIABLE",
+      "sequence": 0,
+      "span": {
+        "byte_sha256": "98ae183a9dcfd127f84070205150126dd0156bf692d892fd289d8273965e4a99",
+        "citation": {
+          "excerpt_sha256": "0e59c406a56fe6690d1b8140b67c9708441be2f415cae7a178aa50ffa0c7f565",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 1,
+          "line_start": 1,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 28,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 1,
+        "line_start": 1,
+        "start": 0
+      },
+      "state_effects": [],
+      "stateful_constructs": [],
+      "writes": []
+    },
+    {
+      "cardinality": "NOT_APPLICABLE",
+      "citations": [
+        {
+          "excerpt_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a",
+          "file_key": "synthetic:settings.sas.txt",
+          "line_end": 1,
+          "line_start": 1,
+          "source_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a"
+        }
+      ],
+      "classification": "INFERENCE",
+      "control_lineage": [],
+      "facts": [
+        {
+          "kind": "macro_binding",
+          "name": "source",
+          "span": {
+            "byte_sha256": "a55977171408143740b27cfcd365ed0602f475366e54b9a0527e2392e5d140b0",
+            "citation": {
+              "excerpt_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a",
+              "file_key": "synthetic:settings.sas.txt",
+              "line_end": 1,
+              "line_start": 1,
+              "source_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a"
+            },
+            "end": 21,
+            "file_key": "synthetic:settings.sas.txt",
+            "line_end": 1,
+            "line_start": 1,
+            "start": 0
+          },
+          "value": "work.raw"
+        }
+      ],
+      "interpretation_rules": [],
+      "kind": "MACRO",
+      "lineage": [],
+      "module_id": "main",
+      "numeric_policy": {
+        "exactness": "BOUNDED_SYNTHETIC_PRECONDITIONS",
+        "expression_order": "SOURCE_TREE_NO_REASSOCIATION",
+        "missing_arithmetic": "PROPAGATE_EXCEPT_SUM_STATEMENT",
+        "missing_join": "SAS_ORDINARY_MISSING_EQUALS_MISSING",
+        "missing_order": "ORDINARY_MISSING_BELOW_FINITE",
+        "runtime_equivalence": "NOT_ASSERTED",
+        "storage": "SAS_NUMERIC_8"
+      },
+      "operation_id": "op_cf9531d088288c56631d9f1a5e37f148a2f68633c332f25e4cc4bd91cfd73608",
+      "order_contract": {
+        "keys": [],
+        "kind": "UNSPECIFIED",
+        "precondition": "NOT_REQUIRED",
+        "requires_sorted_inputs": false,
+        "tie_order": "UNSPECIFIED"
+      },
+      "reads": [],
+      "semantic_verification": "UNVERIFIABLE",
+      "sequence": 1,
+      "span": {
+        "byte_sha256": "a55977171408143740b27cfcd365ed0602f475366e54b9a0527e2392e5d140b0",
+        "citation": {
+          "excerpt_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a",
+          "file_key": "synthetic:settings.sas.txt",
+          "line_end": 1,
+          "line_start": 1,
+          "source_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a"
+        },
+        "end": 21,
+        "file_key": "synthetic:settings.sas.txt",
+        "line_end": 1,
+        "line_start": 1,
+        "start": 0
+      },
+      "state_effects": [],
+      "stateful_constructs": [
+        "GLOBAL_MACRO"
+      ],
+      "writes": []
+    },
+    {
+      "cardinality": "INPUT_ROWS_OR_SUBSET",
+      "citations": [
+        {
+          "excerpt_sha256": "4abe18fbc10b5a1f683ad5606d726b628686a6be614be2b432864ef6caa44e94",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 11,
+          "line_start": 2,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        {
+          "excerpt_sha256": "5761e0eb3b60307a04c97c5a20e42a6351df739e32a5832bf3ac7440b4db104e",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 2,
+          "line_start": 2,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        {
+          "excerpt_sha256": "3305c2972050c7bf25d7fb57043805599aae78b75c25b59946cc043486525863",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 3,
+          "line_start": 3,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        {
+          "excerpt_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a",
+          "file_key": "synthetic:settings.sas.txt",
+          "line_end": 1,
+          "line_start": 1,
+          "source_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a"
+        },
+        {
+          "excerpt_sha256": "b953dd7ce8e75d1d3bcc2863aeceafb21496a92bd55a9530fc395b01c09a5455",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 4,
+          "line_start": 4,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        {
+          "excerpt_sha256": "2bafc6f55a31df947c766103cb971509c3afd5fbc44e830af0eeee3069f35fd7",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 5,
+          "line_start": 5,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        {
+          "excerpt_sha256": "10b63b644644f7d0ee267af2933e6bbe1595d03707684b4636bd7eb520ad7ae2",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 6,
+          "line_start": 6,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        {
+          "excerpt_sha256": "030f32e7a75638461c8e13463ddd3f956307b8d814b78683e9cba6906caece9e",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 7,
+          "line_start": 7,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        {
+          "excerpt_sha256": "3770c2aae15525fb7932aac5d291100060fc0535b15dc47b58b3ff6fb05b2f6b",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 8,
+          "line_start": 8,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        {
+          "excerpt_sha256": "f7fa0b175754260cd7f46e0e8fd56d04fe519f251aaf12bed29214cf6f017569",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 9,
+          "line_start": 9,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        {
+          "excerpt_sha256": "2a36db9ae72e08817fbf26754ad693d4360f1aa7d1d4041972774d68632ab7f8",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 10,
+          "line_start": 10,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "classification": "INFERENCE",
+      "control_lineage": [
+        {
+          "fact_index": 3,
+          "input_column_ids": [
+            "col_6f4275e895a9f6a2a78de1cfc87b695ebbf234b52724c6ec5df5bda306830270",
+            "col_f21730d61806fc82f326024d3129665b188dea437dafca957de9a55db7be7308"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "STATIC",
+          "role": "BY_GROUP"
+        },
+        {
+          "fact_index": 5,
+          "input_column_ids": [
+            "col_6f4275e895a9f6a2a78de1cfc87b695ebbf234b52724c6ec5df5bda306830270"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "role": "ASSIGNMENT_GUARD"
+        },
+        {
+          "fact_index": 7,
+          "input_column_ids": [
+            "col_a93099f8e68679dcf70a228cd2d74fbbfc6c6fc3813020db1f6cf6cc1b46a51d"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "role": "ASSIGNMENT_GUARD"
+        },
+        {
+          "fact_index": 8,
+          "input_column_ids": [
+            "col_6f4275e895a9f6a2a78de1cfc87b695ebbf234b52724c6ec5df5bda306830270",
+            "col_f21730d61806fc82f326024d3129665b188dea437dafca957de9a55db7be7308"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "role": "ASSIGNMENT_GUARD"
+        }
+      ],
+      "facts": [
+        {
+          "dataset": "work.running",
+          "kind": "output",
+          "span": {
+            "byte_sha256": "f3afc71d133baab88671cf183eaa7bd35f9bbc0492d6eaf9edc7adcb9d712392",
+            "citation": {
+              "excerpt_sha256": "5761e0eb3b60307a04c97c5a20e42a6351df739e32a5832bf3ac7440b4db104e",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 2,
+              "line_start": 2,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 47,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 2,
+            "line_start": 2,
+            "start": 29
+          }
+        },
+        {
+          "definition_span": {
+            "byte_sha256": "a55977171408143740b27cfcd365ed0602f475366e54b9a0527e2392e5d140b0",
+            "citation": {
+              "excerpt_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a",
+              "file_key": "synthetic:settings.sas.txt",
+              "line_end": 1,
+              "line_start": 1,
+              "source_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a"
+            },
+            "end": 21,
+            "file_key": "synthetic:settings.sas.txt",
+            "line_end": 1,
+            "line_start": 1,
+            "start": 0
+          },
+          "kind": "macro_use",
+          "name": "source",
+          "span": {
+            "byte_sha256": "dfc2eb777c8d5b659c082d23ba5e0d4166f1921aaa6c3e37131b9616f85d2c1c",
+            "citation": {
+              "excerpt_sha256": "3305c2972050c7bf25d7fb57043805599aae78b75c25b59946cc043486525863",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 3,
+              "line_start": 3,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 60,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 3,
+            "line_start": 3,
+            "start": 52
+          },
+          "value": "work.raw"
+        },
+        {
+          "datasets": [
+            "work.raw"
+          ],
+          "kind": "input",
+          "mode": "SET",
+          "span": {
+            "byte_sha256": "707078e3ce61ee5aa18dfb5199ab3f093c5af5526cb1738a4d93322653a4cf6b",
+            "citation": {
+              "excerpt_sha256": "3305c2972050c7bf25d7fb57043805599aae78b75c25b59946cc043486525863",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 3,
+              "line_start": 3,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 60,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 3,
+            "line_start": 3,
+            "start": 48
+          }
+        },
+        {
+          "ascending": true,
+          "keys": [
+            "group",
+            "subkey"
+          ],
+          "kind": "by",
+          "span": {
+            "byte_sha256": "e672d6c5d41e597608396da60a111f094724274dfd64fba78fc70622c8fdcbb5",
+            "citation": {
+              "excerpt_sha256": "b953dd7ce8e75d1d3bcc2863aeceafb21496a92bd55a9530fc395b01c09a5455",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 4,
+              "line_start": 4,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 77,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 4,
+            "line_start": 4,
+            "start": 62
+          }
+        },
+        {
+          "initial": {
+            "kind": "literal",
+            "lexeme": "8",
+            "span": {
+              "byte_sha256": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+              "citation": {
+                "excerpt_sha256": "2bafc6f55a31df947c766103cb971509c3afd5fbc44e830af0eeee3069f35fd7",
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 5,
+                "line_start": 5,
+                "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+              },
+              "end": 95,
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 5,
+              "line_start": 5,
+              "start": 94
+            }
+          },
+          "kind": "retain",
+          "span": {
+            "byte_sha256": "a111541badb6d74b7ecbec44c65f43226ab305e2180dfe0f3113661ab56970c2",
+            "citation": {
+              "excerpt_sha256": "2bafc6f55a31df947c766103cb971509c3afd5fbc44e830af0eeee3069f35fd7",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 5,
+              "line_start": 5,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 95,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 5,
+            "line_start": 5,
+            "start": 79
+          },
+          "target": "balance"
+        },
+        {
+          "expression": {
+            "kind": "literal",
+            "lexeme": "0",
+            "span": {
+              "byte_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "citation": {
+                "excerpt_sha256": "10b63b644644f7d0ee267af2933e6bbe1595d03707684b4636bd7eb520ad7ae2",
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 6,
+                "line_start": 6,
+                "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+              },
+              "end": 128,
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 6,
+              "line_start": 6,
+              "start": 127
+            }
+          },
+          "guard": {
+            "flag": "first",
+            "key": "group",
+            "kind": "by_flag",
+            "span": {
+              "byte_sha256": "9061cebb3188390629a73f31fb472c7416e71e97684c6194a02ee4566edcd936",
+              "citation": {
+                "excerpt_sha256": "10b63b644644f7d0ee267af2933e6bbe1595d03707684b4636bd7eb520ad7ae2",
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 6,
+                "line_start": 6,
+                "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+              },
+              "end": 111,
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 6,
+              "line_start": 6,
+              "start": 100
+            }
+          },
+          "kind": "assignment",
+          "span": {
+            "byte_sha256": "f55f6e2b5128759018fe07065cb64c25871e678bd7fcbf1dad9ec923e926e8ad",
+            "citation": {
+              "excerpt_sha256": "10b63b644644f7d0ee267af2933e6bbe1595d03707684b4636bd7eb520ad7ae2",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 6,
+              "line_start": 6,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 128,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 6,
+            "line_start": 6,
+            "start": 97
+          },
+          "target": "balance"
+        },
+        {
+          "expression": {
+            "kind": "name",
+            "lexeme": "amount",
+            "name": "amount",
+            "span": {
+              "byte_sha256": "cf38d95c9c6b1d9d5125c04d41a54df57727ef4cfb3f5116a602fe2b25115c13",
+              "citation": {
+                "excerpt_sha256": "030f32e7a75638461c8e13463ddd3f956307b8d814b78683e9cba6906caece9e",
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 7,
+                "line_start": 7,
+                "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+              },
+              "end": 146,
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 7,
+              "line_start": 7,
+              "start": 140
+            }
+          },
+          "guard": null,
+          "kind": "sum",
+          "span": {
+            "byte_sha256": "1f9cb1464bcaf0c749340023762a594e62448778cf6fa04a20fbbfc64378c1c4",
+            "citation": {
+              "excerpt_sha256": "030f32e7a75638461c8e13463ddd3f956307b8d814b78683e9cba6906caece9e",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 7,
+              "line_start": 7,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 146,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 7,
+            "line_start": 7,
+            "start": 130
+          },
+          "target": "balance"
+        },
+        {
+          "expression": {
+            "argument": {
+              "kind": "name",
+              "lexeme": "amount",
+              "name": "amount",
+              "span": {
+                "byte_sha256": "cf38d95c9c6b1d9d5125c04d41a54df57727ef4cfb3f5116a602fe2b25115c13",
+                "citation": {
+                  "excerpt_sha256": "3770c2aae15525fb7932aac5d291100060fc0535b15dc47b58b3ff6fb05b2f6b",
+                  "file_key": "synthetic:main.sas.txt",
+                  "line_end": 8,
+                  "line_start": 8,
+                  "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+                },
+                "end": 188,
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 8,
+                "line_start": 8,
+                "start": 182
+              }
+            },
+            "kind": "lag",
+            "name": "lag",
+            "queue_size": 1,
+            "span": {
+              "byte_sha256": "03423e2cac3e78c3740061a119131d97296c2ed16c830b519d852826416967bd",
+              "citation": {
+                "excerpt_sha256": "3770c2aae15525fb7932aac5d291100060fc0535b15dc47b58b3ff6fb05b2f6b",
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 8,
+                "line_start": 8,
+                "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+              },
+              "end": 189,
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 8,
+              "line_start": 8,
+              "start": 178
+            }
+          },
+          "guard": {
+            "kind": "comparison",
+            "left": {
+              "kind": "name",
+              "lexeme": "amount",
+              "name": "amount",
+              "span": {
+                "byte_sha256": "cf38d95c9c6b1d9d5125c04d41a54df57727ef4cfb3f5116a602fe2b25115c13",
+                "citation": {
+                  "excerpt_sha256": "3770c2aae15525fb7932aac5d291100060fc0535b15dc47b58b3ff6fb05b2f6b",
+                  "file_key": "synthetic:main.sas.txt",
+                  "line_end": 8,
+                  "line_start": 8,
+                  "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+                },
+                "end": 157,
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 8,
+                "line_start": 8,
+                "start": 151
+              }
+            },
+            "operator": ">",
+            "right": {
+              "kind": "literal",
+              "lexeme": "0",
+              "span": {
+                "byte_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+                "citation": {
+                  "excerpt_sha256": "3770c2aae15525fb7932aac5d291100060fc0535b15dc47b58b3ff6fb05b2f6b",
+                  "file_key": "synthetic:main.sas.txt",
+                  "line_end": 8,
+                  "line_start": 8,
+                  "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+                },
+                "end": 161,
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 8,
+                "line_start": 8,
+                "start": 160
+              }
+            },
+            "span": {
+              "byte_sha256": "408e2e8be2f07c68c84f6d2e10a7afcc3addb50a2718dac2af80f82b315b7eae",
+              "citation": {
+                "excerpt_sha256": "3770c2aae15525fb7932aac5d291100060fc0535b15dc47b58b3ff6fb05b2f6b",
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 8,
+                "line_start": 8,
+                "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+              },
+              "end": 161,
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 8,
+              "line_start": 8,
+              "start": 151
+            }
+          },
+          "kind": "assignment",
+          "span": {
+            "byte_sha256": "528aebba74b3463f8224bb139cc7f10ecc07b60d662b3ec38e9451bc5b7ee2a0",
+            "citation": {
+              "excerpt_sha256": "3770c2aae15525fb7932aac5d291100060fc0535b15dc47b58b3ff6fb05b2f6b",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 8,
+              "line_start": 8,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 189,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 8,
+            "line_start": 8,
+            "start": 148
+          },
+          "target": "previous"
+        },
+        {
+          "expression": {
+            "kind": "literal",
+            "lexeme": "1",
+            "span": {
+              "byte_sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+              "citation": {
+                "excerpt_sha256": "f7fa0b175754260cd7f46e0e8fd56d04fe519f251aaf12bed29214cf6f017569",
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 9,
+                "line_start": 9,
+                "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+              },
+              "end": 221,
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 9,
+              "line_start": 9,
+              "start": 220
+            }
+          },
+          "guard": {
+            "flag": "last",
+            "key": "subkey",
+            "kind": "by_flag",
+            "span": {
+              "byte_sha256": "afed0dd690944dd64ef15b0100a2f93143591dfe72bedfe38d541dc7755b05a5",
+              "citation": {
+                "excerpt_sha256": "f7fa0b175754260cd7f46e0e8fd56d04fe519f251aaf12bed29214cf6f017569",
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 9,
+                "line_start": 9,
+                "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+              },
+              "end": 205,
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 9,
+              "line_start": 9,
+              "start": 194
+            }
+          },
+          "kind": "assignment",
+          "span": {
+            "byte_sha256": "c097f4adda5cbb55bdec06545612b6bd347d567adec9e9a66e16b0a779862f8b",
+            "citation": {
+              "excerpt_sha256": "f7fa0b175754260cd7f46e0e8fd56d04fe519f251aaf12bed29214cf6f017569",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 9,
+              "line_start": 9,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 221,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 9,
+            "line_start": 9,
+            "start": 191
+          },
+          "target": "marker"
+        },
+        {
+          "kind": "keep",
+          "names": [
+            "group",
+            "subkey",
+            "amount",
+            "balance",
+            "previous",
+            "marker"
+          ],
+          "span": {
+            "byte_sha256": "d3ef894dc877eaf932ed9f6b83d18612d5d9336e3214e81f10c51fdf1e38ab3f",
+            "citation": {
+              "excerpt_sha256": "2a36db9ae72e08817fbf26754ad693d4360f1aa7d1d4041972774d68632ab7f8",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 10,
+              "line_start": 10,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 271,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 10,
+            "line_start": 10,
+            "start": 223
+          }
+        }
+      ],
+      "interpretation_rules": [
+        "BY_PREFIX_KEY_FLAGS",
+        "SUM_SKIP_MISSING",
+        "LAG_QUEUE_PER_CALLSITE"
+      ],
+      "kind": "DATA_STEP",
+      "lineage": [
+        {
+          "fact_index": 2,
+          "input_column_ids": [
+            "col_6f4275e895a9f6a2a78de1cfc87b695ebbf234b52724c6ec5df5bda306830270"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b"
+        },
+        {
+          "fact_index": 2,
+          "input_column_ids": [
+            "col_f21730d61806fc82f326024d3129665b188dea437dafca957de9a55db7be7308"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_c64b6ff35df023d17e2334e7ded8dcc567c7f761783f1e90b1d5d506552d6b57"
+        },
+        {
+          "fact_index": 2,
+          "input_column_ids": [
+            "col_a93099f8e68679dcf70a228cd2d74fbbfc6c6fc3813020db1f6cf6cc1b46a51d"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_c99239e958979a31259ca35475adc1b85d9960681362d6370a61079dedea8fb7"
+        },
+        {
+          "fact_index": 4,
+          "input_column_ids": [],
+          "input_fact_indices": [],
+          "input_phase": "STATIC",
+          "output_column_id": "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09"
+        },
+        {
+          "fact_index": 5,
+          "input_column_ids": [
+            "col_6f4275e895a9f6a2a78de1cfc87b695ebbf234b52724c6ec5df5bda306830270"
+          ],
+          "input_fact_indices": [
+            4
+          ],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09"
+        },
+        {
+          "fact_index": 6,
+          "input_column_ids": [
+            "col_a93099f8e68679dcf70a228cd2d74fbbfc6c6fc3813020db1f6cf6cc1b46a51d"
+          ],
+          "input_fact_indices": [
+            5
+          ],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09"
+        },
+        {
+          "fact_index": 7,
+          "input_column_ids": [
+            "col_a93099f8e68679dcf70a228cd2d74fbbfc6c6fc3813020db1f6cf6cc1b46a51d"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_a2cf7e9b0b6acd4e8daabe8c6cfbb1c95b28d60ec423298433af83fdc7ce4b36"
+        },
+        {
+          "fact_index": 8,
+          "input_column_ids": [
+            "col_6f4275e895a9f6a2a78de1cfc87b695ebbf234b52724c6ec5df5bda306830270",
+            "col_f21730d61806fc82f326024d3129665b188dea437dafca957de9a55db7be7308"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_ea441647ec242ffe17f731094d56beaa076140c0edf1d998f2fb0c674c1076e5"
+        }
+      ],
+      "module_id": "main",
+      "numeric_policy": {
+        "exactness": "BOUNDED_SYNTHETIC_PRECONDITIONS",
+        "expression_order": "SOURCE_TREE_NO_REASSOCIATION",
+        "missing_arithmetic": "PROPAGATE_EXCEPT_SUM_STATEMENT",
+        "missing_join": "SAS_ORDINARY_MISSING_EQUALS_MISSING",
+        "missing_order": "ORDINARY_MISSING_BELOW_FINITE",
+        "runtime_equivalence": "NOT_ASSERTED",
+        "storage": "SAS_NUMERIC_8"
+      },
+      "operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "order_contract": {
+        "keys": [
+          "group",
+          "subkey"
+        ],
+        "kind": "INPUT_ORDER",
+        "precondition": "DECLARED_SYNTHETIC_INPUT",
+        "requires_sorted_inputs": true,
+        "tie_order": "UNSPECIFIED"
+      },
+      "reads": [
+        "col_6f4275e895a9f6a2a78de1cfc87b695ebbf234b52724c6ec5df5bda306830270",
+        "col_a93099f8e68679dcf70a228cd2d74fbbfc6c6fc3813020db1f6cf6cc1b46a51d",
+        "col_f21730d61806fc82f326024d3129665b188dea437dafca957de9a55db7be7308",
+        "ds_49cd1b62388192984f2702b8a76b09fcb56723e6d2233c3a25d19d72a10b6dad"
+      ],
+      "semantic_verification": "UNVERIFIABLE",
+      "sequence": 2,
+      "span": {
+        "byte_sha256": "88f9a966413af34697d3d6e94035304ec7f1804cd3ba5790f363dd14c10af71c",
+        "citation": {
+          "excerpt_sha256": "4abe18fbc10b5a1f683ad5606d726b628686a6be614be2b432864ef6caa44e94",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 11,
+          "line_start": 2,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 277,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 11,
+        "line_start": 2,
+        "start": 29
+      },
+      "state_effects": [
+        {
+          "call_policy": "NOT_APPLICABLE",
+          "fact_index": 3,
+          "guard": null,
+          "initialization": "GROUP_FLAGS",
+          "kind": "BY",
+          "persistence": "BY_KEY_PREFIX",
+          "queue_size": null,
+          "reset": "KEY_PREFIX_CHANGE",
+          "target": null
+        },
+        {
+          "call_policy": "NOT_APPLICABLE",
+          "fact_index": 4,
+          "guard": null,
+          "initialization": "LITERAL",
+          "kind": "RETAIN",
+          "persistence": "ACROSS_ROWS",
+          "queue_size": null,
+          "reset": "ONLY_EXPLICIT_ASSIGNMENT",
+          "target": "balance"
+        },
+        {
+          "call_policy": "NOT_APPLICABLE",
+          "fact_index": 6,
+          "guard": null,
+          "initialization": "ZERO_UNLESS_RETAIN_INITIALIZED",
+          "kind": "SUM",
+          "persistence": "ACROSS_ROWS",
+          "queue_size": null,
+          "reset": "ONLY_EXPLICIT_ASSIGNMENT",
+          "target": "balance"
+        },
+        {
+          "call_policy": "EXECUTED_CALLS_ONLY",
+          "fact_index": 7,
+          "guard": {
+            "kind": "comparison",
+            "left": {
+              "kind": "name",
+              "lexeme": "amount",
+              "name": "amount",
+              "span": {
+                "byte_sha256": "cf38d95c9c6b1d9d5125c04d41a54df57727ef4cfb3f5116a602fe2b25115c13",
+                "citation": {
+                  "excerpt_sha256": "3770c2aae15525fb7932aac5d291100060fc0535b15dc47b58b3ff6fb05b2f6b",
+                  "file_key": "synthetic:main.sas.txt",
+                  "line_end": 8,
+                  "line_start": 8,
+                  "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+                },
+                "end": 157,
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 8,
+                "line_start": 8,
+                "start": 151
+              }
+            },
+            "operator": ">",
+            "right": {
+              "kind": "literal",
+              "lexeme": "0",
+              "span": {
+                "byte_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+                "citation": {
+                  "excerpt_sha256": "3770c2aae15525fb7932aac5d291100060fc0535b15dc47b58b3ff6fb05b2f6b",
+                  "file_key": "synthetic:main.sas.txt",
+                  "line_end": 8,
+                  "line_start": 8,
+                  "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+                },
+                "end": 161,
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 8,
+                "line_start": 8,
+                "start": 160
+              }
+            },
+            "span": {
+              "byte_sha256": "408e2e8be2f07c68c84f6d2e10a7afcc3addb50a2718dac2af80f82b315b7eae",
+              "citation": {
+                "excerpt_sha256": "3770c2aae15525fb7932aac5d291100060fc0535b15dc47b58b3ff6fb05b2f6b",
+                "file_key": "synthetic:main.sas.txt",
+                "line_end": 8,
+                "line_start": 8,
+                "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+              },
+              "end": 161,
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 8,
+              "line_start": 8,
+              "start": 151
+            }
+          },
+          "initialization": "MISSING_QUEUE",
+          "kind": "LAG",
+          "persistence": "ACROSS_ROWS",
+          "queue_size": 1,
+          "reset": "NONE_IMPLICIT",
+          "target": "previous"
+        }
+      ],
+      "stateful_constructs": [
+        "BY",
+        "GLOBAL_MACRO",
+        "LAG",
+        "RETAIN",
+        "SUM"
+      ],
+      "writes": [
+        "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09",
+        "col_a2cf7e9b0b6acd4e8daabe8c6cfbb1c95b28d60ec423298433af83fdc7ce4b36",
+        "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b",
+        "col_c64b6ff35df023d17e2334e7ded8dcc567c7f761783f1e90b1d5d506552d6b57",
+        "col_c99239e958979a31259ca35475adc1b85d9960681362d6370a61079dedea8fb7",
+        "col_ea441647ec242ffe17f731094d56beaa076140c0edf1d998f2fb0c674c1076e5",
+        "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f"
+      ]
+    },
+    {
+      "cardinality": "SORT_PRESERVES_ROWS",
+      "citations": [
+        {
+          "excerpt_sha256": "2ea8618d5f81b0ccc642b291786d4e9a89c58feb192e9f06a5921aad6c366cf5",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 14,
+          "line_start": 12,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        {
+          "excerpt_sha256": "b953dd7ce8e75d1d3bcc2863aeceafb21496a92bd55a9530fc395b01c09a5455",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 13,
+          "line_start": 13,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "classification": "INFERENCE",
+      "control_lineage": [],
+      "facts": [
+        {
+          "input": "work.running",
+          "keys": [
+            "group",
+            "subkey"
+          ],
+          "kind": "sort",
+          "output": "work.export_order",
+          "span": {
+            "byte_sha256": "4373a10c5c5328395147486a7888aff01a6ee7acf361ef13d8d511f8670cd3ce",
+            "citation": {
+              "excerpt_sha256": "b953dd7ce8e75d1d3bcc2863aeceafb21496a92bd55a9530fc395b01c09a5455",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 13,
+              "line_start": 13,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 345,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 13,
+            "line_start": 13,
+            "start": 329
+          }
+        }
+      ],
+      "interpretation_rules": [],
+      "kind": "PROC_SORT",
+      "lineage": [
+        {
+          "fact_index": 0,
+          "input_column_ids": [
+            "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_ce160f61a9956cf09b294694b3d64d0a5dd6c993bdd09c6d576ef9acd0ead6ae"
+        },
+        {
+          "fact_index": 0,
+          "input_column_ids": [
+            "col_c64b6ff35df023d17e2334e7ded8dcc567c7f761783f1e90b1d5d506552d6b57"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_acc0a1c97dfa7e506fa866a59dd88c09f182d3319dce2f4a3efd44870d52785f"
+        },
+        {
+          "fact_index": 0,
+          "input_column_ids": [
+            "col_c99239e958979a31259ca35475adc1b85d9960681362d6370a61079dedea8fb7"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_006bbceb7b0d26084c52044e4332ec136f8fc6c9f82264260554ed5ee6673cc9"
+        },
+        {
+          "fact_index": 0,
+          "input_column_ids": [
+            "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_bacfc7b21c098356baa37d4ccbe4ae13b03a5e7d0870ea95fe6ffec8be9d25ff"
+        },
+        {
+          "fact_index": 0,
+          "input_column_ids": [
+            "col_a2cf7e9b0b6acd4e8daabe8c6cfbb1c95b28d60ec423298433af83fdc7ce4b36"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_96a72021156702c16416c7b9453a2d7cb8b27c33c3066b893be1bbd0c88e8c12"
+        },
+        {
+          "fact_index": 0,
+          "input_column_ids": [
+            "col_ea441647ec242ffe17f731094d56beaa076140c0edf1d998f2fb0c674c1076e5"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_e662b2c3c597688fb7f2a8415691444a153d2f0d4ad8cd7f87364e44a98f2c7f"
+        }
+      ],
+      "module_id": "main",
+      "numeric_policy": {
+        "exactness": "BOUNDED_SYNTHETIC_PRECONDITIONS",
+        "expression_order": "SOURCE_TREE_NO_REASSOCIATION",
+        "missing_arithmetic": "PROPAGATE_EXCEPT_SUM_STATEMENT",
+        "missing_join": "SAS_ORDINARY_MISSING_EQUALS_MISSING",
+        "missing_order": "ORDINARY_MISSING_BELOW_FINITE",
+        "runtime_equivalence": "NOT_ASSERTED",
+        "storage": "SAS_NUMERIC_8"
+      },
+      "operation_id": "op_e552e3aece6f2acc2fdc2dd7f6673a1e2bc37670c02d9f4ad3b5cafc4782ebbd",
+      "order_contract": {
+        "keys": [
+          "group",
+          "subkey"
+        ],
+        "kind": "ASCENDING_KEYS",
+        "precondition": "NOT_REQUIRED",
+        "requires_sorted_inputs": false,
+        "tie_order": "UNSPECIFIED"
+      },
+      "reads": [
+        "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09",
+        "col_a2cf7e9b0b6acd4e8daabe8c6cfbb1c95b28d60ec423298433af83fdc7ce4b36",
+        "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b",
+        "col_c64b6ff35df023d17e2334e7ded8dcc567c7f761783f1e90b1d5d506552d6b57",
+        "col_c99239e958979a31259ca35475adc1b85d9960681362d6370a61079dedea8fb7",
+        "col_ea441647ec242ffe17f731094d56beaa076140c0edf1d998f2fb0c674c1076e5",
+        "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f"
+      ],
+      "semantic_verification": "UNVERIFIABLE",
+      "sequence": 3,
+      "span": {
+        "byte_sha256": "7859c2d2dcffe156017aa70230545f0eec4159b53a4dd060c043a65b3051eea9",
+        "citation": {
+          "excerpt_sha256": "2ea8618d5f81b0ccc642b291786d4e9a89c58feb192e9f06a5921aad6c366cf5",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 14,
+          "line_start": 12,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 350,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 14,
+        "line_start": 12,
+        "start": 278
+      },
+      "state_effects": [],
+      "stateful_constructs": [],
+      "writes": [
+        "col_006bbceb7b0d26084c52044e4332ec136f8fc6c9f82264260554ed5ee6673cc9",
+        "col_96a72021156702c16416c7b9453a2d7cb8b27c33c3066b893be1bbd0c88e8c12",
+        "col_acc0a1c97dfa7e506fa866a59dd88c09f182d3319dce2f4a3efd44870d52785f",
+        "col_bacfc7b21c098356baa37d4ccbe4ae13b03a5e7d0870ea95fe6ffec8be9d25ff",
+        "col_ce160f61a9956cf09b294694b3d64d0a5dd6c993bdd09c6d576ef9acd0ead6ae",
+        "col_e662b2c3c597688fb7f2a8415691444a153d2f0d4ad8cd7f87364e44a98f2c7f",
+        "ds_cc67902616574bee496597c39ef9ea4c0e19ac11f0326860bd0729321a1b1ea2"
+      ]
+    },
+    {
+      "cardinality": "NOT_APPLICABLE",
+      "citations": [
+        {
+          "excerpt_sha256": "f214fd93961491fb47e6fd740a5b56be2e7658612065ed58ba944e3842890746",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 15,
+          "line_start": 15,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        }
+      ],
+      "classification": "INFERENCE",
+      "control_lineage": [],
+      "facts": [
+        {
+          "kind": "include",
+          "path": "enrich.sas.txt",
+          "span": {
+            "byte_sha256": "ca07323a2a6e1042c9156864f78446c2d9f8b417546359b6983bc278c34a6233",
+            "citation": {
+              "excerpt_sha256": "f214fd93961491fb47e6fd740a5b56be2e7658612065ed58ba944e3842890746",
+              "file_key": "synthetic:main.sas.txt",
+              "line_end": 15,
+              "line_start": 15,
+              "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+            },
+            "end": 377,
+            "file_key": "synthetic:main.sas.txt",
+            "line_end": 15,
+            "line_start": 15,
+            "start": 351
+          },
+          "target_file_key": "synthetic:enrich.sas.txt"
+        }
+      ],
+      "interpretation_rules": [],
+      "kind": "INCLUDE",
+      "lineage": [],
+      "module_id": "main",
+      "numeric_policy": {
+        "exactness": "BOUNDED_SYNTHETIC_PRECONDITIONS",
+        "expression_order": "SOURCE_TREE_NO_REASSOCIATION",
+        "missing_arithmetic": "PROPAGATE_EXCEPT_SUM_STATEMENT",
+        "missing_join": "SAS_ORDINARY_MISSING_EQUALS_MISSING",
+        "missing_order": "ORDINARY_MISSING_BELOW_FINITE",
+        "runtime_equivalence": "NOT_ASSERTED",
+        "storage": "SAS_NUMERIC_8"
+      },
+      "operation_id": "op_990c05c1095e8bc995486cca89098a483914f5b0698c5658edf6a9be1557e7cd",
+      "order_contract": {
+        "keys": [],
+        "kind": "UNSPECIFIED",
+        "precondition": "NOT_REQUIRED",
+        "requires_sorted_inputs": false,
+        "tie_order": "UNSPECIFIED"
+      },
+      "reads": [],
+      "semantic_verification": "UNVERIFIABLE",
+      "sequence": 4,
+      "span": {
+        "byte_sha256": "ca07323a2a6e1042c9156864f78446c2d9f8b417546359b6983bc278c34a6233",
+        "citation": {
+          "excerpt_sha256": "f214fd93961491fb47e6fd740a5b56be2e7658612065ed58ba944e3842890746",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 15,
+          "line_start": 15,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 377,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 15,
+        "line_start": 15,
+        "start": 351
+      },
+      "state_effects": [],
+      "stateful_constructs": [],
+      "writes": []
+    },
+    {
+      "cardinality": "SQL_JOIN_MULTIPLICITY_OR_SUBSET",
+      "citations": [
+        {
+          "excerpt_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 6,
+          "line_start": 1,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        },
+        {
+          "excerpt_sha256": "b166ca83a781a4d9a9ea398b852337e67c9f7469899838253b40cd676c9f2902",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 5,
+          "line_start": 2,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        },
+        {
+          "excerpt_sha256": "a3503fcd1179543f2a83d3681fe54dbf3fc09e94055a84756191035568c08d35",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 3,
+          "line_start": 3,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        },
+        {
+          "excerpt_sha256": "78e3a216f3c36b9036fea1a6ec8409a93cfa28ac7d46d4dbb63876d516f94e7a",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 4,
+          "line_start": 4,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        },
+        {
+          "excerpt_sha256": "81b65fa68cd22083d5207da32f9847dc05f4f792626df47a8b199d64528b4eff",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 5,
+          "line_start": 5,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        }
+      ],
+      "classification": "INFERENCE",
+      "control_lineage": [
+        {
+          "fact_index": 1,
+          "input_column_ids": [
+            "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b",
+            "col_e303102d6a074092afec4c430b5c4df21dcd6282344b4a5f741e4bc0fe83e8d8"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "role": "SQL_ON"
+        },
+        {
+          "fact_index": 1,
+          "input_column_ids": [
+            "col_524b6a18b9f1153decacab38cddae9e06cc05b05ad742535da314cc3ab2ec636"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "role": "SQL_WHERE"
+        }
+      ],
+      "facts": [
+        {
+          "dataset": "work.enriched",
+          "kind": "output",
+          "span": {
+            "byte_sha256": "58b0f6be4f6f1b7a10eaeccadc9472413e0f34df838406b71fe4c83a50eb4aca",
+            "citation": {
+              "excerpt_sha256": "b166ca83a781a4d9a9ea398b852337e67c9f7469899838253b40cd676c9f2902",
+              "file_key": "synthetic:enrich.sas.txt",
+              "line_end": 5,
+              "line_start": 2,
+              "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+            },
+            "end": 195,
+            "file_key": "synthetic:enrich.sas.txt",
+            "line_end": 5,
+            "line_start": 2,
+            "start": 10
+          }
+        },
+        {
+          "inputs": [
+            {
+              "alias": "a",
+              "dataset": "work.running"
+            },
+            {
+              "alias": "b",
+              "dataset": "work.lookup"
+            }
+          ],
+          "join": {
+            "kind": "LEFT",
+            "left": {
+              "kind": "name",
+              "lexeme": "a.group",
+              "name": "a.group",
+              "span": {
+                "byte_sha256": "605cfa43cbbb34af3444419f3561b8dbbb104cded0de9aaf5766f00e57d3c508",
+                "citation": {
+                  "excerpt_sha256": "78e3a216f3c36b9036fea1a6ec8409a93cfa28ac7d46d4dbb63876d516f94e7a",
+                  "file_key": "synthetic:enrich.sas.txt",
+                  "line_end": 4,
+                  "line_start": 4,
+                  "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+                },
+                "end": 166,
+                "file_key": "synthetic:enrich.sas.txt",
+                "line_end": 4,
+                "line_start": 4,
+                "start": 159
+              }
+            },
+            "right": {
+              "kind": "name",
+              "lexeme": "b.group",
+              "name": "b.group",
+              "span": {
+                "byte_sha256": "8efe19e2728135a8734c50aebc27f77371e28ec846e81cd264c9000d6cb2af5d",
+                "citation": {
+                  "excerpt_sha256": "78e3a216f3c36b9036fea1a6ec8409a93cfa28ac7d46d4dbb63876d516f94e7a",
+                  "file_key": "synthetic:enrich.sas.txt",
+                  "line_end": 4,
+                  "line_start": 4,
+                  "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+                },
+                "end": 176,
+                "file_key": "synthetic:enrich.sas.txt",
+                "line_end": 4,
+                "line_start": 4,
+                "start": 169
+              }
+            }
+          },
+          "kind": "sql",
+          "order_by": [],
+          "select": [
+            {
+              "expression": {
+                "kind": "name",
+                "lexeme": "a.group",
+                "name": "a.group",
+                "span": {
+                  "byte_sha256": "605cfa43cbbb34af3444419f3561b8dbbb104cded0de9aaf5766f00e57d3c508",
+                  "citation": {
+                    "excerpt_sha256": "a3503fcd1179543f2a83d3681fe54dbf3fc09e94055a84756191035568c08d35",
+                    "file_key": "synthetic:enrich.sas.txt",
+                    "line_end": 3,
+                    "line_start": 3,
+                    "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+                  },
+                  "end": 54,
+                  "file_key": "synthetic:enrich.sas.txt",
+                  "line_end": 3,
+                  "line_start": 3,
+                  "start": 47
+                }
+              },
+              "output": "group"
+            },
+            {
+              "expression": {
+                "kind": "name",
+                "lexeme": "a.balance",
+                "name": "a.balance",
+                "span": {
+                  "byte_sha256": "5fbeab3e3c7fc2b275126ed92d5f0cc300857ed01d14b2f3153a9ad3584132d5",
+                  "citation": {
+                    "excerpt_sha256": "a3503fcd1179543f2a83d3681fe54dbf3fc09e94055a84756191035568c08d35",
+                    "file_key": "synthetic:enrich.sas.txt",
+                    "line_end": 3,
+                    "line_start": 3,
+                    "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+                  },
+                  "end": 74,
+                  "file_key": "synthetic:enrich.sas.txt",
+                  "line_end": 3,
+                  "line_start": 3,
+                  "start": 65
+                }
+              },
+              "output": "balance"
+            },
+            {
+              "expression": {
+                "kind": "name",
+                "lexeme": "b.weight",
+                "name": "b.weight",
+                "span": {
+                  "byte_sha256": "470af98c4a9b4ba91db717d7681f188a0928c2aeae2394ccf26a7fa31b6c76b6",
+                  "citation": {
+                    "excerpt_sha256": "a3503fcd1179543f2a83d3681fe54dbf3fc09e94055a84756191035568c08d35",
+                    "file_key": "synthetic:enrich.sas.txt",
+                    "line_end": 3,
+                    "line_start": 3,
+                    "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+                  },
+                  "end": 95,
+                  "file_key": "synthetic:enrich.sas.txt",
+                  "line_end": 3,
+                  "line_start": 3,
+                  "start": 87
+                }
+              },
+              "output": "weight"
+            }
+          ],
+          "span": {
+            "byte_sha256": "58b0f6be4f6f1b7a10eaeccadc9472413e0f34df838406b71fe4c83a50eb4aca",
+            "citation": {
+              "excerpt_sha256": "b166ca83a781a4d9a9ea398b852337e67c9f7469899838253b40cd676c9f2902",
+              "file_key": "synthetic:enrich.sas.txt",
+              "line_end": 5,
+              "line_start": 2,
+              "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+            },
+            "end": 195,
+            "file_key": "synthetic:enrich.sas.txt",
+            "line_end": 5,
+            "line_start": 2,
+            "start": 10
+          },
+          "where": {
+            "kind": "comparison",
+            "left": {
+              "kind": "name",
+              "lexeme": "b.weight",
+              "name": "b.weight",
+              "span": {
+                "byte_sha256": "470af98c4a9b4ba91db717d7681f188a0928c2aeae2394ccf26a7fa31b6c76b6",
+                "citation": {
+                  "excerpt_sha256": "81b65fa68cd22083d5207da32f9847dc05f4f792626df47a8b199d64528b4eff",
+                  "file_key": "synthetic:enrich.sas.txt",
+                  "line_end": 5,
+                  "line_start": 5,
+                  "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+                },
+                "end": 191,
+                "file_key": "synthetic:enrich.sas.txt",
+                "line_end": 5,
+                "line_start": 5,
+                "start": 183
+              }
+            },
+            "operator": ">",
+            "right": {
+              "kind": "literal",
+              "lexeme": "0",
+              "span": {
+                "byte_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+                "citation": {
+                  "excerpt_sha256": "81b65fa68cd22083d5207da32f9847dc05f4f792626df47a8b199d64528b4eff",
+                  "file_key": "synthetic:enrich.sas.txt",
+                  "line_end": 5,
+                  "line_start": 5,
+                  "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+                },
+                "end": 195,
+                "file_key": "synthetic:enrich.sas.txt",
+                "line_end": 5,
+                "line_start": 5,
+                "start": 194
+              }
+            },
+            "span": {
+              "byte_sha256": "6687724621ffe6ea0ad8e30de29b6cd94d576438bdd2166808e61e0232ce0bd2",
+              "citation": {
+                "excerpt_sha256": "81b65fa68cd22083d5207da32f9847dc05f4f792626df47a8b199d64528b4eff",
+                "file_key": "synthetic:enrich.sas.txt",
+                "line_end": 5,
+                "line_start": 5,
+                "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+              },
+              "end": 195,
+              "file_key": "synthetic:enrich.sas.txt",
+              "line_end": 5,
+              "line_start": 5,
+              "start": 183
+            }
+          }
+        }
+      ],
+      "interpretation_rules": [
+        "SQL_ON_BEFORE_WHERE",
+        "SQL_MISSING_EQUALS_MISSING"
+      ],
+      "kind": "PROC_SQL",
+      "lineage": [
+        {
+          "fact_index": 1,
+          "input_column_ids": [
+            "col_524b6a18b9f1153decacab38cddae9e06cc05b05ad742535da314cc3ab2ec636",
+            "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b",
+            "col_e303102d6a074092afec4c430b5c4df21dcd6282344b4a5f741e4bc0fe83e8d8"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_b514260024a6bfd42cbb614826bd45b96a0872b5449d1cd066db7a0999af58f5"
+        },
+        {
+          "fact_index": 1,
+          "input_column_ids": [
+            "col_524b6a18b9f1153decacab38cddae9e06cc05b05ad742535da314cc3ab2ec636",
+            "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09",
+            "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b",
+            "col_e303102d6a074092afec4c430b5c4df21dcd6282344b4a5f741e4bc0fe83e8d8"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_6850a2b9515553d6381479b881040cd1c07cf1c83ba3d5538dea7d2cc86b97fb"
+        },
+        {
+          "fact_index": 1,
+          "input_column_ids": [
+            "col_524b6a18b9f1153decacab38cddae9e06cc05b05ad742535da314cc3ab2ec636",
+            "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b",
+            "col_e303102d6a074092afec4c430b5c4df21dcd6282344b4a5f741e4bc0fe83e8d8"
+          ],
+          "input_fact_indices": [],
+          "input_phase": "CURRENT_ITERATION",
+          "output_column_id": "col_b2c02b24f8499385ad71f8ecb5c223625a0ca1063dcda7b3919828194fe37722"
+        }
+      ],
+      "module_id": "main",
+      "numeric_policy": {
+        "exactness": "BOUNDED_SYNTHETIC_PRECONDITIONS",
+        "expression_order": "SOURCE_TREE_NO_REASSOCIATION",
+        "missing_arithmetic": "PROPAGATE_EXCEPT_SUM_STATEMENT",
+        "missing_join": "SAS_ORDINARY_MISSING_EQUALS_MISSING",
+        "missing_order": "ORDINARY_MISSING_BELOW_FINITE",
+        "runtime_equivalence": "NOT_ASSERTED",
+        "storage": "SAS_NUMERIC_8"
+      },
+      "operation_id": "op_8b440a6473e5c67b365eee40a9d187c69ad9675340963cae95e4b55635dd5cf6",
+      "order_contract": {
+        "keys": [],
+        "kind": "UNSPECIFIED",
+        "precondition": "NOT_REQUIRED",
+        "requires_sorted_inputs": false,
+        "tie_order": "UNSPECIFIED"
+      },
+      "reads": [
+        "col_524b6a18b9f1153decacab38cddae9e06cc05b05ad742535da314cc3ab2ec636",
+        "col_88c08377ef63348195a19ba99f3a618b38f45fe63329e7a17cebf7573bdddb09",
+        "col_a2cf7e9b0b6acd4e8daabe8c6cfbb1c95b28d60ec423298433af83fdc7ce4b36",
+        "col_b5bc8e9bec34611b4f735f1bf7c5a24fb6db8e7c91ba6b4b359dff7b4139480b",
+        "col_c64b6ff35df023d17e2334e7ded8dcc567c7f761783f1e90b1d5d506552d6b57",
+        "col_c99239e958979a31259ca35475adc1b85d9960681362d6370a61079dedea8fb7",
+        "col_e303102d6a074092afec4c430b5c4df21dcd6282344b4a5f741e4bc0fe83e8d8",
+        "col_ea441647ec242ffe17f731094d56beaa076140c0edf1d998f2fb0c674c1076e5",
+        "ds_47d5db9cab064477b43c0a964a83bc745cdbaa2a27cfe1fa3715d7621f4f709f",
+        "ds_a75bd8e1bf05d28a9169e1a9369feaa4dfb902dd6144c34a358de6e31970d01f"
+      ],
+      "semantic_verification": "UNVERIFIABLE",
+      "sequence": 5,
+      "span": {
+        "byte_sha256": "c9edd23923448f5d03601065a52672c747bd9b02b7cb618042f7db578f34c0c8",
+        "citation": {
+          "excerpt_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 6,
+          "line_start": 1,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        },
+        "end": 202,
+        "file_key": "synthetic:enrich.sas.txt",
+        "line_end": 6,
+        "line_start": 1,
+        "start": 0
+      },
+      "state_effects": [],
+      "stateful_constructs": [],
+      "writes": [
+        "col_6850a2b9515553d6381479b881040cd1c07cf1c83ba3d5538dea7d2cc86b97fb",
+        "col_b2c02b24f8499385ad71f8ecb5c223625a0ca1063dcda7b3919828194fe37722",
+        "col_b514260024a6bfd42cbb614826bd45b96a0872b5449d1cd066db7a0999af58f5",
+        "ds_58ba2f22aa6207038111633c194998b8f1a843df6cce73d0b86cfe39d61f2645"
+      ]
+    }
+  ],
+  "profile_file_key": "synthetic:profile.json",
+  "profile_sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063",
+  "run_id": "public-p2a",
+  "schema_version": "2.0",
+  "scope_manifest_sha256": "1ceeb6bc3720e8d2cebe4769f5059fad8278e882e5313db8fd8c5da382c662c2",
+  "semantic_acceptance": "BLOCKED",
+  "semantic_verification": "UNVERIFIABLE",
+  "source_fingerprint": "37c134b5feeaf7ebd61d998c01db3d4dc5c2935de7fcf72853621b24b4681229",
+  "statement_coverage": [
+    {
+      "classification": "FACT",
+      "operation_id": "op_4a4a9719ac8b38349a97f5634a5f08acd888086e804e0e3307cb8b0abd1ba2c7",
+      "span": {
+        "byte_sha256": "98ae183a9dcfd127f84070205150126dd0156bf692d892fd289d8273965e4a99",
+        "citation": {
+          "excerpt_sha256": "0e59c406a56fe6690d1b8140b67c9708441be2f415cae7a178aa50ffa0c7f565",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 1,
+          "line_start": 1,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 28,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 1,
+        "line_start": 1,
+        "start": 0
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_cf9531d088288c56631d9f1a5e37f148a2f68633c332f25e4cc4bd91cfd73608",
+      "span": {
+        "byte_sha256": "a55977171408143740b27cfcd365ed0602f475366e54b9a0527e2392e5d140b0",
+        "citation": {
+          "excerpt_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a",
+          "file_key": "synthetic:settings.sas.txt",
+          "line_end": 1,
+          "line_start": 1,
+          "source_sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a"
+        },
+        "end": 21,
+        "file_key": "synthetic:settings.sas.txt",
+        "line_end": 1,
+        "line_start": 1,
+        "start": 0
+      }
+    },
+    {
+      "classification": "HEADER",
+      "operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "span": {
+        "byte_sha256": "f3afc71d133baab88671cf183eaa7bd35f9bbc0492d6eaf9edc7adcb9d712392",
+        "citation": {
+          "excerpt_sha256": "5761e0eb3b60307a04c97c5a20e42a6351df739e32a5832bf3ac7440b4db104e",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 2,
+          "line_start": 2,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 47,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 2,
+        "line_start": 2,
+        "start": 29
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "span": {
+        "byte_sha256": "22c3d94cb38af122931c88967adfee3f3c7ecc0773035fda4db76f7a8306b426",
+        "citation": {
+          "excerpt_sha256": "3305c2972050c7bf25d7fb57043805599aae78b75c25b59946cc043486525863",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 3,
+          "line_start": 3,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 61,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 3,
+        "line_start": 3,
+        "start": 48
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "span": {
+        "byte_sha256": "4373a10c5c5328395147486a7888aff01a6ee7acf361ef13d8d511f8670cd3ce",
+        "citation": {
+          "excerpt_sha256": "b953dd7ce8e75d1d3bcc2863aeceafb21496a92bd55a9530fc395b01c09a5455",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 4,
+          "line_start": 4,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 78,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 4,
+        "line_start": 4,
+        "start": 62
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "span": {
+        "byte_sha256": "717825b4e7a63d4ce66dd3921fff1715b3508f0a84a12c75a36acff6ba40fcb3",
+        "citation": {
+          "excerpt_sha256": "2bafc6f55a31df947c766103cb971509c3afd5fbc44e830af0eeee3069f35fd7",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 5,
+          "line_start": 5,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 96,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 5,
+        "line_start": 5,
+        "start": 79
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "span": {
+        "byte_sha256": "4ea875868d981ca1056a1326d00ecf8d34eb560469c007f7dcbe8242a6fe6f73",
+        "citation": {
+          "excerpt_sha256": "10b63b644644f7d0ee267af2933e6bbe1595d03707684b4636bd7eb520ad7ae2",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 6,
+          "line_start": 6,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 129,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 6,
+        "line_start": 6,
+        "start": 97
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "span": {
+        "byte_sha256": "80c0dc3af8a53ec39d200cc4a4b48ba7832e8f7406a976db5cee86a2ade1daf2",
+        "citation": {
+          "excerpt_sha256": "030f32e7a75638461c8e13463ddd3f956307b8d814b78683e9cba6906caece9e",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 7,
+          "line_start": 7,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 147,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 7,
+        "line_start": 7,
+        "start": 130
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "span": {
+        "byte_sha256": "0fbdabd78db913da2f192b460a4cfadbcc4f5b2899669a3091095e2924a5d81c",
+        "citation": {
+          "excerpt_sha256": "3770c2aae15525fb7932aac5d291100060fc0535b15dc47b58b3ff6fb05b2f6b",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 8,
+          "line_start": 8,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 190,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 8,
+        "line_start": 8,
+        "start": 148
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "span": {
+        "byte_sha256": "931ebe5c54b90c632d67aa43299e1d69a1ebd2e0f2682afa2f52c5ed58e9bf88",
+        "citation": {
+          "excerpt_sha256": "f7fa0b175754260cd7f46e0e8fd56d04fe519f251aaf12bed29214cf6f017569",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 9,
+          "line_start": 9,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 222,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 9,
+        "line_start": 9,
+        "start": 191
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "span": {
+        "byte_sha256": "f9c95d58ea3b981eca0bfd4a901d88da0295e17eb1580fb8821c7b73c846e4b8",
+        "citation": {
+          "excerpt_sha256": "2a36db9ae72e08817fbf26754ad693d4360f1aa7d1d4041972774d68632ab7f8",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 10,
+          "line_start": 10,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 272,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 10,
+        "line_start": 10,
+        "start": 223
+      }
+    },
+    {
+      "classification": "TERMINATOR",
+      "operation_id": "op_474cbae0a46ac0272421e0061c16bdba1a2a0c3b7246d78625c31e5dc674b709",
+      "span": {
+        "byte_sha256": "f186c08008848a3a583e59ec5592dacfeca638cbf3f57450a147017f72f3a6dd",
+        "citation": {
+          "excerpt_sha256": "fb6a04fcba47d9371815e71b8b8bffa6416c4a75fadfc3ea62dbeae07b70d993",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 11,
+          "line_start": 11,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 277,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 11,
+        "line_start": 11,
+        "start": 273
+      }
+    },
+    {
+      "classification": "HEADER",
+      "operation_id": "op_e552e3aece6f2acc2fdc2dd7f6673a1e2bc37670c02d9f4ad3b5cafc4782ebbd",
+      "span": {
+        "byte_sha256": "0ca472c91c8bf48c42b2c86abcff1b4da2ce43c2d25e59372b7bdcce6dc94123",
+        "citation": {
+          "excerpt_sha256": "3c87073f83ee05570b267dff321c2f1aeab21c75ba2c15562dff8d982d40ad5c",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 12,
+          "line_start": 12,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 328,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 12,
+        "line_start": 12,
+        "start": 278
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_e552e3aece6f2acc2fdc2dd7f6673a1e2bc37670c02d9f4ad3b5cafc4782ebbd",
+      "span": {
+        "byte_sha256": "4373a10c5c5328395147486a7888aff01a6ee7acf361ef13d8d511f8670cd3ce",
+        "citation": {
+          "excerpt_sha256": "b953dd7ce8e75d1d3bcc2863aeceafb21496a92bd55a9530fc395b01c09a5455",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 13,
+          "line_start": 13,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 345,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 13,
+        "line_start": 13,
+        "start": 329
+      }
+    },
+    {
+      "classification": "TERMINATOR",
+      "operation_id": "op_e552e3aece6f2acc2fdc2dd7f6673a1e2bc37670c02d9f4ad3b5cafc4782ebbd",
+      "span": {
+        "byte_sha256": "f186c08008848a3a583e59ec5592dacfeca638cbf3f57450a147017f72f3a6dd",
+        "citation": {
+          "excerpt_sha256": "fb6a04fcba47d9371815e71b8b8bffa6416c4a75fadfc3ea62dbeae07b70d993",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 14,
+          "line_start": 14,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 350,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 14,
+        "line_start": 14,
+        "start": 346
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_990c05c1095e8bc995486cca89098a483914f5b0698c5658edf6a9be1557e7cd",
+      "span": {
+        "byte_sha256": "ca07323a2a6e1042c9156864f78446c2d9f8b417546359b6983bc278c34a6233",
+        "citation": {
+          "excerpt_sha256": "f214fd93961491fb47e6fd740a5b56be2e7658612065ed58ba944e3842890746",
+          "file_key": "synthetic:main.sas.txt",
+          "line_end": 15,
+          "line_start": 15,
+          "source_sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+        },
+        "end": 377,
+        "file_key": "synthetic:main.sas.txt",
+        "line_end": 15,
+        "line_start": 15,
+        "start": 351
+      }
+    },
+    {
+      "classification": "HEADER",
+      "operation_id": "op_8b440a6473e5c67b365eee40a9d187c69ad9675340963cae95e4b55635dd5cf6",
+      "span": {
+        "byte_sha256": "d794436d2293f66cab549f755731ae7699da5be14814e07f5d57deff6700235c",
+        "citation": {
+          "excerpt_sha256": "465df65bf41443c050086fb43d9ac6d0cd015b3a748caceccb45dc664865fd9b",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 1,
+          "line_start": 1,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        },
+        "end": 9,
+        "file_key": "synthetic:enrich.sas.txt",
+        "line_end": 1,
+        "line_start": 1,
+        "start": 0
+      }
+    },
+    {
+      "classification": "FACT",
+      "operation_id": "op_8b440a6473e5c67b365eee40a9d187c69ad9675340963cae95e4b55635dd5cf6",
+      "span": {
+        "byte_sha256": "c4cabc06b3ee6a9edbd44363a5b298a62003fb6215fc0724b24e472c8700c629",
+        "citation": {
+          "excerpt_sha256": "b166ca83a781a4d9a9ea398b852337e67c9f7469899838253b40cd676c9f2902",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 5,
+          "line_start": 2,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        },
+        "end": 196,
+        "file_key": "synthetic:enrich.sas.txt",
+        "line_end": 5,
+        "line_start": 2,
+        "start": 10
+      }
+    },
+    {
+      "classification": "TERMINATOR",
+      "operation_id": "op_8b440a6473e5c67b365eee40a9d187c69ad9675340963cae95e4b55635dd5cf6",
+      "span": {
+        "byte_sha256": "bc536969502e91c8a4fbd0eff84f850452c481c2a56663018fcdeebf003e58bd",
+        "citation": {
+          "excerpt_sha256": "557ee3d8235ea874f38683b027e4bf12906637bb15670983ac0a413d61823724",
+          "file_key": "synthetic:enrich.sas.txt",
+          "line_end": 6,
+          "line_start": 6,
+          "source_sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+        },
+        "end": 202,
+        "file_key": "synthetic:enrich.sas.txt",
+        "line_end": 6,
+        "line_start": 6,
+        "start": 197
+      }
+    }
+  ],
+  "unknowns": [],
+  "workspace_id": "public-intake"
+}

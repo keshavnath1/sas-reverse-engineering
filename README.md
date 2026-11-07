@@ -29,6 +29,10 @@ DRAFT / UNVERIFIABLE / BLOCKED / NOT_RUN statuses.
 
 ## Review a public INTAKE before running a migration candidate
 
+Open the [multi-file modernization example](examples/modernization/README.md)
+to review recovered SAS logic, architecture choices and candidate coverage.
+The example runs offline from a declared public synthetic INTAKE.
+
 Follow the [INTG-1 operator workflow](examples/intg1/README.md) to inventory
 a public INTAKE folder, generate source evidence, and review it in GitHub
 Copilot Agent. Byte-bound human approval through GATE-1 permits the supported
