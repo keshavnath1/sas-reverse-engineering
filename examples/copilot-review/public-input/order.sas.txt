@@ -1,1 +1,0 @@
-proc sort data=work.staged out=work.ordered; by id; run;

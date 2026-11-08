@@ -1,6 +1,0 @@
-proc sql;
-create table work.enriched as
-select a.group as group, a.balance as balance, b.weight as weight
-from work.running as a left join work.lookup as b on a.group = b.group
-where b.weight > 0;
-quit;
