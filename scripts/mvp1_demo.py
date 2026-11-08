@@ -19,7 +19,7 @@ from sas_re.semantic import validate_v2
 
 
 FIXTURE = "sort_and_producer_consumer"
-# Exact historical reconstruction already recorded in docs/DEPENDENCY_ANALYSIS_VALIDATION.md.
+# Exact historical reconstruction already recorded in docs/P3_A1_VALIDATION.md.
 FIXTURE_GRAPH_SHA256 = "385423530208b08635de832bed57698b7278490f2cb7a43f08fd754b80df9155"
 FILES = ("ADR_NATIVE.md", "ADR_SPARK.md", "ARCHITECTURE.md", "EVIDENCE.md", "MODULES.md", "PRD.md")
 
