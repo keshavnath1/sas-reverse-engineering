@@ -23,4 +23,4 @@ acceptance BLOCKED, and unperformed execution NOT_RUN.
 ## Reference material
 
 For the original offline example, see [`MANIFEST.json`](../../tests/fixtures/source-reconstruction/offline-review-package/MANIFEST.json), [`EVIDENCE.md`](../../tests/fixtures/source-reconstruction/offline-review-package/EVIDENCE.md), [`ARCHITECTURE.md`](../../tests/fixtures/source-reconstruction/offline-review-package/ARCHITECTURE.md), [`DECISION_REVIEW.md`](../../tests/fixtures/source-reconstruction/offline-review-package/DECISION_REVIEW.md).
-For its related technical details, see [_dependency_diagnostics.py](../../src/sas_re/_dependency_diagnostics.py), [DEPENDENCY_ANALYSIS_DESIGN.md](../../docs/DEPENDENCY_ANALYSIS_DESIGN.md).
+For its related technical details, see [_dependency_diagnostics.py](../../src/sas_re/_review/_dependency_diagnostics.py), [DEPENDENCY_ANALYSIS_DESIGN.md](../../docs/DEPENDENCY_ANALYSIS_DESIGN.md).

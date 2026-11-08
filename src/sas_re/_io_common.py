@@ -16,10 +16,14 @@ MAX_DEPTH = 32
 MAX_DIRECTORIES = 1000
 
 
-ARTIFACT_NAMES = frozenset({
-    "source_inventory.json", "source_record.json", "validation_report.json",
-    "verification_report.json",
-})
+ARTIFACT_NAMES = frozenset(
+    {
+        "source_inventory.json",
+        "source_record.json",
+        "validation_report.json",
+        "verification_report.json",
+    }
+)
 
 
 _COMPONENT = re.compile(r"[A-Za-z0-9_.-]{1,128}\Z", re.ASCII)
@@ -32,7 +36,9 @@ class EvidenceError(Exception):
     """Public errors contain a fixed diagnostic code, never input contents."""
 
     def __init__(self, code: str, gate: str = "FAIL") -> None:
-        self.code = code if isinstance(code, str) and _CODE.fullmatch(code) else "INVALID_ERROR_CODE"
+        self.code = (
+            code if isinstance(code, str) and _CODE.fullmatch(code) else "INVALID_ERROR_CODE"
+        )
         self.gate = gate if gate in {"FAIL", "BLOCKED"} else "FAIL"
         super().__init__(self.code)
 
@@ -72,8 +78,12 @@ def canonical_bytes(obj: object) -> bytes:
     """Canonical local JSON policy: sorted compact UTF-8, finite numbers, final LF."""
     try:
         _json_depth(obj)
-        return (json.dumps(obj, ensure_ascii=False, sort_keys=True,
-                           separators=(",", ":"), allow_nan=False) + "\n").encode("utf-8")
+        return (
+            json.dumps(
+                obj, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+            )
+            + "\n"
+        ).encode("utf-8")
     except (TypeError, ValueError, UnicodeError, RecursionError):
         raise EvidenceError("JSON_INVALID") from None
 

@@ -18,3 +18,31 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 sas_re = ["data/*.json", "contracts/v1/*.json", "contracts/v2/*.json", "contracts/authorization/v1/*.json"]
+
+# Optional contributor tooling only; runtime dependencies and lock stay unchanged.
+# Frozen evaluators/adapters and historical script bytes are not formatting targets.
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = ["scripts", "tests/fixtures", "tests/p2a_expectations.py", "tests/mvp2_expectations.py", "tests/mvp3_cases.py", "tests/p2a_support.py", "tests/mvp2_fixture.py", "tests/fixture_support.py", "tests/support/cp2_vectors.py", "tests/support/dependency_vectors.py", "tests/support/preview_expectations.py"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+# Existing import-based exports stay available; do not prune namespaces in a layout refactor.
+[tool.ruff.lint.per-file-ignores]
+"src/sas_re/safeio.py" = ["F401"]
+"src/sas_re/semantic.py" = ["F401"]
+"src/sas_re/_filesystem/_posix_io.py" = ["F401"]
+# Preserve original test import namespaces/preloading; no broad automatic pruning.
+"tests/core/test_authorization.py" = ["F401"]
+"tests/platform_checks/test_platform_io.py" = ["F401"]
+"tests/reconstruction/test_dependency_diagnostics.py" = ["F401"]
+"tests/reconstruction/test_graphs.py" = ["F401"]
+"tests/reconstruction/test_publication.py" = ["F401"]
+"tests/workflow/test_preparation_candidate.py" = ["F401"]

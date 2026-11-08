@@ -43,17 +43,34 @@ def _request(envelope: object, policy: LocalInspectionPolicy) -> tuple[dict, tup
     # copy hooks, and never mutate the frozen declaration or its projection.
     detached = _parse_json(canonical_bytes(envelope))
     logical = detached["logical_scope"]
-    if (any(type(getattr(policy, field)) is not str for field in (
-            "anchor", "store_path", "workspace_id", "run_id", "scope_sha256", "source_model"))
-            or type(policy.source_roots) is not tuple
-            or any(type(item) is not tuple or len(item) != 2
-                   or any(type(value) is not str for value in item) for item in policy.source_roots)):
+    if (
+        any(
+            type(getattr(policy, field)) is not str
+            for field in (
+                "anchor",
+                "store_path",
+                "workspace_id",
+                "run_id",
+                "scope_sha256",
+                "source_model",
+            )
+        )
+        or type(policy.source_roots) is not tuple
+        or any(
+            type(item) is not tuple
+            or len(item) != 2
+            or any(type(value) is not str for value in item)
+            for item in policy.source_roots
+        )
+    ):
         raise EvidenceError("CP3A_POLICY_MISMATCH")
     expected = tuple(sorted((item["root_id"], item["path"]) for item in detached["bindings"]))
-    if (tuple(sorted(policy.source_roots)) != expected
-            or policy.workspace_id != logical["workspace_id"]
-            or policy.run_id != logical["run_id"]
-            or policy.scope_sha256 != authorization_scope_identity(detached)):
+    if (
+        tuple(sorted(policy.source_roots)) != expected
+        or policy.workspace_id != logical["workspace_id"]
+        or policy.run_id != logical["run_id"]
+        or policy.scope_sha256 != authorization_scope_identity(detached)
+    ):
         raise EvidenceError("CP3A_POLICY_MISMATCH")
     if policy.source_model != SOURCE_MODEL:
         raise EvidenceError("CP3A_WRITER_POLICY_UNAVAILABLE", "BLOCKED")
@@ -62,7 +79,7 @@ def _request(envelope: object, policy: LocalInspectionPolicy) -> tuple[dict, tup
         raise EvidenceError("CP3A_LIMIT", "BLOCKED")
     for path, is_source in [(path, True) for _, path in expected] + [(policy.store_path, False)]:
         parts = _native_parts("posix", path)
-        if parts[:len(anchor)] != anchor or (is_source and len(parts) == len(anchor)):
+        if parts[: len(anchor)] != anchor or (is_source and len(parts) == len(anchor)):
             raise EvidenceError("CP3A_OUTSIDE_ANCHOR")
         if len(parts) - len(anchor) > MAX_DEPTH:
             raise EvidenceError("CP3A_LIMIT", "BLOCKED")
@@ -80,7 +97,7 @@ def open_preflight(envelope: object, *, policy: LocalInspectionPolicy | None = N
     require_evidence_io()
     detached, anchor = _request(envelope, policy)
     try:
-        backend = import_module("sas_re._posix_preflight")
+        backend = import_module("sas_re._filesystem._posix_preflight")
     except (ImportError, AttributeError):
         raise EvidenceError("CP3A_FILESYSTEM_UNAVAILABLE", "BLOCKED") from None
     return backend.PosixPreflight(detached, policy, anchor)

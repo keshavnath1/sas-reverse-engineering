@@ -40,7 +40,7 @@ outside the candidate contract.
 
 ## Engineering tie-out
 
-The [public tests](../../tests/test_running_balance.py) contain independently
+The [public tests](../../tests/workflow/test_running_balance.py) contain independently
 specified expectations. The published profile produces three preparation rows,
 three SORT rows and three enrichment rows. The enrichment multiset contains
 two copies of `(1, 2, 3)` and one `(2, 4, 5)`, in group, balance, weight order.

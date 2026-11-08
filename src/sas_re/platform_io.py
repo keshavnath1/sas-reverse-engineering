@@ -13,13 +13,38 @@ from ._io_common import EvidenceError
 
 
 _CAPABILITIES = (
-    "source_read", "root_traversal", "enumeration", "file_identity",
-    "publisher_lock", "no_clobber_publication",
+    "source_read",
+    "root_traversal",
+    "enumeration",
+    "file_identity",
+    "publisher_lock",
+    "no_clobber_publication",
 )
-_FLAGS = ("O_RDONLY", "O_WRONLY", "O_CREAT", "O_EXCL", "O_DIRECTORY",
-          "O_NOFOLLOW", "O_NONBLOCK", "O_CLOEXEC")
-_CALLS = ("open", "close", "dup", "mkdir", "fsync", "fstat", "stat",
-          "scandir", "read", "write", "fchmod", "link", "unlink")
+_FLAGS = (
+    "O_RDONLY",
+    "O_WRONLY",
+    "O_CREAT",
+    "O_EXCL",
+    "O_DIRECTORY",
+    "O_NOFOLLOW",
+    "O_NONBLOCK",
+    "O_CLOEXEC",
+)
+_CALLS = (
+    "open",
+    "close",
+    "dup",
+    "mkdir",
+    "fsync",
+    "fstat",
+    "stat",
+    "scandir",
+    "read",
+    "write",
+    "fchmod",
+    "link",
+    "unlink",
+)
 
 
 def filesystem_capabilities() -> dict:
@@ -36,9 +61,12 @@ def filesystem_capabilities() -> dict:
     elif os_name != "posix" or platform not in {"darwin", "linux"}:
         reason = "PLATFORM_NOT_SUPPORTED"
     else:
-        missing.extend("os." + name for name in _FLAGS
-                       if type(getattr(os, name, None)) is not int
-                       or (name != "O_RDONLY" and getattr(os, name, 0) == 0))
+        missing.extend(
+            "os." + name
+            for name in _FLAGS
+            if type(getattr(os, name, None)) is not int
+            or (name != "O_RDONLY" and getattr(os, name, 0) == 0)
+        )
         missing.extend("os." + name for name in _CALLS if not callable(getattr(os, name, None)))
         for group, names in (
             ("supports_dir_fd", ("open", "mkdir", "stat", "link", "unlink")),
@@ -59,14 +87,22 @@ def filesystem_capabilities() -> dict:
             missing.append("fcntl")
         reason = "POSIX_PRIMITIVES_UNAVAILABLE" if missing else None
     state = "BLOCKED" if reason else "AVAILABLE"
-    return {"platform": platform, "os_name": os_name,
-            "backend": "blocked" if reason else "posix", "evidence_io": state,
-            "reason": reason, "missing_primitives": sorted(missing),
-            "capabilities": {name: state for name in _CAPABILITIES},
-            "qualification": "Availability only; no filesystem or semantic qualification is implied.",
-            "mitigation": ("Use an already qualified POSIX environment; Windows evidence I/O "
-                           "requires separately approved CP3/CP4 implementation and qualification."
-                           if reason else None)}
+    return {
+        "platform": platform,
+        "os_name": os_name,
+        "backend": "blocked" if reason else "posix",
+        "evidence_io": state,
+        "reason": reason,
+        "missing_primitives": sorted(missing),
+        "capabilities": {name: state for name in _CAPABILITIES},
+        "qualification": "Availability only; no filesystem or semantic qualification is implied.",
+        "mitigation": (
+            "Use an already qualified POSIX environment; Windows evidence I/O "
+            "requires separately approved CP3/CP4 implementation and qualification."
+            if reason
+            else None
+        ),
+    }
 
 
 def require_evidence_io() -> None:
@@ -83,24 +119,29 @@ def preflight_capabilities() -> dict:
     Preserve the existing full-evidence capability/exit-code contract separately.
     """
     if sys.platform == "win32" or os.name == "nt":
-        return {"backend": "windows", "read_only_preflight": "BLOCKED",
-                "private_protocol": "IMPLEMENTED_UNQUALIFIED",
-                "volume_bootstrap": "NOT_IMPLEMENTED",
-                "native_qualification": "BLOCKED",
-                "reason": "WINDOWS_VOLUME_BINDING_AND_QUALIFICATION_UNAVAILABLE",
-                "publication": "BLOCKED"}
+        return {
+            "backend": "windows",
+            "read_only_preflight": "BLOCKED",
+            "private_protocol": "IMPLEMENTED_UNQUALIFIED",
+            "volume_bootstrap": "NOT_IMPLEMENTED",
+            "native_qualification": "BLOCKED",
+            "reason": "WINDOWS_VOLUME_BINDING_AND_QUALIFICATION_UNAVAILABLE",
+            "publication": "BLOCKED",
+        }
     current = filesystem_capabilities()
-    return {"backend": current["backend"],
-            "read_only_preflight": current["evidence_io"],
-            "reason": current["reason"],
-            "qualification": "Per-operation filesystem checks and explicit local policy remain required."}
+    return {
+        "backend": current["backend"],
+        "read_only_preflight": current["evidence_io"],
+        "reason": current["reason"],
+        "qualification": "Per-operation filesystem checks and explicit local policy remain required.",
+    }
 
 
 def get_backend() -> ModuleType:
     """Load only the existing POSIX implementation after the capability gate."""
     require_evidence_io()
     try:
-        return import_module("sas_re._posix_io")
+        return import_module("sas_re._filesystem._posix_io")
     except (ImportError, AttributeError):
         # No ordinary open/pathlib/lock-free fallback on a broken runtime.
         raise EvidenceError("FILESYSTEM_CAPABILITY_UNAVAILABLE", "BLOCKED") from None

@@ -14,11 +14,18 @@ from ._io_common import EvidenceError, MAX_FILES, safe_relative
 _DRIVE = re.compile(r"[A-Z]:\\", re.ASCII)
 _WINDOWS_FORBIDDEN = frozenset('<>:"/\\|?*')
 _EXPANSIONS = frozenset("$%~")
-_DEVICES = frozenset({
-    "con", "prn", "aux", "nul", "conin$", "conout$",
-    *("com" + digit for digit in "123456789¹²³"),
-    *("lpt" + digit for digit in "123456789¹²³"),
-})
+_DEVICES = frozenset(
+    {
+        "con",
+        "prn",
+        "aux",
+        "nul",
+        "conin$",
+        "conout$",
+        *("com" + digit for digit in "123456789¹²³"),
+        *("lpt" + digit for digit in "123456789¹²³"),
+    }
+)
 
 
 def _invalid() -> None:
@@ -32,8 +39,7 @@ def _alias() -> None:
 def _text(value: object) -> str:
     if type(value) is not str or not value:
         _invalid()
-    if any(unicodedata.category(char) in {"Cc", "Cf", "Cs", "Zl", "Zp"}
-           for char in value):
+    if any(unicodedata.category(char) in {"Cc", "Cf", "Cs", "Zl", "Zp"} for char in value):
         _invalid()
     return value
 
@@ -44,9 +50,13 @@ def _comparison(value: str) -> str:
 
 
 def _portable_component(part: str) -> None:
-    if (part in {".", ".."} or not part or part.endswith((".", " "))
-            or any(char in _WINDOWS_FORBIDDEN | _EXPANSIONS for char in part)
-            or part.split(".", 1)[0].rstrip(" .").casefold() in _DEVICES):
+    if (
+        part in {".", ".."}
+        or not part
+        or part.endswith((".", " "))
+        or any(char in _WINDOWS_FORBIDDEN | _EXPANSIONS for char in part)
+        or part.split(".", 1)[0].rstrip(" .").casefold() in _DEVICES
+    ):
         _invalid()
 
 
@@ -66,12 +76,17 @@ def _native_parts(platform: str, path: object) -> tuple[str, ...]:
                 _invalid()
         return (value[:2], *parts)
     if platform == "posix":
-        if (len(value.encode("utf-8")) > 4096 or not value.startswith("/")
-                or value.startswith("//") or "\\" in value):
+        if (
+            len(value.encode("utf-8")) > 4096
+            or not value.startswith("/")
+            or value.startswith("//")
+            or "\\" in value
+        ):
             _invalid()
         parts = value[1:].split("/")
-        if any(not part or part in {".", ".."} or len(part.encode("utf-8")) > 255
-               for part in parts):
+        if any(
+            not part or part in {".", ".."} or len(part.encode("utf-8")) > 255 for part in parts
+        ):
             _invalid()
         return tuple(parts)
     _invalid()
@@ -109,7 +124,11 @@ def validate_bindings(platform: str, bindings: list[dict]) -> None:
     The platform is declaration data, never inferred from this host. Even a
     successful return leaves physical filesystem authorization unestablished.
     """
-    if type(platform) is not str or platform not in {"windows", "posix"} or type(bindings) is not list:
+    if (
+        type(platform) is not str
+        or platform not in {"windows", "posix"}
+        or type(bindings) is not list
+    ):
         _invalid()
     if not 1 <= len(bindings) <= MAX_FILES:
         _invalid()

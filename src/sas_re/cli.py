@@ -10,12 +10,32 @@ from sas_re.runs import execute
 from sas_re.platform_io import filesystem_capabilities, preflight_capabilities
 
 PLANNED = (
-    "analyze-parallelism", "draft-requirements",
-    "propose-adrs", "verify-adrs", "package-handoff", "eval",
+    "analyze-parallelism",
+    "draft-requirements",
+    "propose-adrs",
+    "verify-adrs",
+    "package-handoff",
+    "eval",
 )
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Dispatch an existing command and print its JSON result to stdout.
+
+    Args:
+        argv: Arguments without the executable name, or None for the process argv.
+
+    Returns:
+        The selected command's existing exit code; planned commands return 3.
+
+    Raises:
+        SystemExit: Argument parsing, help and version requests follow argparse.
+
+    Status reads package metadata and reports capabilities, not caller paths.
+    Explicit baseline checks can query Git;
+    supported evidence commands may read authorized inputs and publish attempts.
+    Planned commands read no caller input and grant no execution or approval.
+    """
     parser = argparse.ArgumentParser(description="SAS planner — synthetic P2A reconstruction")
     parser.add_argument("--version", action="version", version=version("sas-reverse-engineering"))
     sub = parser.add_subparsers(dest="command", required=True)
@@ -26,48 +46,85 @@ def main(argv: list[str] | None = None) -> int:
     for command in ("discover", "seal-source", "verify-source"):
         p1 = sub.add_parser(command, help="Explicit synthetic scope; structural integrity only")
         p1.add_argument("--scope", type=Path, required=True, help="Authorized JSON scope manifest")
-        p1.add_argument("--store", type=Path, required=True, help="Absolute artifact store outside source roots")
+        p1.add_argument(
+            "--store", type=Path, required=True, help="Absolute artifact store outside source roots"
+        )
         p1.add_argument("--run", required=True)
-        p1.add_argument("--attempt", required=True, help="Explicit attempt ID (subject for verify-source)")
+        p1.add_argument(
+            "--attempt", required=True, help="Explicit attempt ID (subject for verify-source)"
+        )
         if command == "seal-source":
-            p1.add_argument("--record", type=Path, required=True, help="Supplied canonical graph JSON")
+            p1.add_argument(
+                "--record", type=Path, required=True, help="Supplied canonical graph JSON"
+            )
         if command == "verify-source":
-            p1.add_argument("--verification-attempt", required=True, help="New append-only verification attempt")
+            p1.add_argument(
+                "--verification-attempt", required=True, help="New append-only verification attempt"
+            )
     for command in ("reconstruct-source", "check-reconstruction"):
-        p2a = sub.add_parser(command, help="Deterministic synthetic reconstruction; independent acceptance BLOCKED")
+        p2a = sub.add_parser(
+            command, help="Deterministic synthetic reconstruction; independent acceptance BLOCKED"
+        )
         p2a.add_argument("--scope", type=Path, required=True)
         p2a.add_argument("--store", type=Path, required=True)
         p2a.add_argument("--run", required=True)
         p2a.add_argument("--attempt", required=True)
-        p2a.add_argument("--profile-file", required=True, help="Authorized CONFIG file key, not a filesystem path")
+        p2a.add_argument(
+            "--profile-file",
+            required=True,
+            help="Authorized CONFIG file key, not a filesystem path",
+        )
         if command == "reconstruct-source":
-            p2a.add_argument("--inventory-attempt", required=True, help="Exact sealed P1 inventory/record attempt")
+            p2a.add_argument(
+                "--inventory-attempt",
+                required=True,
+                help="Exact sealed P1 inventory/record attempt",
+            )
         else:
             p2a.add_argument("--verification-attempt", required=True)
     for command in PLANNED:
         sub.add_parser(command, help="NOT IMPLEMENTED; exits 3 without reading inputs")
     args, extra = parser.parse_known_args(argv)
     if args.command in PLANNED:
-        result = {"command": args.command, "stage_gate": "BLOCKED", "status": "NOT_IMPLEMENTED",
-                  "reason": "P2A reconstruction only. This command requires a later approved phase.",
-                  "benchmark_execution": "NOT_RUN", "inputs_read": False}
+        result = {
+            "command": args.command,
+            "stage_gate": "BLOCKED",
+            "status": "NOT_IMPLEMENTED",
+            "reason": "P2A reconstruction only. This command requires a later approved phase.",
+            "benchmark_execution": "NOT_RUN",
+            "inputs_read": False,
+        }
         code = 3
     else:
         if extra:
             parser.error("unrecognized arguments")
         if args.command == "status":
             baseline = metadata()
-            result = {"version": version("sas-reverse-engineering"), "phase": "P2A",
-                      "implemented": ["status", "check-baseline", "discover", "seal-source", "verify-source",
-                                      "reconstruct-source", "check-reconstruction"], "planned": list(PLANNED),
-                      "downstream_commit": baseline["downstream"]["commit"],
-                      "specification_sha256": baseline["specification"]["sha256"],
-                      "benchmark_execution": "NOT_RUN", "downstream_integration": "NOT_IMPLEMENTED",
-                      "semantic_verification": "UNVERIFIABLE", "artifact_authority": "DRAFT",
-                      "semantic_acceptance": "BLOCKED", "independent_evaluation": "NOT_IMPLEMENTED",
-                      "filesystem_capabilities": filesystem_capabilities(),
-                      "read_only_preflight_capabilities": preflight_capabilities(),
-                      "note": "Status does not execute validation or advance a workflow."}
+            result = {
+                "version": version("sas-reverse-engineering"),
+                "phase": "P2A",
+                "implemented": [
+                    "status",
+                    "check-baseline",
+                    "discover",
+                    "seal-source",
+                    "verify-source",
+                    "reconstruct-source",
+                    "check-reconstruction",
+                ],
+                "planned": list(PLANNED),
+                "downstream_commit": baseline["downstream"]["commit"],
+                "specification_sha256": baseline["specification"]["sha256"],
+                "benchmark_execution": "NOT_RUN",
+                "downstream_integration": "NOT_IMPLEMENTED",
+                "semantic_verification": "UNVERIFIABLE",
+                "artifact_authority": "DRAFT",
+                "semantic_acceptance": "BLOCKED",
+                "independent_evaluation": "NOT_IMPLEMENTED",
+                "filesystem_capabilities": filesystem_capabilities(),
+                "read_only_preflight_capabilities": preflight_capabilities(),
+                "note": "Status does not execute validation or advance a workflow.",
+            }
             code = 0
         elif args.command == "check-baseline":
             if args.checkout is None and not args.remote:
@@ -75,11 +132,26 @@ def main(argv: list[str] | None = None) -> int:
             result, code = report(args.checkout, args.remote)
         elif args.command in {"reconstruct-source", "check-reconstruction"}:
             from sas_re.semantic_runs import execute as execute_p2a
-            result, code = execute_p2a(args.command, args.scope, args.store, args.run, args.attempt,
-                                      args.profile_file, getattr(args, "inventory_attempt", None),
-                                      getattr(args, "verification_attempt", None))
+
+            result, code = execute_p2a(
+                args.command,
+                args.scope,
+                args.store,
+                args.run,
+                args.attempt,
+                args.profile_file,
+                getattr(args, "inventory_attempt", None),
+                getattr(args, "verification_attempt", None),
+            )
         else:
-            result, code = execute(args.command, args.scope, args.store, args.run, args.attempt,
-                                   getattr(args, "record", None), getattr(args, "verification_attempt", None))
+            result, code = execute(
+                args.command,
+                args.scope,
+                args.store,
+                args.run,
+                args.attempt,
+                getattr(args, "record", None),
+                getattr(args, "verification_attempt", None),
+            )
     print(json.dumps(result, indent=2))
     return code

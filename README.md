@@ -78,6 +78,12 @@ Human reviewers decide business intent, configuration and approval.
 See the [architecture guide](docs/ARCHITECTURE.md) for component boundaries,
 the evidence flow, and runtime decision criteria.
 
+### Reading the Python implementation
+
+Use the [Python module map and contributor standards](docs/ARCHITECTURE.md#python-structure-where-to-read-the-implementation) to connect the design to code. Public modules cover parsing, semantic reconstruction, evidence, authorization and attempts. Private filesystem implementations live in `src/sas_re/_filesystem/`; dependency analysis and review rendering live in `src/sas_re/_review/`. Existing public imports, CLI commands and operator script names remain available.
+
+The [test guide](tests/README.md) explains `core/`, `reconstruction/`, `workflow/`, `platform_checks/` and `support/`. Test names describe the behavior being checked rather than a development milestone. A few frozen evaluators/adapters retain their original paths and bytes; they are documented exceptions, not new starting points. Optional Ruff formatting/basic lint configuration is in `pyproject.toml`, with no runtime dependency or lockfile change.
+
 ## Run the public walkthrough
 
 After [installing the development environment](#install-and-validate), run
@@ -200,8 +206,8 @@ The team guides above explain today's workflow. The references below support a s
 | Repository area | What to look for |
 | --- | --- |
 | `scripts/` | The guides identify the operator commands. The same directory also holds internal helpers, candidate runners, CI utilities, and earlier replay commands. |
-| `src/sas_re/` | Core Python implementation for inventory, reconstruction, evidence checks, and diagnostics. |
-| `tests/` | Engineering expectations, compatibility checks, and reproducible replays. Required public inputs and frozen packages are grouped under `tests/fixtures/`. |
+| `src/sas_re/` | Stable public Python APIs for inventory, reconstruction and evidence, with private platform and review code grouped by responsibility. |
+| `tests/` | Responsibility-based test categories, shared support, and documented frozen exceptions. Required public inputs and frozen packages remain under `tests/fixtures/`. |
 | `docs/` | Two main team guides plus the retained contract, boundary and compatibility-reference files listed below. |
 | `examples/` | Three descriptive team walkthroughs: SAS modernization, running balance, and governed continuation. |
 

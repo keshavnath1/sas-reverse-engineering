@@ -1,8 +1,11 @@
-"""Closed, deterministic synthetic SAS syntax profile; never executes source.
+"""Parse a closed, bounded synthetic SAS profile without executing SAS.
 
-The result is transient parser data for the canonical graph builder, not a second
-persisted graph. Byte offsets are half-open offsets into original UTF-8 bytes.
-Parsing a construct is not semantic acceptance: callers retain UNVERIFIABLE.
+Results are transient parser data for the canonical graph builder, not a second
+persisted graph or a replacement for the authoritative JSON record schemas.
+Reported spans use half-open offsets into the original UTF-8 bytes, even though
+lexing uses decoded characters. Unsupported syntax remains recorded as issues;
+recognizing a construct does not prove its semantics or authorize acceptance.
+Callers own include authorization, cross-entry-point budgets, and issue retention.
 """
 
 from __future__ import annotations
@@ -32,6 +35,8 @@ IncludeLoader = Callable[[str, str], tuple[str, bytes]]
 
 @dataclass(frozen=True)
 class _Token:
+    """Immutable lexeme with character offsets internal to one decoded source."""
+
     text: str
     start: int
     end: int
@@ -43,11 +48,17 @@ class _Token:
 
 
 class _Syntax(Exception):
-    def __init__(self, code: str = "UNSUPPORTED_SYNTAX", message: str = "Outside the closed pilot grammar"):
+    """Internal refusal converted to an issue at the enclosing parse boundary."""
+
+    def __init__(
+        self, code: str = "UNSUPPORTED_SYNTAX", message: str = "Outside the closed pilot grammar"
+    ):
         self.code, self.message = code, message
 
 
 class _Source:
+    """Retain original bytes and map decoded character positions to byte spans."""
+
     def __init__(self, data: bytes, file_key: str):
         self.data, self.file_key = data, file_key
         self.text = data.decode("utf-8", errors="strict")
@@ -61,10 +72,16 @@ class _Source:
         self.lines.extend(match.end() for match in re.finditer(rb"\r\n|\r|\n", data))
 
     def span(self, start: int, end: int) -> dict:
+        """Convert a character range to original-byte offsets and 1-based lines."""
         a, b = self.offsets[start], self.offsets[end]
-        return {"file_key": self.file_key, "start": a, "end": b,
-                "line_start": bisect_right(self.lines, a),
-                "line_end": bisect_right(self.lines, max(a, b - 1))}
+        # A nonempty half-open range ends on the line of its last owned byte.
+        return {
+            "file_key": self.file_key,
+            "start": a,
+            "end": b,
+            "line_start": bisect_right(self.lines, a),
+            "line_end": bisect_right(self.lines, max(a, b - 1)),
+        }
 
 
 def _issue(source: _Source, code: str, message: str, start: int, end: int) -> dict:
@@ -88,11 +105,24 @@ def _frames(source: _Source) -> list[dict]:
             end = len(text) if closing < 0 else closing + 2
             comment_issues = []
             if closing < 0:
-                comment_issues.append(_issue(source, "UNCLOSED_COMMENT", "Unclosed block comment", i, end))
-            if "/*" in text[i + 2:closing if closing >= 0 else len(text)]:
-                comment_issues.append(_issue(source, "NESTED_COMMENT", "Nested block comments are unsupported", i, end))
-            result.append({"start": comment_start, "end": end, "tokens": [],
-                           "comment": True, "issues": comment_issues})
+                comment_issues.append(
+                    _issue(source, "UNCLOSED_COMMENT", "Unclosed block comment", i, end)
+                )
+            if "/*" in text[i + 2 : closing if closing >= 0 else len(text)]:
+                comment_issues.append(
+                    _issue(
+                        source, "NESTED_COMMENT", "Nested block comments are unsupported", i, end
+                    )
+                )
+            result.append(
+                {
+                    "start": comment_start,
+                    "end": end,
+                    "tokens": [],
+                    "comment": True,
+                    "issues": comment_issues,
+                }
+            )
             i = end
             if len(result) > MAX_STATEMENTS:
                 raise _Syntax("STATEMENT_LIMIT", "Statement count exceeds the bounded profile")
@@ -112,7 +142,12 @@ def _frames(source: _Source) -> list[dict]:
                     i += 1
             elif quote:
                 if comment and ch == ";":
-                    problems.append(("AMBIGUOUS_COMMENT_BOUNDARY", "Semicolon inside a quoted comment is outside the frozen comment profile"))
+                    problems.append(
+                        (
+                            "AMBIGUOUS_COMMENT_BOUNDARY",
+                            "Semicolon inside a quoted comment is outside the frozen comment profile",
+                        )
+                    )
                 if ch == quote:
                     if i + 1 < len(text) and text[i + 1] == quote:
                         i += 2
@@ -136,16 +171,27 @@ def _frames(source: _Source) -> list[dict]:
         if block:
             problems.append(("UNCLOSED_COMMENT", "Unclosed block comment"))
         if comment and not macro_comment and any(c in raw for c in "%&"):
-            problems.append(("MACRO_BEARING_COMMENT", "Statement comments with macro triggers cannot be discarded"))
+            problems.append(
+                (
+                    "MACRO_BEARING_COMMENT",
+                    "Statement comments with macro triggers cannot be discarded",
+                )
+            )
         tokens, token_errors = ([], []) if comment else _tokens(source, start, i)
         problems.extend(token_errors)
         if not terminated and tokens and not quote and not block:
             problems.append(("MISSING_SEMICOLON", "Nonempty statement is not semicolon terminated"))
         if comment and not terminated and not quote:
             problems.append(("MISSING_SEMICOLON", "Comment statement is not semicolon terminated"))
-        result.append({"start": start, "end": i, "tokens": tokens,
-                       "comment": comment or not tokens,
-                       "issues": [_issue(source, code, message, start, i) for code, message in problems]})
+        result.append(
+            {
+                "start": start,
+                "end": i,
+                "tokens": tokens,
+                "comment": comment or not tokens,
+                "issues": [_issue(source, code, message, start, i) for code, message in problems],
+            }
+        )
         if len(result) > MAX_STATEMENTS:
             raise _Syntax("STATEMENT_LIMIT", "Statement count exceeds the bounded profile")
     return result
@@ -180,7 +226,12 @@ def _tokens(source: _Source, start: int, end: int) -> tuple[list[_Token], list[t
                 i += 1
             kind = "name"
             if not _NAME.fullmatch(text[a:i]):
-                issues.append(("INVALID_NAME", "Names must be ordinary ASCII identifiers of at most 32 characters"))
+                issues.append(
+                    (
+                        "INVALID_NAME",
+                        "Names must be ordinary ASCII identifiers of at most 32 characters",
+                    )
+                )
         elif ch.isascii() and ch.isdigit():
             i += 1
             while i < end and text[i].isascii() and text[i].isdigit():
@@ -191,8 +242,10 @@ def _tokens(source: _Source, start: int, end: int) -> tuple[list[_Token], list[t
                     i += 1
             kind = "number"
             if i - a > 128:
-                issues.append(("NUMERIC_TOKEN_LIMIT", "Numeric literal exceeds the bounded spelling length"))
-        elif text[i:i + 2] in ("<=", ">=", "^="):
+                issues.append(
+                    ("NUMERIC_TOKEN_LIMIT", "Numeric literal exceeds the bounded spelling length")
+                )
+        elif text[i : i + 2] in ("<=", ">=", "^="):
             i += 2
             kind = "symbol"
         else:
@@ -207,6 +260,8 @@ def _tokens(source: _Source, start: int, end: int) -> tuple[list[_Token], list[t
 
 
 class _Cursor:
+    """Consume one frame's tokens, refusing mismatches and unconsumed suffixes."""
+
     def __init__(self, tokens: list[_Token], source: _Source):
         self.tokens, self.source, self.i = tokens, source, 0
         self.expression_nodes = 0
@@ -247,9 +302,13 @@ def _literal(cursor: _Cursor) -> dict:
     sign = cursor.take().text if cursor.peek("+") or cursor.peek("-") else ""
     token = cursor.take()
     if token.text != "." and not _DECIMAL.fullmatch(token.text):
-        raise _Syntax("UNSUPPORTED_NUMERIC_LITERAL", "Expected a decimal literal or ordinary numeric missing")
+        raise _Syntax(
+            "UNSUPPORTED_NUMERIC_LITERAL", "Expected a decimal literal or ordinary numeric missing"
+        )
     if sign and token.text == ".":
-        raise _Syntax("UNSUPPORTED_NUMERIC_LITERAL", "Signed missing markers are outside the profile")
+        raise _Syntax(
+            "UNSUPPORTED_NUMERIC_LITERAL", "Signed missing markers are outside the profile"
+        )
     return {"kind": "literal", "lexeme": sign + token.text, "span": cursor.span(start)}
 
 
@@ -264,8 +323,12 @@ def _expression(cursor: _Cursor, qualified: bool = False, minimum: int = 0, dept
     start = cursor.i
     token = cursor.take()
     if token.text in ("+", "-"):
-        left = {"kind": "unary", "operator": token.text,
-                "operand": _expression(cursor, qualified, 30, depth + 1), "span": cursor.span(start)}
+        left = {
+            "kind": "unary",
+            "operator": token.text,
+            "operand": _expression(cursor, qualified, 30, depth + 1),
+            "span": cursor.span(start),
+        }
     elif token.text == "(":
         inside = _expression(cursor, qualified, depth=depth + 1)
         cursor.take(")")
@@ -279,9 +342,12 @@ def _expression(cursor: _Cursor, qualified: bool = False, minimum: int = 0, dept
         if qualified:
             cursor.take(".")
             name += "." + cursor.name()
-        left = {"kind": "name", "name": name,
-                "lexeme": cursor.source.text[token.start:cursor.tokens[cursor.i - 1].end],
-                "span": cursor.span(start)}
+        left = {
+            "kind": "name",
+            "name": name,
+            "lexeme": cursor.source.text[token.start : cursor.tokens[cursor.i - 1].end],
+            "span": cursor.span(start),
+        }
     else:
         raise _Syntax("UNSUPPORTED_EXPRESSION", "Expression outside the numeric arithmetic grammar")
     while cursor.peek() and cursor.tokens[cursor.i].text in ("+", "-", "*", "/"):
@@ -294,8 +360,13 @@ def _expression(cursor: _Cursor, qualified: bool = False, minimum: int = 0, dept
         cursor.expression_nodes += 1
         if cursor.expression_nodes > MAX_EXPRESSION_NODES:
             raise _Syntax("EXPRESSION_LIMIT", "Expression node limit exceeded")
-        left = {"kind": "binary", "operator": op, "left": left, "right": right,
-                "span": cursor.span(start)}
+        left = {
+            "kind": "binary",
+            "operator": op,
+            "left": left,
+            "right": right,
+            "span": cursor.span(start),
+        }
     if depth == 0:
         # Left-associative chains are shallow parser recursion but deep trees.
         # Bound the emitted tree too, before schema or graph traversal sees it.
@@ -319,24 +390,34 @@ def _condition(cursor: _Cursor, qualified: bool = False) -> dict:
         return {"kind": "by_flag", "flag": flag, "key": key, "span": cursor.span(start)}
     token = cursor.take()
     if token.kind != "name" or not _NAME.fullmatch(token.text):
-        raise _Syntax("UNSUPPORTED_CONDITION", "Condition must compare one numeric variable with a literal")
+        raise _Syntax(
+            "UNSUPPORTED_CONDITION", "Condition must compare one numeric variable with a literal"
+        )
     name = token.lower
     if qualified:
         cursor.take(".")
         name += "." + cursor.name()
-    left = {"kind": "name", "name": name,
-            "lexeme": cursor.source.text[token.start:cursor.tokens[cursor.i - 1].end],
-            "span": cursor.span(start)}
+    left = {
+        "kind": "name",
+        "name": name,
+        "lexeme": cursor.source.text[token.start : cursor.tokens[cursor.i - 1].end],
+        "span": cursor.span(start),
+    }
     operator = cursor.take().text
     if operator not in ("=", "^=", "<", "<=", ">", ">="):
         raise _Syntax("UNSUPPORTED_CONDITION", "Unsupported comparison operator")
     right = _literal(cursor)
-    return {"kind": "comparison", "left": left, "operator": operator,
-            "right": right, "span": cursor.span(start)}
+    return {
+        "kind": "comparison",
+        "left": left,
+        "operator": operator,
+        "right": right,
+        "span": cursor.span(start),
+    }
 
 
 def _numeric_issues(value: object) -> list[tuple[str, str, dict]]:
-    """Conservative literal/divisor checks; input/intermediate proof stays unresolved."""
+    """Check literal/divisor restrictions, not input ranges or intermediate proof."""
     found = []
     if isinstance(value, list):
         for item in value:
@@ -344,8 +425,18 @@ def _numeric_issues(value: object) -> list[tuple[str, str, dict]]:
     elif isinstance(value, dict):
         if value.get("kind") == "literal" and value["lexeme"] != ".":
             number = Fraction(value["lexeme"])
-            if abs(number) > 2 ** 20 or number.denominator > 1024 or number.denominator & (number.denominator - 1):
-                found.append(("NUMERIC_PROFILE", "Literal needs a numerical policy outside the exact dyadic profile", value["span"]))
+            if (
+                abs(number) > 2**20
+                or number.denominator > 1024
+                or number.denominator & (number.denominator - 1)
+            ):
+                found.append(
+                    (
+                        "NUMERIC_PROFILE",
+                        "Literal needs a numerical policy outside the exact dyadic profile",
+                        value["span"],
+                    )
+                )
         if value.get("kind") == "binary" and value.get("operator") == "/":
             denominator = value["right"]
             while denominator.get("kind") in ("group", "unary"):
@@ -354,9 +445,19 @@ def _numeric_issues(value: object) -> list[tuple[str, str, dict]]:
                 valid = False
             else:
                 number = abs(Fraction(denominator["lexeme"]))
-                valid = bool(number) and not (number.numerator & (number.numerator - 1)) and not (number.denominator & (number.denominator - 1))
+                valid = (
+                    bool(number)
+                    and not (number.numerator & (number.numerator - 1))
+                    and not (number.denominator & (number.denominator - 1))
+                )
             if not valid:
-                found.append(("NUMERIC_DIVISION_PROFILE", "Division requires a nonzero literal power-of-two divisor", value["span"]))
+                found.append(
+                    (
+                        "NUMERIC_DIVISION_PROFILE",
+                        "Division requires a nonzero literal power-of-two divisor",
+                        value["span"],
+                    )
+                )
         for key, item in value.items():
             if key != "span":
                 found.extend(_numeric_issues(item))
@@ -364,11 +465,20 @@ def _numeric_issues(value: object) -> list[tuple[str, str, dict]]:
 
 
 def _dataset(cursor: _Cursor, macros: dict, macro_facts: list) -> str:
+    """Consume an explicit WORK name, recording only resolved literal macro uses."""
     start = cursor.i
 
     def contiguous():
-        if any(left.end != right.start for left, right in zip(cursor.tokens[start:cursor.i], cursor.tokens[start + 1:cursor.i])):
-            raise _Syntax("UNSUPPORTED_DATASET_TOKEN", "Dataset names and macro substitutions must be contiguous tokens")
+        if any(
+            left.end != right.start
+            for left, right in zip(
+                cursor.tokens[start : cursor.i], cursor.tokens[start + 1 : cursor.i]
+            )
+        ):
+            raise _Syntax(
+                "UNSUPPORTED_DATASET_TOKEN",
+                "Dataset names and macro substitutions must be contiguous tokens",
+            )
 
     prefix = ""
     if cursor.peek("work"):
@@ -380,13 +490,25 @@ def _dataset(cursor: _Cursor, macros: dict, macro_facts: list) -> str:
         cursor.accept(".")
         binding = macros.get(name)
         if binding is None or binding.get("unresolved"):
-            raise _Syntax("UNRESOLVED_MACRO", "Dataset token references an undefined literal macro binding")
+            raise _Syntax(
+                "UNRESOLVED_MACRO", "Dataset token references an undefined literal macro binding"
+            )
         value = prefix + binding["value"].lower()
         if not re.fullmatch(r"work\.[A-Za-z_][A-Za-z0-9_]{0,31}", value):
-            raise _Syntax("UNSUPPORTED_MACRO_SUBSTITUTION", "Macro binding does not produce one explicit WORK dataset")
+            raise _Syntax(
+                "UNSUPPORTED_MACRO_SUBSTITUTION",
+                "Macro binding does not produce one explicit WORK dataset",
+            )
         contiguous()
-        macro_facts.append({"kind": "macro_use", "span": cursor.span(start),
-                            "name": name, "value": binding["value"], "definition_span": binding["span"]})
+        macro_facts.append(
+            {
+                "kind": "macro_use",
+                "span": cursor.span(start),
+                "name": name,
+                "value": binding["value"],
+                "definition_span": binding["span"],
+            }
+        )
         return value
     if not prefix:
         raise _Syntax("IMPLICIT_OR_EXTERNAL_DATASET", "Dataset must be an explicit WORK name")
@@ -400,23 +522,42 @@ def _action(cursor: _Cursor, guard: dict | None = None) -> dict:
     target = cursor.name()
     if cursor.accept("+"):
         expression = _expression(cursor)
-        return {"kind": "sum", "span": cursor.span(start), "target": target,
-                "expression": expression, "guard": guard}
+        return {
+            "kind": "sum",
+            "span": cursor.span(start),
+            "target": target,
+            "expression": expression,
+            "guard": guard,
+        }
     cursor.take("=")
     if cursor.peek("lag") or cursor.peek("lag2"):
         pos, name = cursor.i, cursor.take().lower
         cursor.take("(")
         arg_start = cursor.i
         argument = cursor.name()
-        arg = {"kind": "name", "name": argument, "lexeme": cursor.tokens[arg_start].text,
-               "span": cursor.span(arg_start)}
+        arg = {
+            "kind": "name",
+            "name": argument,
+            "lexeme": cursor.tokens[arg_start].text,
+            "span": cursor.span(arg_start),
+        }
         cursor.take(")")
-        expression = {"kind": "lag", "name": name, "argument": arg,
-                      "queue_size": 1 if name == "lag" else 2, "span": cursor.span(pos)}
+        expression = {
+            "kind": "lag",
+            "name": name,
+            "argument": arg,
+            "queue_size": 1 if name == "lag" else 2,
+            "span": cursor.span(pos),
+        }
     else:
         expression = _expression(cursor)
-    return {"kind": "assignment", "span": cursor.span(start), "target": target,
-            "expression": expression, "guard": guard}
+    return {
+        "kind": "assignment",
+        "span": cursor.span(start),
+        "target": target,
+        "expression": expression,
+        "guard": guard,
+    }
 
 
 def _data_statement(cursor: _Cursor, macros: dict, macro_facts: list) -> dict:
@@ -427,15 +568,22 @@ def _data_statement(cursor: _Cursor, macros: dict, macro_facts: list) -> dict:
         while cursor.peek():
             inputs.append(_dataset(cursor, macros, macro_facts))
         if len(inputs) not in ((1, 2) if mode == "SET" else (2,)):
-            raise _Syntax("UNSUPPORTED_INPUT_COUNT", "SET accepts one or two inputs; MERGE exactly two")
+            raise _Syntax(
+                "UNSUPPORTED_INPUT_COUNT", "SET accepts one or two inputs; MERGE exactly two"
+            )
         return {"kind": "input", "span": cursor.span(start), "mode": mode, "datasets": inputs}
     if cursor.accept("by"):
         keys = []
         while cursor.peek():
             keys.append(cursor.name())
-        if (len(keys) not in (1, 2) or len(set(keys)) != len(keys)
-                or set(keys) & {"descending", "notsorted", "groupformat"}):
-            raise _Syntax("UNSUPPORTED_BY", "BY requires one or two distinct ascending numeric keys")
+        if (
+            len(keys) not in (1, 2)
+            or len(set(keys)) != len(keys)
+            or set(keys) & {"descending", "notsorted", "groupformat"}
+        ):
+            raise _Syntax(
+                "UNSUPPORTED_BY", "BY requires one or two distinct ascending numeric keys"
+            )
         return {"kind": "by", "span": cursor.span(start), "keys": keys, "ascending": True}
     if cursor.accept("retain"):
         target = cursor.name()
@@ -491,9 +639,16 @@ def _sql_statement(cursor: _Cursor, macros: dict, macro_facts: list) -> tuple[st
         left = _expression(cursor, qualified=True)
         cursor.take("=")
         right = _expression(cursor, qualified=True)
-        if (left["kind"] != "name" or right["kind"] != "name"
-                or {left["name"].split(".")[0], right["name"].split(".")[0]} != {x["alias"] for x in inputs}):
-            raise _Syntax("UNSUPPORTED_JOIN_CONDITION", "ON requires one equality between the two input key columns")
+        if (
+            left["kind"] != "name"
+            or right["kind"] != "name"
+            or {left["name"].split(".")[0], right["name"].split(".")[0]}
+            != {x["alias"] for x in inputs}
+        ):
+            raise _Syntax(
+                "UNSUPPORTED_JOIN_CONDITION",
+                "ON requires one equality between the two input key columns",
+            )
         join = {"kind": kind, "left": left, "right": right}
     where = _condition(cursor, qualified=True) if cursor.accept("where") else None
     order = []
@@ -505,14 +660,18 @@ def _sql_statement(cursor: _Cursor, macros: dict, macro_facts: list) -> tuple[st
             order.append(cursor.name())
             cursor.accept("asc")
         if len(set(order)) != len(order) or not set(order) <= {x["output"] for x in selected}:
-            raise _Syntax("UNSUPPORTED_SQL_ORDER", "ORDER BY requires distinct selected output names")
+            raise _Syntax(
+                "UNSUPPORTED_SQL_ORDER", "ORDER BY requires distinct selected output names"
+            )
     cursor.finish()
     aliases = {x["alias"] for x in inputs}
 
     def check_alias(value):
         if isinstance(value, dict):
             if value.get("kind") == "name" and value["name"].split(".")[0] not in aliases:
-                raise _Syntax("UNKNOWN_SQL_ALIAS", "Expression references an undeclared SQL input alias")
+                raise _Syntax(
+                    "UNKNOWN_SQL_ALIAS", "Expression references an undeclared SQL input alias"
+                )
             for item in value.values():
                 check_alias(item)
         elif isinstance(value, list):
@@ -521,11 +680,24 @@ def _sql_statement(cursor: _Cursor, macros: dict, macro_facts: list) -> tuple[st
 
     check_alias(selected)
     check_alias(where)
-    return output, {"kind": "sql", "span": cursor.span(start), "inputs": inputs,
-                    "select": selected, "join": join, "where": where, "order_by": order}
+    return output, {
+        "kind": "sql",
+        "span": cursor.span(start),
+        "inputs": inputs,
+        "select": selected,
+        "join": join,
+        "where": where,
+        "order_by": order,
+    }
 
 
 class _Session:
+    """Accumulate facts, refusals, and budgets across one entry point and includes.
+
+    The macro mapping is borrowed and mutated, not copied. Includes share parser
+    state but acquire bytes only through the caller-supplied loader.
+    """
+
     def __init__(self, macros: dict, loader: IncludeLoader | None):
         self.macros, self.loader = macros, loader
         self.operations, self.statements, self.issues = [], [], []
@@ -545,55 +717,134 @@ class _Session:
             self.macros[name] = {**binding, "unresolved": True}
 
     def operation(self, kind: str, source: _Source, frame: dict) -> dict:
-        return {"kind": kind, "span": source.span(frame["start"], frame["end"]),
-                "statements": [], "facts": [], "reads": [], "writes": [], "issues": []}
+        return {
+            "kind": kind,
+            "span": source.span(frame["start"], frame["end"]),
+            "statements": [],
+            "facts": [],
+            "reads": [],
+            "writes": [],
+            "issues": [],
+        }
 
     def finish(self, operation: dict, source: _Source, start: int, end: int):
+        """Append an operation after cross-statement diagnostics, not semantic proof."""
         operation["span"] = source.span(start, end)
         if operation["kind"] == "DATA_STEP":
             inputs = [f for f in operation["facts"] if f["kind"] == "input"]
             bys = [f for f in operation["facts"] if f["kind"] == "by"]
             if len(inputs) != 1:
-                self.add_issue(operation, _issue(source, "INPUT_STATEMENT_COUNT", "DATA step requires exactly one SET or MERGE statement", start, end))
+                self.add_issue(
+                    operation,
+                    _issue(
+                        source,
+                        "INPUT_STATEMENT_COUNT",
+                        "DATA step requires exactly one SET or MERGE statement",
+                        start,
+                        end,
+                    ),
+                )
             if len(bys) > 1:
-                self.add_issue(operation, _issue(source, "BY_STATEMENT_COUNT", "Only one BY declaration is supported", start, end))
+                self.add_issue(
+                    operation,
+                    _issue(
+                        source,
+                        "BY_STATEMENT_COUNT",
+                        "Only one BY declaration is supported",
+                        start,
+                        end,
+                    ),
+                )
             if len(inputs) == 1:
                 inp = inputs[0]
                 if any(operation["facts"].index(by) < operation["facts"].index(inp) for by in bys):
                     for by in bys:
                         if operation["facts"].index(by) < operation["facts"].index(inp):
-                            self.add_issue(operation, {"code": "BY_PRECEDES_INPUT",
-                                                       "message": "DATA-step BY must follow its SET or MERGE statement",
-                                                       "span": by["span"]})
+                            self.add_issue(
+                                operation,
+                                {
+                                    "code": "BY_PRECEDES_INPUT",
+                                    "message": "DATA-step BY must follow its SET or MERGE statement",
+                                    "span": by["span"],
+                                },
+                            )
                 if inp["mode"] == "MERGE" and (len(bys) != 1 or len(bys[0]["keys"]) != 1):
-                    self.add_issue(operation, _issue(source, "MERGE_REQUIRES_BY", "MERGE requires one ascending numeric BY key", start, end))
+                    self.add_issue(
+                        operation,
+                        _issue(
+                            source,
+                            "MERGE_REQUIRES_BY",
+                            "MERGE requires one ascending numeric BY key",
+                            start,
+                            end,
+                        ),
+                    )
                 if inp["mode"] == "SET" and len(inp["datasets"]) == 2 and bys:
-                    self.add_issue(operation, _issue(source, "INTERLEAVING_SET_UNSUPPORTED", "Multi-input SET with BY is outside the profile", start, end))
+                    self.add_issue(
+                        operation,
+                        _issue(
+                            source,
+                            "INTERLEAVING_SET_UNSUPPORTED",
+                            "Multi-input SET with BY is outside the profile",
+                            start,
+                            end,
+                        ),
+                    )
             keys = set(bys[0]["keys"]) if len(bys) == 1 else set()
             for fact in operation["facts"]:
                 guard = fact.get("guard") or fact.get("condition")
                 if guard and guard["kind"] == "by_flag" and guard["key"] not in keys:
-                    self.add_issue(operation, {"code": "UNBOUND_BY_FLAG", "message": "FIRST/LAST flag has no supported BY key", "span": guard["span"]})
+                    self.add_issue(
+                        operation,
+                        {
+                            "code": "UNBOUND_BY_FLAG",
+                            "message": "FIRST/LAST flag has no supported BY key",
+                            "span": guard["span"],
+                        },
+                    )
         for fact in operation["facts"]:
             for code, message, span in _numeric_issues(fact):
                 self.add_issue(operation, {"code": code, "message": message, "span": span})
         for dataset in operation["writes"]:
             if dataset in self.outputs:
-                self.add_issue(operation, _issue(source, "DATASET_OVERWRITE", "Dataset output names must be written once per scoped case", start, end))
+                self.add_issue(
+                    operation,
+                    _issue(
+                        source,
+                        "DATASET_OVERWRITE",
+                        "Dataset output names must be written once per scoped case",
+                        start,
+                        end,
+                    ),
+                )
             self.outputs.add(dataset)
         self.operations.append(operation)
 
-    def include(self, source: _Source, frame: dict, cursor: _Cursor, stack: tuple[str, ...], statement: dict) -> tuple[str | None, bytes | None]:
-        """Resolve one explicit literal include without gaining file authority."""
+    def include(
+        self, source: _Source, frame: dict, cursor: _Cursor, stack: tuple[str, ...], statement: dict
+    ) -> tuple[str | None, bytes | None]:
+        """Resolve a literal include through borrowed authority and record failures.
+
+        Path spelling checks do not authorize filesystem access. Loader failures
+        handled here leave an issue and invalidate existing macro bindings.
+        """
         token = cursor.take()
         cursor.finish()
         if token.kind != "string" or len(token.text) < 2 or token.text[-1] != token.text[0]:
             raise _Syntax("DYNAMIC_INCLUDE", "INCLUDE requires one quoted literal path")
         path = token.text[1:-1].replace(token.text[0] * 2, token.text[0])
-        if (not path or len(path) > 4096 or len(path.split("/")) > 32
-                or any(part in ("", ".", "..") or not re.fullmatch(r"[A-Za-z0-9_.-]{1,128}", part)
-                       for part in path.split("/"))):
-            raise _Syntax("UNSAFE_INCLUDE", "INCLUDE path is outside the safe relative-path profile")
+        if (
+            not path
+            or len(path) > 4096
+            or len(path.split("/")) > 32
+            or any(
+                part in ("", ".", "..") or not re.fullmatch(r"[A-Za-z0-9_.-]{1,128}", part)
+                for part in path.split("/")
+            )
+        ):
+            raise _Syntax(
+                "UNSAFE_INCLUDE", "INCLUDE path is outside the safe relative-path profile"
+            )
         op = self.operation("INCLUDE", source, frame)
         op["statements"] = [statement]
         fact = {"kind": "include", "span": statement["span"], "path": path, "target_file_key": None}
@@ -620,33 +871,90 @@ class _Session:
             self.poison_macros()
             included = None
         except (KeyError, ValueError, OSError):
-            self.add_issue(op, _issue(source, "UNRESOLVED_INCLUDE", "Literal include has no readable authorized mapping", frame["start"], frame["end"]))
+            self.add_issue(
+                op,
+                _issue(
+                    source,
+                    "UNRESOLVED_INCLUDE",
+                    "Literal include has no readable authorized mapping",
+                    frame["start"],
+                    frame["end"],
+                ),
+            )
             self.poison_macros()
             included = None
         self.finish(op, source, frame["start"], frame["end"])
         return target, included
 
-    def parse(self, data: bytes, file_key: str, stack: tuple[str, ...] = (), context: dict | None = None):
-        state = context or {"active": None, "block_start": None, "owner_source": None, "owner_end": None,
-                            "sort_input": None, "sort_output": None, "sort_keys": [], "sort_span": None}
+    def parse(
+        self, data: bytes, file_key: str, stack: tuple[str, ...] = (), context: dict | None = None
+    ):
+        """Accumulate one file's records and return block state for include traversal."""
+        state = context or {
+            "active": None,
+            "block_start": None,
+            "owner_source": None,
+            "owner_end": None,
+            "sort_input": None,
+            "sort_output": None,
+            "sort_keys": [],
+            "sort_span": None,
+        }
         if len(data) > MAX_SOURCE_BYTES:
-            span = {"file_key": file_key, "start": 0, "end": len(data), "line_start": 1,
-                    "line_end": 1 + sum(m.end() < len(data) for m in re.finditer(rb"\r\n|\r|\n", data))}
-            issue = {"code": "SOURCE_BYTE_LIMIT", "message": "Source exceeds the P1 per-file byte limit", "span": span}
+            span = {
+                "file_key": file_key,
+                "start": 0,
+                "end": len(data),
+                "line_start": 1,
+                "line_end": 1 + sum(m.end() < len(data) for m in re.finditer(rb"\r\n|\r|\n", data)),
+            }
+            issue = {
+                "code": "SOURCE_BYTE_LIMIT",
+                "message": "Source exceeds the P1 per-file byte limit",
+                "span": span,
+            }
             self.issues.append(issue)
             statement = {"span": span, "classification": "UNKNOWN"}
             self.statements.append(statement)
-            self.operations.append({"kind": "UNKNOWN", "span": span, "statements": [statement],
-                                    "facts": [], "reads": [], "writes": [], "issues": [issue]})
+            self.operations.append(
+                {
+                    "kind": "UNKNOWN",
+                    "span": span,
+                    "statements": [statement],
+                    "facts": [],
+                    "reads": [],
+                    "writes": [],
+                    "issues": [issue],
+                }
+            )
             return state
         try:
             source = _Source(data, file_key)
         except UnicodeDecodeError:
-            span = {"file_key": file_key, "start": 0, "end": len(data), "line_start": 1,
-                    "line_end": 1 + sum(m.end() < len(data) for m in re.finditer(rb"\r\n|\r|\n", data))}
-            issue = {"code": "UNSUPPORTED_ENCODING", "message": "Only strict UTF-8/ASCII is supported", "span": span}
+            span = {
+                "file_key": file_key,
+                "start": 0,
+                "end": len(data),
+                "line_start": 1,
+                "line_end": 1 + sum(m.end() < len(data) for m in re.finditer(rb"\r\n|\r|\n", data)),
+            }
+            issue = {
+                "code": "UNSUPPORTED_ENCODING",
+                "message": "Only strict UTF-8/ASCII is supported",
+                "span": span,
+            }
             self.issues.append(issue)
-            self.operations.append({"kind": "UNKNOWN", "span": span, "statements": [{"span": span, "classification": "UNKNOWN"}], "facts": [], "reads": [], "writes": [], "issues": [issue]})
+            self.operations.append(
+                {
+                    "kind": "UNKNOWN",
+                    "span": span,
+                    "statements": [{"span": span, "classification": "UNKNOWN"}],
+                    "facts": [],
+                    "reads": [],
+                    "writes": [],
+                    "issues": [issue],
+                }
+            )
             self.statements.append({"span": span, "classification": "UNKNOWN"})
             return state
         self.visited.add(file_key)
@@ -654,7 +962,16 @@ class _Session:
         if self.line_count > MAX_LINES or len(self.visited) > MAX_FILES:
             frame = {"start": 0, "end": len(source.text)}
             op = self.operation("UNKNOWN", source, frame)
-            self.add_issue(op, _issue(source, "SOURCE_LIMIT", "Source line or file count exceeds the bounded profile", 0, len(source.text)))
+            self.add_issue(
+                op,
+                _issue(
+                    source,
+                    "SOURCE_LIMIT",
+                    "Source line or file count exceeds the bounded profile",
+                    0,
+                    len(source.text),
+                ),
+            )
             statement = {"span": op["span"], "classification": "UNKNOWN"}
             op["statements"].append(statement)
             self.statements.append(statement)
@@ -673,14 +990,25 @@ class _Session:
             return state
         active, block_start = state["active"], state["block_start"]
         owner_source, owner_end = state["owner_source"], state["owner_end"]
-        sort_input, sort_output, sort_keys, sort_span = state["sort_input"], state["sort_output"], state["sort_keys"], state["sort_span"]
+        sort_input, sort_output, sort_keys, sort_span = (
+            state["sort_input"],
+            state["sort_output"],
+            state["sort_keys"],
+            state["sort_span"],
+        )
         for frame in frames:
+            # Included facts keep their own spans; the block span stays anchored
+            # to its header's file rather than mixing coordinates across files.
             if active and owner_source.file_key == file_key:
                 owner_end = frame["end"]
             tokens = frame["tokens"]
             self.token_count += len(tokens)
-            statement = {"span": source.span(frame["start"], frame["end"]),
-                         "classification": "COMMENT" if frame["comment"] and not frame["issues"] else "UNKNOWN"}
+            statement = {
+                "span": source.span(frame["start"], frame["end"]),
+                "classification": "COMMENT"
+                if frame["comment"] and not frame["issues"]
+                else "UNKNOWN",
+            }
             self.statements.append(statement)
             if frame["comment"] and not frame["issues"]:
                 if active:
@@ -693,16 +1021,31 @@ class _Session:
                 statement["classification"] = "UNKNOWN"
                 op = active or self.operation("UNKNOWN", source, frame)
                 op["statements"].append(statement)
-                self.add_issue(op, _issue(source, "PARSER_LIMIT", "Operation or token budget exceeded; remaining source is unresolved", frame["start"], len(source.text)))
-                self.finish(op, owner_source if active else source,
-                            block_start if active else frame["start"],
-                            owner_end if active else len(source.text))
+                self.add_issue(
+                    op,
+                    _issue(
+                        source,
+                        "PARSER_LIMIT",
+                        "Operation or token budget exceeded; remaining source is unresolved",
+                        frame["start"],
+                        len(source.text),
+                    ),
+                )
+                self.finish(
+                    op,
+                    owner_source if active else source,
+                    block_start if active else frame["start"],
+                    owner_end if active else len(source.text),
+                )
                 active = None
                 break
             op = active or self.operation("UNKNOWN", source, frame)
             op["statements"].append(statement)
             if frame["issues"]:
-                if any(x["code"] in {"MACRO_BEARING_COMMENT", "UNCLOSED_QUOTE", "UNCLOSED_COMMENT"} for x in frame["issues"]):
+                if any(
+                    x["code"] in {"MACRO_BEARING_COMMENT", "UNCLOSED_QUOTE", "UNCLOSED_COMMENT"}
+                    for x in frame["issues"]
+                ):
                     self.poison_macros()
                 for issue in frame["issues"]:
                     self.add_issue(op, issue)
@@ -717,27 +1060,64 @@ class _Session:
                     cursor.take("include")
                     target, included = self.include(source, frame, cursor, stack, statement)
                     if included is not None:
-                        state = self.parse(included, target, (*stack, file_key),
-                                           {"active": active, "block_start": block_start, "owner_source": owner_source,
-                                            "owner_end": owner_end, "sort_input": sort_input, "sort_output": sort_output,
-                                            "sort_keys": sort_keys, "sort_span": sort_span})
+                        state = self.parse(
+                            included,
+                            target,
+                            (*stack, file_key),
+                            {
+                                "active": active,
+                                "block_start": block_start,
+                                "owner_source": owner_source,
+                                "owner_end": owner_end,
+                                "sort_input": sort_input,
+                                "sort_output": sort_output,
+                                "sort_keys": sort_keys,
+                                "sort_span": sort_span,
+                            },
+                        )
                         active, block_start = state["active"], state["block_start"]
                         owner_source, owner_end = state["owner_source"], state["owner_end"]
-                        sort_input, sort_output, sort_keys, sort_span = state["sort_input"], state["sort_output"], state["sort_keys"], state["sort_span"]
+                        sort_input, sort_output, sort_keys, sort_span = (
+                            state["sort_input"],
+                            state["sort_output"],
+                            state["sort_keys"],
+                            state["sort_span"],
+                        )
                     continue
                 if active:
                     if cursor.peek("run") or cursor.peek("quit"):
                         terminator = cursor.take().lower
                         cursor.finish()
                         if (active["kind"] == "PROC_SQL") != (terminator == "quit"):
-                            raise _Syntax("WRONG_TERMINATOR", "DATA/SORT require RUN; SQL requires QUIT")
+                            raise _Syntax(
+                                "WRONG_TERMINATOR", "DATA/SORT require RUN; SQL requires QUIT"
+                            )
                         if active["kind"] == "PROC_SORT":
                             if not sort_keys:
                                 raise _Syntax("SORT_REQUIRES_BY", "SORT requires one BY statement")
-                            active["facts"].append({"kind": "sort", "span": sort_span,
-                                                    "input": sort_input, "output": sort_output, "keys": sort_keys})
-                        if active["kind"] == "PROC_SQL" and sum(f["kind"] == "sql" for f in active["facts"]) != 1:
-                            self.add_issue(active, _issue(owner_source, "SQL_STATEMENT_COUNT", "PROC SQL requires exactly one CREATE TABLE", block_start, owner_end))
+                            active["facts"].append(
+                                {
+                                    "kind": "sort",
+                                    "span": sort_span,
+                                    "input": sort_input,
+                                    "output": sort_output,
+                                    "keys": sort_keys,
+                                }
+                            )
+                        if (
+                            active["kind"] == "PROC_SQL"
+                            and sum(f["kind"] == "sql" for f in active["facts"]) != 1
+                        ):
+                            self.add_issue(
+                                active,
+                                _issue(
+                                    owner_source,
+                                    "SQL_STATEMENT_COUNT",
+                                    "PROC SQL requires exactly one CREATE TABLE",
+                                    block_start,
+                                    owner_end,
+                                ),
+                            )
                         statement["classification"] = "TERMINATOR"
                         self.finish(active, owner_source, block_start, owner_end)
                         active = None
@@ -751,18 +1131,31 @@ class _Session:
                     elif active["kind"] == "PROC_SORT":
                         cursor.take("by")
                         if sort_keys:
-                            raise _Syntax("SORT_BY_COUNT", "Only one SORT BY statement is supported")
+                            raise _Syntax(
+                                "SORT_BY_COUNT", "Only one SORT BY statement is supported"
+                            )
                         while cursor.peek():
                             sort_keys.append(cursor.name())
-                        if (len(sort_keys) not in (1, 2) or len(set(sort_keys)) != len(sort_keys)
-                                or set(sort_keys) & {"descending", "notsorted", "groupformat"}):
-                            raise _Syntax("UNSUPPORTED_BY", "SORT requires one or two distinct ascending keys")
+                        if (
+                            len(sort_keys) not in (1, 2)
+                            or len(set(sort_keys)) != len(sort_keys)
+                            or set(sort_keys) & {"descending", "notsorted", "groupformat"}
+                        ):
+                            raise _Syntax(
+                                "UNSUPPORTED_BY", "SORT requires one or two distinct ascending keys"
+                            )
                         sort_span = statement["span"]
                     else:
                         if any(f["kind"] == "sql" for f in active["facts"]):
-                            raise _Syntax("SQL_STATEMENT_COUNT", "Only one CREATE TABLE per PROC SQL is supported")
+                            raise _Syntax(
+                                "SQL_STATEMENT_COUNT",
+                                "Only one CREATE TABLE per PROC SQL is supported",
+                            )
                         output, fact = _sql_statement(cursor, self.macros, macro_facts)
-                        active["facts"].extend(macro_facts + [{"kind": "output", "span": fact["span"], "dataset": output}, fact])
+                        active["facts"].extend(
+                            macro_facts
+                            + [{"kind": "output", "span": fact["span"], "dataset": output}, fact]
+                        )
                         active["reads"] = [x["dataset"] for x in fact["inputs"]]
                         active["writes"] = [output]
                     statement["classification"] = "FACT"
@@ -770,7 +1163,9 @@ class _Session:
                     output = _dataset(cursor, self.macros, macro_facts)
                     cursor.finish()
                     op["kind"] = "DATA_STEP"
-                    op["facts"] = macro_facts + [{"kind": "output", "span": statement["span"], "dataset": output}]
+                    op["facts"] = macro_facts + [
+                        {"kind": "output", "span": statement["span"], "dataset": output}
+                    ]
                     op["writes"] = [output]
                     active, block_start = op, frame["start"]
                     owner_source, owner_end = source, frame["end"]
@@ -786,16 +1181,25 @@ class _Session:
                         sort_output = _dataset(cursor, self.macros, macro_facts)
                         cursor.finish()
                         if sort_input == sort_output:
-                            raise _Syntax("IN_PLACE_SORT", "PROC SORT requires a distinct output dataset")
+                            raise _Syntax(
+                                "IN_PLACE_SORT", "PROC SORT requires a distinct output dataset"
+                            )
                         sort_keys = []
                         sort_span = None
-                        op["kind"], op["reads"], op["writes"] = "PROC_SORT", [sort_input], [sort_output]
+                        op["kind"], op["reads"], op["writes"] = (
+                            "PROC_SORT",
+                            [sort_input],
+                            [sort_output],
+                        )
                         op["facts"] = macro_facts
                     elif proc == "sql":
                         cursor.finish()
                         op["kind"] = "PROC_SQL"
                     else:
-                        raise _Syntax("UNSUPPORTED_PROCEDURE", "Only PROC SORT and bounded PROC SQL are supported")
+                        raise _Syntax(
+                            "UNSUPPORTED_PROCEDURE",
+                            "Only PROC SORT and bounded PROC SQL are supported",
+                        )
                     active, block_start = op, frame["start"]
                     owner_source, owner_end = source, frame["end"]
                     statement["classification"] = "HEADER"
@@ -808,22 +1212,44 @@ class _Session:
                         value = cursor.name()
                         if cursor.accept("."):
                             if value != "work":
-                                raise _Syntax("UNSUPPORTED_MACRO_VALUE", "Literal macro values are a name or complete WORK name")
+                                raise _Syntax(
+                                    "UNSUPPORTED_MACRO_VALUE",
+                                    "Literal macro values are a name or complete WORK name",
+                                )
                             value += "." + cursor.name()
                         cursor.finish()
-                        raw = source.text[tokens[value_start].start:tokens[-1].end]
+                        raw = source.text[tokens[value_start].start : tokens[-1].end]
                         if any(c.isspace() for c in raw) or "/*" in raw:
-                            raise _Syntax("UNSUPPORTED_MACRO_VALUE", "Macro literal cannot contain whitespace or comments")
+                            raise _Syntax(
+                                "UNSUPPORTED_MACRO_VALUE",
+                                "Macro literal cannot contain whitespace or comments",
+                            )
                         if name in self.macros:
                             # The old value is no longer sound after an unsupported
                             # reassignment. Keep a tombstone instead of using it.
-                            self.macros[name] = {"value": raw, "span": statement["span"], "unresolved": True}
-                            raise _Syntax("MACRO_REASSIGNMENT", "Macro names may only be defined once")
+                            self.macros[name] = {
+                                "value": raw,
+                                "span": statement["span"],
+                                "unresolved": True,
+                            }
+                            raise _Syntax(
+                                "MACRO_REASSIGNMENT", "Macro names may only be defined once"
+                            )
                         self.macros[name] = {"value": raw, "span": statement["span"]}
                         op["kind"] = "MACRO"
-                        op["facts"] = [{"kind": "macro_binding", "span": statement["span"], "name": name, "value": raw}]
+                        op["facts"] = [
+                            {
+                                "kind": "macro_binding",
+                                "span": statement["span"],
+                                "name": name,
+                                "value": raw,
+                            }
+                        ]
                     else:
-                        raise _Syntax("UNSUPPORTED_MACRO", "Only open-code literal LET and INCLUDE are supported")
+                        raise _Syntax(
+                            "UNSUPPORTED_MACRO",
+                            "Only open-code literal LET and INCLUDE are supported",
+                        )
                     statement["classification"] = "FACT"
                     self.finish(op, source, frame["start"], frame["end"])
                 else:
@@ -831,31 +1257,81 @@ class _Session:
             except _Syntax as exc:
                 if tokens and tokens[0].text == "%":
                     self.poison_macros()
-                self.add_issue(op, _issue(source, exc.code, exc.message, frame["start"], frame["end"]))
+                self.add_issue(
+                    op, _issue(source, exc.code, exc.message, frame["start"], frame["end"])
+                )
                 if not active:
                     self.finish(op, source, frame["start"], frame["end"])
         if active and context is None:
-            self.add_issue(active, _issue(owner_source, "UNTERMINATED_BLOCK", "DATA/PROC block lacks its supported explicit terminator", block_start, owner_end))
+            self.add_issue(
+                active,
+                _issue(
+                    owner_source,
+                    "UNTERMINATED_BLOCK",
+                    "DATA/PROC block lacks its supported explicit terminator",
+                    block_start,
+                    owner_end,
+                ),
+            )
             self.finish(active, owner_source, block_start, owner_end)
-        return {"active": active, "block_start": block_start, "owner_source": owner_source, "owner_end": owner_end,
-                "sort_input": sort_input, "sort_output": sort_output, "sort_keys": sort_keys, "sort_span": sort_span}
+        return {
+            "active": active,
+            "block_start": block_start,
+            "owner_source": owner_source,
+            "owner_end": owner_end,
+            "sort_input": sort_input,
+            "sort_output": sort_output,
+            "sort_keys": sort_keys,
+            "sort_span": sort_span,
+        }
 
 
-def parse_source(data: bytes, *, file_key: str, macros: dict | None = None,
-                 include_loader: IncludeLoader | None = None) -> dict:
-    """Parse only supplied bytes; includes resolve solely through the caller.
+def parse_source(
+    data: bytes,
+    *,
+    file_key: str,
+    macros: dict | None = None,
+    include_loader: IncludeLoader | None = None,
+) -> dict:
+    """Parse supplied bytes into bounded facts and issues, without executing SAS.
 
-    ``macros`` is updated in encounter order, including included definitions.
-    The loader must return bytes from an already validated authorized scope; this
-    module never opens paths, performs network access, runs SAS or invokes a model.
-    Caller must apply global budgets across distinct entry points and preserve
-    returned issues. No successful parse is a semantic verification result.
+    Unsupported syntax and handled include failures are recorded, not silently
+    accepted. The caller must retain issues and apply global budgets across
+    distinct entry points. A successful return is not semantic verification.
+    This module does not open paths, access the network, or invoke a model;
+    any loader I/O and its authorization remain the caller's responsibility.
+
+    Loader exceptions other than handled KeyError, ValueError, OSError, and
+    internal syntax refusals propagate to the caller.
+
+    Args:
+        data: Original source bytes, decoded only as strict UTF-8/ASCII.
+        file_key: Nonempty identity used for this source's original-byte spans.
+        macros: Optional binding mapping, mutated in encounter order, including
+            included definitions and unresolved bindings after refusals.
+        include_loader: Optional callable receiving the including file key and
+            a literal relative path. It must return a target file key and bytes
+            from an already validated, authorized scope.
+
+    Returns:
+        Transient parser records, issues, visited file keys, and the profile.
+        The returned macro mapping is the supplied mapping when present, not a
+        copy. Semantic verification remains UNVERIFIABLE and acceptance BLOCKED.
+
+    Raises:
+        TypeError: If data is not bytes or file_key is not a nonempty string.
     """
     if not isinstance(data, bytes) or not isinstance(file_key, str) or not file_key:
         raise TypeError("parse_source requires bytes and a nonempty file key")
     session = _Session(macros if macros is not None else {}, include_loader)
     session.parse(data, file_key)
-    return {"profile": PROFILE, "operations": session.operations, "statements": session.statements,
-            "issues": session.issues, "macros": session.macros,
-            "files": sorted(session.visited), "semantic_verification": "UNVERIFIABLE",
-            "semantic_acceptance": "BLOCKED"}
+    return {
+        "profile": PROFILE,
+        "operations": session.operations,
+        "statements": session.statements,
+        "issues": session.issues,
+        "macros": session.macros,
+        "files": sorted(session.visited),
+        "semantic_verification": "UNVERIFIABLE",
+        "semantic_acceptance": "BLOCKED",
+    }

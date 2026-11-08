@@ -16,7 +16,11 @@ def metadata() -> dict:
 def _git(*args: str, cwd: Path | None = None) -> str:
     result = subprocess.run(
         ["git", "--no-optional-locks", "-c", "core.fsmonitor=false", *args],
-        cwd=cwd, capture_output=True, text=True, timeout=30, check=True,
+        cwd=cwd,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=True,
     )
     return result.stdout.strip()
 
@@ -24,14 +28,20 @@ def _git(*args: str, cwd: Path | None = None) -> str:
 def check_checkout(checkout: Path, baseline: dict) -> dict:
     """Compare HEAD, worktree cleanliness and every pinned file's actual bytes."""
     if filesystem_capabilities()["evidence_io"] != "AVAILABLE":
-        return {"check": "checkout", "stage_gate": "BLOCKED",
-                "reason": "Local checkout traversal is unavailable on this platform."}
+        return {
+            "check": "checkout",
+            "stage_gate": "BLOCKED",
+            "reason": "Local checkout traversal is unavailable on this platform.",
+        }
     expected = baseline["downstream"]
     try:
         root = checkout.resolve(strict=True)
         if Path(_git("rev-parse", "--show-toplevel", cwd=root)).resolve() != root:
-            return {"check": "checkout", "stage_gate": "BLOCKED",
-                    "reason": "Path must be the checkout root."}
+            return {
+                "check": "checkout",
+                "stage_gate": "BLOCKED",
+                "reason": "Path must be the checkout root.",
+            }
         head = _git("rev-parse", "HEAD", cwd=root)
         dirty = bool(_git("status", "--porcelain", "--untracked-files=normal", cwd=root))
         changed = []
@@ -43,14 +53,22 @@ def check_checkout(checkout: Path, baseline: dict) -> dict:
             elif not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest:
                 changed.append(name)
         drift = head != expected["commit"] or dirty or bool(changed)
-        return {"check": "checkout", "stage_gate": "FAIL" if drift else "PASS",
-                "expected_commit": expected["commit"], "observed_commit": head,
-                "worktree_clean": not dirty, "changed_or_missing_files": changed,
-                "files_checked": len(expected["file_sha256"])}
+        return {
+            "check": "checkout",
+            "stage_gate": "FAIL" if drift else "PASS",
+            "expected_commit": expected["commit"],
+            "observed_commit": head,
+            "worktree_clean": not dirty,
+            "changed_or_missing_files": changed,
+            "files_checked": len(expected["file_sha256"]),
+        }
     except (OSError, subprocess.SubprocessError, UnicodeError):
         # Git stderr can contain credential-bearing URLs or private file content.
-        return {"check": "checkout", "stage_gate": "BLOCKED",
-                "reason": "Checkout unavailable, unreadable, or Git check failed."}
+        return {
+            "check": "checkout",
+            "stage_gate": "BLOCKED",
+            "reason": "Checkout unavailable, unreadable, or Git check failed.",
+        }
 
 
 def check_remote(baseline: dict) -> dict:
@@ -65,12 +83,19 @@ def check_remote(baseline: dict) -> dict:
         head = rows[0][0]
         if len(head) != 40 or any(c not in "0123456789abcdef" for c in head):
             raise ValueError("Invalid commit")
-        return {"check": "remote", "stage_gate": "PASS" if head == expected["commit"] else "FAIL",
-                "expected_commit": expected["commit"], "observed_commit": head,
-                "branch": expected["branch"]}
+        return {
+            "check": "remote",
+            "stage_gate": "PASS" if head == expected["commit"] else "FAIL",
+            "expected_commit": expected["commit"],
+            "observed_commit": head,
+            "branch": expected["branch"],
+        }
     except (OSError, subprocess.SubprocessError, UnicodeError, ValueError):
-        return {"check": "remote", "stage_gate": "BLOCKED",
-                "reason": "Remote branch unavailable or response invalid; drift is unknown."}
+        return {
+            "check": "remote",
+            "stage_gate": "BLOCKED",
+            "reason": "Remote branch unavailable or response invalid; drift is unknown.",
+        }
 
 
 def report(checkout: Path | None, remote: bool) -> tuple[dict, int]:
@@ -82,7 +107,9 @@ def report(checkout: Path | None, remote: bool) -> tuple[dict, int]:
         checks.append(check_remote(baseline))
     gates = {item["stage_gate"] for item in checks}
     gate = "FAIL" if "FAIL" in gates else "BLOCKED" if "BLOCKED" in gates or not checks else "PASS"
-    return {"stage_gate": gate, "checks": checks,
-            "proves": "Only baseline identity and explicitly requested drift checks.",
-            "does_not_prove": ["downstream integration", "SAS semantics", "human approval"]}, {
-                "PASS": 0, "FAIL": 1, "BLOCKED": 2}[gate]
+    return {
+        "stage_gate": gate,
+        "checks": checks,
+        "proves": "Only baseline identity and explicitly requested drift checks.",
+        "does_not_prove": ["downstream integration", "SAS semantics", "human approval"],
+    }, {"PASS": 0, "FAIL": 1, "BLOCKED": 2}[gate]

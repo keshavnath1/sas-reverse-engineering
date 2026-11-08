@@ -34,6 +34,42 @@ The operator generates the evidence package and supplies its handoff to a human-
 | Candidate execution | Existing approval-gated continuations check claims, exact-byte human approval, and supported contracts before publication. The running-balance command separately runs a draft engineering example after verifying exact source and evidence identities. |
 | Validation | Repository checks, public engineering expectations, and deterministic replay cover the bounded implementation. Independent SAS comparison requires attributable inputs, outputs, and execution evidence. |
 
+## Python structure: where to read the implementation
+
+The package keeps its public entry points stable and groups private implementation details by responsibility. There is one implementation of each algorithm, not a new engine, plugin registry or duplicate compatibility implementation.
+
+| Area | Files and responsibility |
+| --- | --- |
+| Command entry | `cli.py` and `__main__.py` expose the existing `sas-re` and `python -m sas_re` commands. Operator-specific commands remain under `scripts/`. |
+| Source reconstruction | `sas_subset.py` parses supported original bytes; `semantic.py` reconstructs the bounded graph; `observations.py` binds supplied observations without claiming SAS execution. |
+| Evidence and authorization | `evidence.py` binds inventory, scope, citations and coverage; `contracts.py` validates the existing JSON schemas; `authorization.py` checks declared scope without granting business approval. |
+| Attempts and publication | `runs.py` and `semantic_runs.py` coordinate supported attempts. `safeio.py` delegates protected file access and no-clobber publication. |
+| Private platform code | `_filesystem/` contains POSIX and private Windows implementations. Public `platform_io.py` and `preflight.py` keep capability checks and lazy selection; Windows evidence I/O remains blocked. |
+| Private review code | `_review/` contains dependency diagnostics, draft preview generation and decision-review rendering. Three tiny old import modules forward explicitly to these implementations so existing scripts keep working. |
+| Immutable contracts | `contracts/` and `data/` retain the original JSON schema and baseline resource locations; they are not renamed Python implementation packages. |
+
+The existing path through the code is:
+
+```text
+CLI or supported operator script
+  → authorized scope and protected source read
+  → inventory + bounded SAS parser + semantic reconstruction
+  → bound evidence + dependency/review analysis
+  → supported attempt or candidate route, subject to its existing gates
+```
+
+Not every command traverses every step. Reading or rendering supplied evidence is distinct from reconstructing source or publishing a candidate. AI skills interpret the selected evidence; this Python layout does not add automatic skill execution.
+
+### Contributor standards
+
+- Use four-space indentation, snake_case functions/modules and descriptive test names. The optional formatter configuration in `pyproject.toml` targets Python 3.12 with a 100-character line length.
+- Document public inputs, returns, refusal conditions and side effects. Existing annotations and signatures remain stable; JSON schemas, rather than prose or new wrapper classes, define validated record shapes.
+- Comment non-obvious invariants: original-byte coordinates, ordering/state, missing values, multiplicity, descriptor ownership and refusal rules. Do not annotate every obvious statement.
+- Keep business decisions, expected values, tolerances and authority statuses separate from candidate logic. Never change frozen evaluator bytes or accepted artifacts to make a refactor pass.
+- Place tests in the responsibility groups described by `tests/README.md`; use the existing `unittest` suite, with clear arrange, act and assert steps. Security tests patch the actual owning implementation, not a facade that conceals its globals.
+
+Optional contributor formatting is `ruff format src/sas_re tests`. Ruff is development-only, not a runtime dependency or additional verification framework. The configuration excludes frozen expectation/adaptor files, independent vectors, fixtures and historical scripts. Use the existing regression, repository-guard and installed-wheel checks from the README for acceptance.
+
 ## How the five skills collaborate
 
 Use the selected evidence and its manifest throughout. Skills can work
@@ -108,10 +144,10 @@ comparison is a design choice, with no attribution to Thompson.
 
 | Practice | Repository evidence | Implementation status | Limitation |
 | --- | --- | --- | --- |
-| **J2 — Repository-aware planning and explicit scope.** Establish what can be analyzed before planning a migration. | [INTAKE implementation](../scripts/review_intake.py), [public operator walkthrough](../examples/sas-modernization/README.md), [scope](../tests/fixtures/running-balance-workload/source/scope.json), and [INTAKE tests](../tests/test_review_intake.py). | IMPLEMENTED and DEMONSTRATED. The public example binds the entry point, literal includes, source hashes, and typed profile. | Scope and profile are explicit. Unsupported or uninspected source remains a coverage boundary. |
+| **J2 — Repository-aware planning and explicit scope.** Establish what can be analyzed before planning a migration. | [INTAKE implementation](../scripts/review_intake.py), [public operator walkthrough](../examples/sas-modernization/README.md), [scope](../tests/fixtures/running-balance-workload/source/scope.json), and [INTAKE tests](../tests/workflow/test_review_intake.py). | IMPLEMENTED and DEMONSTRATED. The public example binds the entry point, literal includes, source hashes, and typed profile. | Scope and profile are explicit. Unsupported or uninspected source remains a coverage boundary. |
 | **J3 — Observable feedback and verification integrity.** Keep source traceability separate from runtime claims. | [Inventory engine](../src/sas_re/evidence.py), [reconstruction engine](../src/sas_re/semantic.py), [TRACE/MAP renderer](../scripts/migration_review.py), and [public evidence graph](../tests/fixtures/running-balance-workload/evidence/EVIDENCE.json). | IMPLEMENTED and DEMONSTRATED. The graph records source-qualified spans, six operations, and four inferred dependencies. | Graph edges leave runtime order, dataset-version continuity, and independence unverified. |
 | **J5 — Focused, progressively supplied context.** Give each of the [five skills](#how-the-five-skills-collaborate) the evidence needed for its deliverable. | [Generated Copilot handoff](../tests/fixtures/running-balance-workload/evidence/MODERNIZATION_REVIEW.md), [requirements and design review](../tests/fixtures/running-balance-workload/REVIEW.md), and [recorded live review and correction](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/goal4c/README.md). | DEMONSTRATED for handoff generation and a separate live review of the same pattern. The live drafts required correction before human design approval. | The team example contains draft PRD, module specifications, HLD, LLD, and ADRs. The handoff is human-invoked and does not guarantee correct claims or automate approval. |
-| **J2 — Acceptance criteria and human gates.** Keep configuration, design approval, and execution authority distinct. | [Migration profile](../tests/fixtures/running-balance-workload/evidence/migration-profile.yaml), [tie-out draft](../tests/fixtures/running-balance-workload/evidence/tie-out.yaml), [claim gate](../scripts/review_claim_gate.py), and [gated continuation tests](../tests/test_review_to_migration.py). | IMPLEMENTED and DEMONSTRATED for supported approval-gated routes. | The running-balance example is a separate draft engineering route. Its business approval and runtime selection remain pending. |
-| **J3 — Executable feedback within the verified contract.** Test the recovered behavior with explicit engineering expectations. | [Running-balance implementation](../scripts/run_running_balance.py), [operator guide](../examples/running-balance/README.md), and [public tests](../tests/test_running_balance.py). | IMPLEMENTED and DEMONSTRATED. The candidate executes ordered BY/RETAIN/SUM/LAG processing. Two-key SORT and SQL enrichment consume prepared rows separately. Tests check state, stable ties, missing values, join multiplicity, identity refusal, and replay. | Tied order and numeric handling are bounded engineering choices. The tested outputs do not establish independent SAS equivalence. |
+| **J2 — Acceptance criteria and human gates.** Keep configuration, design approval, and execution authority distinct. | [Migration profile](../tests/fixtures/running-balance-workload/evidence/migration-profile.yaml), [tie-out draft](../tests/fixtures/running-balance-workload/evidence/tie-out.yaml), [claim gate](../scripts/review_claim_gate.py), and [gated continuation tests](../tests/workflow/test_review_to_migration.py). | IMPLEMENTED and DEMONSTRATED for supported approval-gated routes. | The running-balance example is a separate draft engineering route. Its business approval and runtime selection remain pending. |
+| **J3 — Executable feedback within the verified contract.** Test the recovered behavior with explicit engineering expectations. | [Running-balance implementation](../scripts/run_running_balance.py), [operator guide](../examples/running-balance/README.md), and [public tests](../tests/workflow/test_running_balance.py). | IMPLEMENTED and DEMONSTRATED. The candidate executes ordered BY/RETAIN/SUM/LAG processing. Two-key SORT and SQL enrichment consume prepared rows separately. Tests check state, stable ties, missing values, join multiplicity, identity refusal, and replay. | Tied order and numeric handling are bounded engineering choices. The tested outputs do not establish independent SAS equivalence. |
 | **Project design — Compare runtimes against dependency and workload evidence.** | [Public architecture and optimization review](../tests/fixtures/running-balance-workload/REVIEW.md). | PROPOSED for Spark, Ray, and Dask. Native Python is demonstrated on the exact public workload. | Distribution requires evidence about ordering, state continuity, multiplicity, data movement, and workload cost. Benchmarks remain NOT_RUN. |
 | **J3 — Verification integrity at the semantic boundary.** Require attributable reference evidence before claiming equivalence. | [Public validation plan](../tests/fixtures/running-balance-workload/REVIEW.md#4-validation-and-engineering-tie-out) and [reference execution status](../tests/fixtures/running-balance-workload/evidence/tie-out.yaml). | UNVERIFIED for SAS semantics. | Public expectations and deterministic replay establish engineering behavior within the candidate contract. SAS reference execution remains NOT_RUN and semantic acceptance BLOCKED. |
