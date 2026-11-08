@@ -80,3 +80,55 @@ The checker verifies the cited documents' package bindings and uses the
 existing claim-gate pointer resolver. `BLOCK` reports unresolved or malformed
 citations. `REVIEW_REQUIRED` means the supplied citations resolved. Claim
 coverage, factual support and classification still require human review.
+
+## Workflow architecture
+
+The workflow below combines operator steps and tool boundaries. The
+five-skill review is human-invoked. Its deliverables inform human review.
+Only existing candidate contracts and approval routes can continue to execution.
+
+```mermaid
+flowchart TD
+    intake["Authorized INTAKE"] --> scope["Inventory and explicit scope"]
+    scope --> reconstruct["Deterministic source reconstruction"]
+    reconstruct --> evidence["Evidence, TRACE and MAP"]
+    evidence --> skills["Five Copilot skills"]
+    skills --> design["Draft PRD, specifications, HLD, LLD and ADRs"]
+    design --> review["Human review of decisions and configuration"]
+    review --> fit{"Supported candidate and applicable approval?"}
+    fit -->|Yes| candidate["Existing Python candidate"]
+    fit -->|No| stop["Stop at review with explicit gaps"]
+    candidate --> validation["Engineering tests and replay"]
+```
+
+The public running-balance command is a separate draft engineering route for
+an exact verified workload. It does not publish an approval-gated candidate.
+The P2A citation preflight checks pointers for design review. Existing GATE-1
+continuations use their own supported review subjects.
+
+## Script responsibilities
+
+Arrows show calls or the labeled artifact handoff. The two continuations
+remain separate operator commands.
+
+```mermaid
+flowchart TD
+    intake["review_intake.py"] -->|"bounded source route"| source["review_source.py"]
+    intake -->|"P2A route"| engine["sas_re.evidence.build_inventory<br/>sas_re.semantic.reconstruct"]
+    source --> subset["sas_re.sas_subset.parse_source<br/>source_rules.py and source_interval.py"]
+    source --> render["migration_review.py"]
+    intake --> render
+    intake -->|"evidence and draft YAML"| operator["Human-operated review"]
+    operator -->|"P2A Markdown"| cite["check_p2a_citations.py"]
+    cite -->|"reuses pointer_value"| claims["review_claim_gate.py"]
+    operator -->|"structured Copilot draft"| record["prepare_claim_record.py"]
+    record -->|"checks draft record"| claims
+    operator -->|"reviewed configuration"| plan["plan_modernization.py"]
+    continuation["review_to_migration.py<br/>review_mig5.py"] -->|"rechecks configuration"| config["configured_continuation.py"]
+    config --> plan
+    continuation -->|"checks claims and byte-bound approval"| claims
+    continuation -->|"supported route"| execute["migrate_projection_sort.py<br/>migrate_preparation_gates.py"]
+    intake -->|"exact evidence plus original INTAKE"| balance["run_running_balance.py"]
+    execute -->|"exercised by"| tests["Engineering comparisons and regression tests"]
+    balance -->|"exercised by"| tests
+```
