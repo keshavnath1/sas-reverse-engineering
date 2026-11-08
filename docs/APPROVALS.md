@@ -196,7 +196,7 @@ grant, drive scan or new runtime service/provider requirement. Host/reviewer,
 provisioning and native authority remain OPEN. Stop after CP3D; CP4/CP5/P2B/P3
 need separate approval. Existing repository-push authorization remains valid.
 
-On 2026-11-06 the user accepted the [post-CP3D roadmap](POST_CP3D_ROADMAP.md)
+On 2026-11-06 the user accepted the [post-CP3D roadmap](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/POST_CP3D_ROADMAP.md)
 at `dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc` and approved **P3-A1 only**.
 The explicit development-order exception allows one private, pure dependency
 and blocker diagnostic over supplied in-memory public synthetic canonical v2
@@ -222,7 +222,7 @@ On 2026-11-06 the user accepted P3-A1 at
 `5e62727b9b8e463cf6c7dd1bc68172801a7868f6` within its documented private,
 in-memory public synthetic diagnostic scope and approved **P2B-B1 isolation
 readiness planning only**. The authorized deliverables are the
-[isolation design](P2B_B1_ISOLATION_DESIGN.md), [test plan](P2B_B1_TEST_PLAN.md)
+[isolation design](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P2B_B1_ISOLATION_DESIGN.md), [test plan](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P2B_B1_TEST_PLAN.md)
 and necessary ledger updates. The proposed 40 sentinel family-runs belong to a
 future B1 proof. The 360 scheduled semantic case-attempts belong to B3. Each
 schedule requires its own execution authorization.
@@ -236,7 +236,7 @@ verification UNVERIFIABLE, independent acceptance BLOCKED and benchmarks NOT_RUN
 
 On 2026-11-06 the user accepted the B1 planning checkpoint at
 `fd9dc0194da9f15ff99805dd5ab6dea38815e684` as documentation only and authorized
-the [B1 approval checklist](P2B_B1_APPROVAL_CHECKLIST.md) and necessary
+the [B1 approval checklist](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P2B_B1_APPROVAL_CHECKLIST.md) and necessary
 decision-ledger updates. The host, owners, runtime/policy, custody, retention
 and budget are OPEN under RMAP-02 and D09-B. Implementation, host provisioning,
 sentinel execution and later semantic evaluation each require a separate
@@ -249,8 +249,8 @@ independent semantic acceptance BLOCKED and benchmarks NOT_RUN.
 
 On 2026-11-06 the user authorized a **documentation-only workstation planning
 checkpoint** at `13a82fdb48248215548a57463aafc075edeb7e41`. The deliverables
-are the [workstation execution plan](WORKSTATION_EXECUTION_PLAN.md),
-[compatibility matrix](WORKSTATION_COMPATIBILITY_MATRIX.md) and necessary ledger
+are the [workstation execution plan](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/WORKSTATION_EXECUTION_PLAN.md),
+[compatibility matrix](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/WORKSTATION_COMPATIBILITY_MATRIX.md) and necessary ledger
 updates. The targets for ordinary use are macOS Terminal/Bash and Windows Git
 Bash with an existing Python 3.12 installation or an approved offline bundle.
 Git commands, AI services, a dedicated host, VMs, Docker, WSL and cloud services
@@ -269,7 +269,7 @@ On 2026-11-06 the user accepted the workstation plan at
 This covers one read-only Bash launcher for exactly one of `--help`, `--version`
 or `status`, the six W01–W06 test families, usage/validation documentation and
 necessary ledger updates. Preserve all 693 existing regressions and historical
-synthetic evidence. Stop at WS-1 review. See the [design](WS1_DESIGN.md) and
+synthetic evidence. Stop at WS-1 review. See the [design](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/WS1_DESIGN.md) and
 [validation record](WS1_VALIDATION.md).
 
 The production installation inventory and its independently authenticated pin
@@ -290,8 +290,8 @@ approval slots and returns bootstrap BLOCKED/2 for each valid verb. Native
 Windows W01–W06 are BLOCKED / NOT_RUN.
 
 The user approved **WS-2A planning only**. Deliverables are the
-[offline kit plan](WS2A_OFFLINE_KIT_PLAN.md), the
-[installation test plan](WS2A_INSTALLATION_TEST_PLAN.md) and necessary approval,
+[offline kit plan](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/WS2A_OFFLINE_KIT_PLAN.md), the
+[installation test plan](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/WS2A_INSTALLATION_TEST_PLAN.md) and necessary approval,
 decision and practice ledger updates. Stop at documentation review. Release
 ownership and authentication, approval of exact artifact bytes, installer
 implementation, native installation and test execution, kit release and
@@ -312,7 +312,7 @@ integration require separate decisions.
 At `022c672d244a522e25a5aded7f29513f51875b69` the user accepted MVP-1 only
 as a public synthetic demonstration and approved the bounded MVP-2 experiment.
 Its [multi-module draft](../examples/mvp2/ARCHITECTURE.md) and [validation
-report](MVP2_VALIDATION.md) are for review. Independent evaluation, migration,
+report](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/MVP2_VALIDATION.md) are for review. Independent evaluation, migration,
 publication, native Windows access and runtime selection retain their separate gates.
 
 At `a82ff2b1f0ae26e545f1e1640eb4ed697f33e56b` the user accepted MVP-2 as an

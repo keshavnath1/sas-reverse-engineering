@@ -109,13 +109,13 @@ remains DECLARED with human approval NOT_VERIFIED.
 Local paths and caller metadata are excluded by an explicit versioned projection
 from canonical graph/source identities and never added to sealed artifacts. Keep
 actual envelopes outside Git (the existing ignored `local/` is suitable). CP2 uses
-only synthetic declarations in public tests. See [CP2 design](docs/CP2_DESIGN.md)
+only synthetic declarations in public tests. See [CP2 design](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/CP2_DESIGN.md)
 for the deliberately restricted path profile and proof limits. Native Windows
 qualification and independent semantic acceptance remain BLOCKED.
 
 ## CP3A additive POSIX boundary
 
-The separately invoked [CP3A API](docs/CP3A_DESIGN.md) consumes a CP2 envelope
+The separately invoked [CP3A API](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/CP3A_DESIGN.md) consumes a CP2 envelope
 only with an independent exact local inspection policy. It confines roots/store
 inspection beneath an existing dedicated owned anchor on a qualified filesystem,
 retains and rechecks descriptor/name identities, rejects unexpected directories
@@ -132,13 +132,13 @@ content. Native paths/IDs and policy data stay outside portable artifacts/hashes
 
 Windows remains BLOCKED before caller-path I/O. No native Windows access,
 publication redesign, dependency/lock change, private intake or new approval
-claim is introduced. [Validation](docs/CP3A_VALIDATION.md) records actual native
+claim is introduced. [Validation](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/CP3A_VALIDATION.md) records actual native
 tests separately from simulated cases, in-process observers and unresolved
 independent security/native-tracing qualification.
 
 ## CP3B blocked Windows protocol
 
-[CP3B](docs/CP3B_DESIGN.md) adds private existing-only relative-handle primitives
+[CP3B](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/CP3B_DESIGN.md) adds private existing-only relative-handle primitives
 and a reader protocol. It does not provide an approved physical-volume bootstrap,
 locality proof or public Windows source access. The existing public capability
 gate denies before caller-path inspection/DLL loading/content/output; no override
@@ -160,7 +160,7 @@ result. No frozen evidence schema, canonical ID, POSIX behavior or history chang
 
 ## CP3D private metadata subset
 
-[CP3D](docs/CP3D_DESIGN.md) adds typed external comparison records and a private
+[CP3D](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/CP3D_DESIGN.md) adds typed external comparison records and a private
 metadata-only bootstrap/absence protocol. It is exercised by independent memory
 fixtures only, not wired into the public gate or CP3B reader. References and
 matching object IDs do not authenticate an inspection grant, prove physical
@@ -179,4 +179,4 @@ so this is not a claim to implement native pending-I/O cleanup. Absence observat
 are temporary, under quiescent trusted writers, and never reservations or creation
 permissions. No snapshot/ABA, ACL isolation or native certification is claimed.
 All public Windows access remains BLOCKED/exit 2. See
-[actual checks and unresolved gates](docs/CP3D_VALIDATION.md).
+[actual checks and unresolved gates](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/CP3D_VALIDATION.md).

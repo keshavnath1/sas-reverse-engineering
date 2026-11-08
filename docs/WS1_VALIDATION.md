@@ -1,7 +1,7 @@
 # WS-1 validation and qualification limits
 
 Baseline `a79b15fefd878f1ecc9c0e4969e1c6a211120a41` was clean before work. The
-user authorized WS-1 only. See [design and bootstrap assumptions](WS1_DESIGN.md).
+user authorized WS-1 only. See [design and bootstrap assumptions](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/WS1_DESIGN.md).
 The shipped launcher has **no release approval record/pin**, and **no target workstation
 release is being certified**. Invalid argv → usage/2; a valid verb without trusted
 approval → bootstrap BLOCKED/2 before interpreter discovery. Supplying an executable path

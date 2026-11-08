@@ -2,7 +2,7 @@
 
 Scope: private diagnostics over caller-supplied public synthetic graph values.
 Baseline `dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc`; see the [design](P3_A1_DESIGN.md)
-and [approved obligations](POST_CP3D_ROADMAP.md#proposed-exact-tests-and-acceptance).
+and [approved obligations](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/POST_CP3D_ROADMAP.md#proposed-exact-tests-and-acceptance).
 All 693 tests passed in the final macOS development, fresh-clone and installed-wheel
 runs and in both hosted Linux installation modes. The 26 new methods exercised
 133 explicit subtests. All 30 historical artifacts and eight frozen hashes matched.

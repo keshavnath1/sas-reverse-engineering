@@ -10,7 +10,7 @@ added. Native Windows execution and qualification remain **BLOCKED**.
 approval, host ownership, independent security review, an approved Windows runtime,
 volume bootstrap and the source-writer trust policy are still OPEN. A valid CP2
 envelope is declaration data; it never becomes human approval or physical permission.
-The [security test plan](CP3_SECURITY_TEST_PLAN.md) contains proposed Windows/macOS
+The [security test plan](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/CP3_SECURITY_TEST_PLAN.md) contains proposed Windows/macOS
 qualification instructions, privilege separation and acceptance obligations.
 
 ## Evidence and scope
@@ -308,7 +308,7 @@ neither a blocked native read nor valid declaration produces semantic PASS.
 
 ## OPEN decisions and implementation gate
 
-The authoritative new rows are in [OPEN_DECISIONS.md](OPEN_DECISIONS.md), CP3-R01–R10.
+The authoritative new rows are in [OPEN_DECISIONS.md](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/OPEN_DECISIONS.md), CP3-R01–R10.
 All remain OPEN except this planning scope itself. Required: Windows host owner,
 independent security reviewer, runtime/offline package approval, native ABI and
 volume bootstrap, filesystem/writer/ACL assumptions, macOS/Linux mount policy,

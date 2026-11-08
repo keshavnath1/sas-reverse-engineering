@@ -5,7 +5,7 @@ P2A implements the user-approved D08-A/B subset from the planning baseline
 This is a static, synthetic-only implementation: **semantic acceptance BLOCKED,
 semantic verification UNVERIFIABLE, authority DRAFT, benchmarks NOT_RUN**.
 Public tests establish tested reconstruction behavior, not independent reliability.
-Actual checks and failures are recorded in [P2A_VALIDATION.md](P2A_VALIDATION.md).
+Actual checks and failures are recorded in [P2A_VALIDATION.md](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P2A_VALIDATION.md).
 
 ## Authority and compatibility
 
@@ -57,7 +57,7 @@ no operation lineage and therefore a null revision map.
 ## Closed source profile
 
 The normative allowlist and excluded language families remain in
-[P2_READINESS.md](P2_READINESS.md). Implemented forms include constrained numeric
+[P2_READINESS.md](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P2_READINESS.md). Implemented forms include constrained numeric
 DATA assignments/IF/KEEP/DROP; single/two-input SET concatenation; two-input BY
 match-merge; one/two-key BY and FIRST/LAST; single-variable RETAIN, sum statements
 and guarded call-site LAG/LAG2; distinct-output PROC SORT; one-table SQL or a single
@@ -174,7 +174,7 @@ and custodian; choose model/provider revisions and egress/budget rules; provisio
 the Linux isolation host and evaluator-owned store; freeze source/expected-answer
 versions and scoring denominators; test access denial and immutable handoff before
 loading gold. Only then authorize P2B's 36-case, five-attempt, two-track campaign
-and zero-critical-false-approval gate from [P2_EVALUATION_DESIGN.md](P2_EVALUATION_DESIGN.md).
+and zero-critical-false-approval gate from [P2_EVALUATION_DESIGN.md](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P2_EVALUATION_DESIGN.md).
 
 P2A stops here. No private workload, SAS execution, protected-gold infrastructure,
 PRD/ADR, translated code, runtime recommendation, parallelization or downstream

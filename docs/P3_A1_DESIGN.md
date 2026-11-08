@@ -7,11 +7,11 @@ prove runtime order, authorize inserting an edge, or make either operation safe
 to move.
 
 The user approved this private development experiment at
-`dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc`. [The roadmap](POST_CP3D_ROADMAP.md)
+`dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc`. [The roadmap](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/POST_CP3D_ROADMAP.md)
 specifies A01–A26. The workflow still requires independently accepted source
 semantics and draft requirements before operational parallelism analysis.
-[P2A](P2A_DESIGN.md) reconstructs the graph; [P2B readiness](P2B_READINESS.md)
-and [evaluation design](P2_EVALUATION_DESIGN.md) describe a separate, unrun gate.
+[P2A](P2A_DESIGN.md) reconstructs the graph; [P2B readiness](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P2B_READINESS.md)
+and [evaluation design](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P2_EVALUATION_DESIGN.md) describe a separate, unrun gate.
 
 ## Subject and trust boundary
 
