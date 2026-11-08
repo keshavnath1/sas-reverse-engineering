@@ -53,11 +53,28 @@ evidence="/tmp/sas-re-int1-${scratch##*/}"
 python3.12 -IB scripts/review_intake.py --p2a --modernization-drafts --intake "$scratch/INTAKE" --destination "$evidence"
 ```
 
-Open the generated `MODERNIZATION_REVIEW.md`, evidence graph, migration
-profile and tie-out drafts. Review the scope, unresolved obligations and
-pending decisions with the team. The
-[public candidate guide](examples/running-balance/README.md#run-from-a-fresh-intake-review)
-shows how to run the exact supported draft candidate from that evidence.
+The command generates `INVENTORY.json`, `EVIDENCE.json`, `MANIFEST.json`,
+`MODERNIZATION_REVIEW.md`, and the migration profile and tie-out YAML drafts.
+The example's [PRD and architecture review](examples/modernization/REVIEW.md)
+is authored draft prose. To draft or revise it with Copilot, open a session
+and supply the generated evidence and handoff yourself. Review the resulting
+claims and configuration choices with the team.
+
+The [source-review guide](examples/modernization/README.md) stops at design
+review. The [running-balance guide](examples/running-balance/README.md)
+covers a separate draft engineering runner for the same exact public inputs.
+After generating evidence above, run it from the same shell:
+
+```sh
+evidence=$(cd "$evidence" && pwd -P)
+python3.12 -IB scripts/run_running_balance.py --package "$evidence" --intake "$scratch/INTAKE"
+```
+
+Use these walkthrough commands on macOS. They resolve scratch paths before
+passing them to commands that require canonical paths. The runner verifies
+the source and evidence identities and emits JSON for preparation, SORT, and
+enrichment. The approval-gated publication route described earlier has its
+own supported contracts.
 
 ## Use the five skills
 
