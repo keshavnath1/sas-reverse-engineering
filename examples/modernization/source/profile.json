@@ -1,0 +1,81 @@
+{
+  "entrypoints": [
+    "synthetic:main.sas.txt"
+  ],
+  "inputs": [
+    {
+      "columns": [
+        {
+          "length": 8,
+          "name": "group",
+          "type": "NUMERIC"
+        },
+        {
+          "length": 8,
+          "name": "subkey",
+          "type": "NUMERIC"
+        },
+        {
+          "length": 8,
+          "name": "amount",
+          "type": "NUMERIC"
+        }
+      ],
+      "module_id": "main",
+      "name": "work.raw",
+      "rows": [
+        [
+          "1",
+          "1",
+          "2"
+        ],
+        [
+          "1",
+          "1",
+          "."
+        ],
+        [
+          "2",
+          "1",
+          "4"
+        ]
+      ],
+      "sorted_by": [
+        "group",
+        "subkey"
+      ]
+    },
+    {
+      "columns": [
+        {
+          "length": 8,
+          "name": "group",
+          "type": "NUMERIC"
+        },
+        {
+          "length": 8,
+          "name": "weight",
+          "type": "NUMERIC"
+        }
+      ],
+      "module_id": "main",
+      "name": "work.lookup",
+      "rows": [
+        [
+          "1",
+          "3"
+        ],
+        [
+          "2",
+          "5"
+        ]
+      ],
+      "sorted_by": []
+    }
+  ],
+  "log_bindings": [],
+  "lst_bindings": [],
+  "numeric_missing_join_policy": "SAS_ORDINARY_MISSING_EQUALS_MISSING",
+  "profile_id": "sas94-synthetic-v1",
+  "schema_version": "2.0"
+}

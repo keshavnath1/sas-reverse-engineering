@@ -1,0 +1,1 @@
+data work.staged; set work.sample; keep id amount; run;

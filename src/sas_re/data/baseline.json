@@ -1,0 +1,41 @@
+{
+  "metadata_version": 1,
+  "recorded_on": "2026-11-05",
+  "specification": {
+    "path": "reference/Codex_SAS_Architecture_Pack_v2.zip",
+    "sha256": "e3cbf3d9df6cc20c594261556c5e3ea1dfc292c9c1a30672c2d7b1a736b9718e",
+    "version": "v2",
+    "authority": "docs/02 for workflow; docs/05 for compatibility; user controls execution scope"
+  },
+  "downstream": {
+    "repository": "https://github.com/keshavnath1/Agent-mastery.git",
+    "branch": "feature/governed-learning-memory",
+    "commit": "bc754e0f1204a99020c864df2a5b25983005e09c",
+    "file_sha256": {
+      "AGENTS.md": "507535ac7ce661f5c90d1de4a674054a6d0acd92ed8e2253b91cf0c0b0788d54",
+      "config/workflow.yaml": "b34650330bf8c71eadc4b0cf0f1ea4f89555d90df31093eeedcae7ff5bedaaa5",
+      "config/migration_profile.yaml": "b81f985375edb200303dd353aa01aa2729bc211a6fb957afaf27fe3219e154c6",
+      "config/tieout.yaml": "2a7daa6e76cf5f13e02fa82e05e3eb52532016329f95087e98e450afddd9e7cb",
+      "contracts/tieout_contract.schema.json": "4668aa6a9a538c8d977c614d5ce85755c67c6a218dcd5f85c69d92f936acd182",
+      "contracts/run_state.schema.json": "7628d49c4aef9659071f6fe2b2a353b311065097204fb20571f49538c9ba8a5f",
+      ".github/skills/trace/SKILL.md": "16fe5218c7f2f23b1d518a98ca3ad32f9a8956b52681203e0623e4a420459fb5",
+      ".github/skills/trace/references/sas-trace-contract.md": "d570cad1a7dc2c9938e278ed5d49c00347ac65d65a45a8bbe95a417c86981812",
+      ".github/skills/trace/schemas/execution_trace.schema.json": "109434bacefdf1dd394c16f4855bee36ec1f4bccb4d536c9016dc08823c5e5ed",
+      ".github/skills/map/SKILL.md": "cfc5730029a5f80700adf72be457ea37e031c6f2b6f9fe4b330351a9702784c9",
+      ".github/skills/map/references/behavior-mapping-contract.md": "f21fcc645ed66301d8f665149afe595db8d3db6272e9ca7466890e0a47c03cd0",
+      ".github/skills/map/schemas/policy_registry.schema.json": "283479c8dba46d5256b93f4b469341861328f328e996b0639d03c7d5ca7896e5",
+      ".github/skills/import/SKILL.md": "ea5d0b12466ec309bbf1a1088c0e4d2c870ae8ecf4b2e321237200dbaabc376e",
+      ".github/skills/specify/SKILL.md": "4497bb237e93ade30b9169936dc4c5dbd5b6812485b7a44fdabf45fc1c6eeed7",
+      ".github/skills/decide/SKILL.md": "b649366d5eef08facc87be9d3c7ab4964512ffda9ab464f8e77b35c77df6cc61",
+      ".github/skills/diagnose/SKILL.md": "01aab6757a1f47471d59b24266487febb787c681f273417677897444b9f59511",
+      "scripts/intake.py": "2fa7f9886da458c41cf374a27f0ced38e3cb6ea0aa8160339bb104d69ccffcec",
+      "scripts/project.py": "587410fd9d2e333bcf163f224055abe14e5fa3e364f3ead1a0ad7c806798044c",
+      "scripts/smoke_test.py": "5afc3facbc91e1b3fb03d15facdf95c43831589cc7eed001c4a11436a80926b0",
+      ".github/workflows/template-validation.yml": "1fc5cc3399f8497bd66334b845ff9afeaac3db565f9716788479fb14a159601d"
+    }
+  },
+  "limitations": [
+    "Source identity baseline only; no import adapter or compatibility execution.",
+    "Approval boundaries remain human-owned downstream."
+  ]
+}

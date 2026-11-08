@@ -1,30 +1,35 @@
-# Private inputs and generated runs
-/intake/*
-!/intake/.gitkeep
-/output/*
-!/output/.gitkeep
-/private/
-/artifacts/
-/outputs/
-/local/
-/gold/
-
-# Local tools and caches
+# Python and local tooling
 .venv/
 venv/
 __pycache__/
 *.py[cod]
+*.egg-info/
 .pytest_cache/
-.codex/
-.vscode/
-.idea/
+.coverage*
+htmlcov/
+build/
+dist/
 .DS_Store
+.idea/
+.vscode/
 
-# Source, data, archives and credentials must not be published
-*.[sS][aA][sS]
-*.[lL][oO][gG]
-*.[lL][sS][tT]
-*.[cC][sS][vV]
+# Private intake, outputs, evaluation answers and local state
+intake/
+private/
+artifacts/
+outputs/
+local/
+gold/
+.agents/
+!/.agents/
+/.agents/*
+!/.agents/skills
+/.agents/skills/**
+.codex/
+*.sas
+*.log
+*.lst
+*.csv
 *.tsv
 *.parquet
 *.sas7bdat
@@ -35,6 +40,16 @@ __pycache__/
 *.db
 *.sqlite*
 *.zip
+*.[sS][aA][sS]
+*.[lL][oO][gG]
+*.[lL][sS][tT]
+*.[cC][sS][vV]
+*.[tT][sS][vV]
+*.[pP][eE][mM]
+*.[kK][eE][yY]
+!reference/Codex_SAS_Architecture_Pack_v2.zip
+
+# Credentials and account configuration
 .env
 .env.*
 .aws/
@@ -43,7 +58,7 @@ __pycache__/
 .gcloud/
 credentials*
 secrets*
-*.[pP][eE][mM]
-*.[kK][eE][yY]
+*.pem
+*.key
 *.p12
 *.pfx

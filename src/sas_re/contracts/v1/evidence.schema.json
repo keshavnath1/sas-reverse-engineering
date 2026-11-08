@@ -1,0 +1,1341 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sas-re:evidence:1.0",
+  "title": "SAS Reverse Engineering P1 Source Evidence Contracts",
+  "description": "Version 1.0 structural contracts only. P1 cannot authenticate provenance, assert semantic correctness, or grant human approval. Select a named contract from $defs.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/Scope"
+    },
+    {
+      "$ref": "#/$defs/Inventory"
+    },
+    {
+      "$ref": "#/$defs/Graph"
+    },
+    {
+      "$ref": "#/$defs/Seal"
+    },
+    {
+      "$ref": "#/$defs/ModuleView"
+    },
+    {
+      "$ref": "#/$defs/RevisionMap"
+    },
+    {
+      "$ref": "#/$defs/Attempt"
+    },
+    {
+      "$ref": "#/$defs/Report"
+    },
+    {
+      "$ref": "#/$defs/VerificationReport"
+    }
+  ],
+  "$defs": {
+    "SchemaVersion": {
+      "const": "1.0"
+    },
+    "SafeId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}(?![\\s\\S])"
+    },
+    "Sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "FileKey": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}:[^\\r\\n]+(?![\\s\\S])"
+    },
+    "RelativePath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "SasName": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_.]{0,127}(?![\\s\\S])"
+    },
+    "FileId": {
+      "type": "string",
+      "pattern": "^file_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "DatasetId": {
+      "type": "string",
+      "pattern": "^ds_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "ColumnId": {
+      "type": "string",
+      "pattern": "^col_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "OperationId": {
+      "type": "string",
+      "pattern": "^op_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "EdgeId": {
+      "type": "string",
+      "pattern": "^edge_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "LogObservationId": {
+      "type": "string",
+      "pattern": "^log_[a-f0-9]{64}(?![\\s\\S])"
+    },
+    "NodeId": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/DatasetId"
+        },
+        {
+          "$ref": "#/$defs/ColumnId"
+        }
+      ]
+    },
+    "NonNegativeInteger": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "Classification": {
+      "type": "string",
+      "enum": [
+        "OBSERVATION",
+        "INFERENCE",
+        "ASSUMPTION",
+        "HYPOTHESIS",
+        "MEASUREMENT"
+      ]
+    },
+    "VerificationStatus": {
+      "type": "string",
+      "enum": [
+        "VERIFIED",
+        "PARTIAL",
+        "UNSUPPORTED",
+        "CONTRADICTED",
+        "UNVERIFIABLE"
+      ]
+    },
+    "StageGate": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED"
+      ]
+    },
+    "Stage": {
+      "type": "string",
+      "enum": [
+        "INVENTORY",
+        "RECORD",
+        "VERIFICATION"
+      ]
+    },
+    "FileKind": {
+      "type": "string",
+      "enum": [
+        "SAS",
+        "LOG",
+        "LST",
+        "INCLUDE",
+        "CONFIG",
+        "FORMAT",
+        "REFERENCE"
+      ]
+    },
+    "Encoding": {
+      "type": "string",
+      "enum": [
+        "utf-8",
+        "utf-8-sig",
+        "ascii",
+        "latin-1",
+        "binary"
+      ]
+    },
+    "Root": {
+      "type": "object",
+      "properties": {
+        "root_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^/",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "root_id",
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "ScopedFile": {
+      "type": "object",
+      "properties": {
+        "file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "root_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "path": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "kind": {
+          "$ref": "#/$defs/FileKind"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "encoding": {
+          "$ref": "#/$defs/Encoding"
+        }
+      },
+      "required": [
+        "file_key",
+        "root_id",
+        "path",
+        "kind",
+        "module_id",
+        "encoding"
+      ],
+      "additionalProperties": false
+    },
+    "Dependency": {
+      "type": "object",
+      "properties": {
+        "dependency_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "from_file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "to_file_key": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FileKey"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "INCLUDE",
+            "CONFIG",
+            "FORMAT",
+            "MACRO",
+            "OTHER"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "DECLARED",
+            "UNRESOLVED"
+          ]
+        }
+      },
+      "required": [
+        "dependency_id",
+        "from_file_key",
+        "to_file_key",
+        "kind",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "LogAssociation": {
+      "type": "object",
+      "properties": {
+        "association_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "log_file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "source_file_keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FileKey"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "execution_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "status": {
+          "const": "DECLARED"
+        }
+      },
+      "required": [
+        "association_id",
+        "log_file_key",
+        "source_file_keys",
+        "execution_id",
+        "run_id",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "Scope": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "module_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SafeId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "synthetic": {
+          "const": true
+        },
+        "roots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Root"
+          },
+          "minItems": 1
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ScopedFile"
+          },
+          "minItems": 1
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Dependency"
+          }
+        },
+        "log_associations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LogAssociation"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "workspace_id",
+        "run_id",
+        "module_ids",
+        "synthetic",
+        "roots",
+        "files",
+        "dependencies",
+        "log_associations"
+      ],
+      "additionalProperties": false
+    },
+    "File": {
+      "type": "object",
+      "properties": {
+        "file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "root_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "path": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "kind": {
+          "$ref": "#/$defs/FileKind"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "encoding": {
+          "$ref": "#/$defs/Encoding"
+        },
+        "sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "size_bytes": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "line_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "newline": {
+          "type": "string",
+          "enum": [
+            "LF",
+            "CRLF",
+            "CR",
+            "MIXED",
+            "NONE",
+            "BINARY"
+          ]
+        },
+        "file_id": {
+          "$ref": "#/$defs/FileId"
+        }
+      },
+      "required": [
+        "file_key",
+        "root_id",
+        "path",
+        "kind",
+        "module_id",
+        "encoding",
+        "sha256",
+        "size_bytes",
+        "line_count",
+        "newline",
+        "file_id"
+      ],
+      "additionalProperties": false
+    },
+    "Citation": {
+      "type": "object",
+      "properties": {
+        "file_key": {
+          "$ref": "#/$defs/FileKey"
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "line_start": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "line_end": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "excerpt_sha256": {
+          "$ref": "#/$defs/Sha256"
+        }
+      },
+      "required": [
+        "file_key",
+        "source_sha256",
+        "line_start",
+        "line_end",
+        "excerpt_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "Issue": {
+      "type": "object",
+      "properties": {
+        "issue_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "MISSING_DEPENDENCY",
+            "DYNAMIC_DEPENDENCY",
+            "MISSING_LOG_PROVENANCE",
+            "CONTRADICTION",
+            "OTHER"
+          ]
+        },
+        "file_keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FileKey"
+          },
+          "uniqueItems": true
+        },
+        "operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "uniqueItems": true
+        },
+        "status": {
+          "const": "UNRESOLVED"
+        }
+      },
+      "required": [
+        "issue_id",
+        "kind",
+        "file_keys",
+        "operation_ids",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "Inventory": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "module_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SafeId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "scope_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "source_fingerprint": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/File"
+          },
+          "minItems": 1
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Dependency"
+          }
+        },
+        "log_associations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LogAssociation"
+          }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "workspace_id",
+        "run_id",
+        "attempt_id",
+        "module_ids",
+        "scope_sha256",
+        "source_fingerprint",
+        "files",
+        "dependencies",
+        "log_associations",
+        "unknowns"
+      ],
+      "additionalProperties": false
+    },
+    "Dataset": {
+      "type": "object",
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/DatasetId"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "name": {
+          "$ref": "#/$defs/SasName"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "module_id",
+        "name",
+        "semantic_verification"
+      ],
+      "additionalProperties": false
+    },
+    "Column": {
+      "type": "object",
+      "properties": {
+        "column_id": {
+          "$ref": "#/$defs/ColumnId"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "dataset_id": {
+          "$ref": "#/$defs/DatasetId"
+        },
+        "name": {
+          "$ref": "#/$defs/SasName"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        }
+      },
+      "required": [
+        "column_id",
+        "module_id",
+        "dataset_id",
+        "name",
+        "semantic_verification"
+      ],
+      "additionalProperties": false
+    },
+    "Operation": {
+      "type": "object",
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "DATA_STEP",
+            "PROC_SQL",
+            "PROC",
+            "MACRO",
+            "INCLUDE",
+            "OTHER"
+          ]
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "minItems": 1
+        },
+        "reads": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NodeId"
+          },
+          "uniqueItems": true
+        },
+        "writes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NodeId"
+          },
+          "uniqueItems": true
+        },
+        "stateful_constructs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "RETAIN",
+              "LAG",
+              "BY",
+              "FIRST_LAST",
+              "GLOBAL_MACRO",
+              "LOOP",
+              "OTHER"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "classification": {
+          "$ref": "#/$defs/Classification"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        }
+      },
+      "required": [
+        "operation_id",
+        "module_id",
+        "kind",
+        "citations",
+        "reads",
+        "writes",
+        "stateful_constructs",
+        "classification",
+        "semantic_verification"
+      ],
+      "additionalProperties": false
+    },
+    "Edge": {
+      "type": "object",
+      "properties": {
+        "edge_id": {
+          "$ref": "#/$defs/EdgeId"
+        },
+        "from_operation_id": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "to_operation_id": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "DATA",
+            "STATE",
+            "ORDER",
+            "SIDE_EFFECT",
+            "RESOURCE",
+            "UNKNOWN"
+          ]
+        },
+        "node_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NodeId"
+          },
+          "uniqueItems": true
+        },
+        "evidence_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "classification": {
+          "$ref": "#/$defs/Classification"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        }
+      },
+      "required": [
+        "edge_id",
+        "from_operation_id",
+        "to_operation_id",
+        "type",
+        "node_ids",
+        "evidence_operation_ids",
+        "classification",
+        "semantic_verification"
+      ],
+      "additionalProperties": false
+    },
+    "LogObservation": {
+      "type": "object",
+      "properties": {
+        "observation_id": {
+          "$ref": "#/$defs/LogObservationId"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "association_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "execution_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "log_citation": {
+          "$ref": "#/$defs/Citation"
+        },
+        "source_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "metric": {
+          "type": "string",
+          "enum": [
+            "ROW_COUNT",
+            "ELAPSED_SECONDS",
+            "CPU_SECONDS",
+            "WARNING_COUNT"
+          ]
+        },
+        "value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "classification": {
+          "const": "OBSERVATION"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        }
+      },
+      "required": [
+        "observation_id",
+        "module_id",
+        "run_id",
+        "attempt_id",
+        "association_id",
+        "execution_id",
+        "log_citation",
+        "source_operation_ids",
+        "metric",
+        "value",
+        "classification",
+        "semantic_verification"
+      ],
+      "additionalProperties": false
+    },
+    "Coverage": {
+      "type": "object",
+      "properties": {
+        "file_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "operation_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "dataset_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "column_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "edge_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "log_observation_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "unknown_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "contradiction_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        },
+        "covered_source_file_count": {
+          "$ref": "#/$defs/NonNegativeInteger"
+        }
+      },
+      "required": [
+        "file_count",
+        "operation_count",
+        "dataset_count",
+        "column_count",
+        "edge_count",
+        "log_observation_count",
+        "unknown_count",
+        "contradiction_count",
+        "covered_source_file_count"
+      ],
+      "additionalProperties": false
+    },
+    "Graph": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "module_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SafeId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "scope_manifest_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "source_fingerprint": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "artifact_authority": {
+          "const": "DRAFT"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "datasets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Dataset"
+          }
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Column"
+          }
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Operation"
+          },
+          "minItems": 1
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Edge"
+          }
+        },
+        "log_observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LogObservation"
+          }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "contradictions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Issue"
+          }
+        },
+        "coverage": {
+          "$ref": "#/$defs/Coverage"
+        }
+      },
+      "required": [
+        "schema_version",
+        "workspace_id",
+        "run_id",
+        "attempt_id",
+        "module_ids",
+        "scope_manifest_sha256",
+        "source_fingerprint",
+        "artifact_authority",
+        "semantic_verification",
+        "datasets",
+        "columns",
+        "operations",
+        "edges",
+        "log_observations",
+        "unknowns",
+        "contradictions",
+        "coverage"
+      ],
+      "additionalProperties": false
+    },
+    "Seal": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "module_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SafeId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "stage": {
+          "$ref": "#/$defs/Stage"
+        },
+        "stage_gate": {
+          "$ref": "#/$defs/StageGate"
+        },
+        "artifact_authority": {
+          "const": "DRAFT"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "publication_state": {
+          "const": "COMPLETE"
+        },
+        "artifacts": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "enum": [
+              "attempt.json",
+              "source_inventory.json",
+              "source_record.json",
+              "validation_report.json",
+              "verification_report.json"
+            ]
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/Sha256"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "workspace_id",
+        "run_id",
+        "attempt_id",
+        "module_ids",
+        "stage",
+        "stage_gate",
+        "artifact_authority",
+        "semantic_verification",
+        "publication_state",
+        "artifacts"
+      ],
+      "additionalProperties": false
+    },
+    "ModuleView": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "module_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "source_record_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "uniqueItems": true
+        },
+        "dataset_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DatasetId"
+          },
+          "uniqueItems": true
+        },
+        "column_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ColumnId"
+          },
+          "uniqueItems": true
+        },
+        "edge_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EdgeId"
+          },
+          "uniqueItems": true
+        },
+        "log_observation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LogObservationId"
+          },
+          "uniqueItems": true
+        },
+        "artifact_authority": {
+          "const": "DRAFT"
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        }
+      },
+      "required": [
+        "schema_version",
+        "workspace_id",
+        "run_id",
+        "attempt_id",
+        "module_id",
+        "source_record_sha256",
+        "operation_ids",
+        "dataset_ids",
+        "column_ids",
+        "edge_ids",
+        "log_observation_ids",
+        "artifact_authority",
+        "semantic_verification"
+      ],
+      "additionalProperties": false
+    },
+    "RevisionMap": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "previous_record_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "current_record_sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "retained_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "uniqueItems": true
+        },
+        "removed_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "uniqueItems": true
+        },
+        "added_operation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OperationId"
+          },
+          "uniqueItems": true
+        },
+        "semantic_equivalence": {
+          "const": "NOT_ASSERTED"
+        }
+      },
+      "required": [
+        "schema_version",
+        "previous_record_sha256",
+        "current_record_sha256",
+        "retained_operation_ids",
+        "removed_operation_ids",
+        "added_operation_ids",
+        "semantic_equivalence"
+      ],
+      "additionalProperties": false
+    },
+    "Attempt": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "module_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SafeId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "stage": {
+          "$ref": "#/$defs/Stage"
+        },
+        "publication_state": {
+          "const": "STARTED"
+        }
+      },
+      "required": [
+        "schema_version",
+        "workspace_id",
+        "run_id",
+        "attempt_id",
+        "module_ids",
+        "stage",
+        "publication_state"
+      ],
+      "additionalProperties": false
+    },
+    "Finding": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{0,63}(?![\\s\\S])"
+        },
+        "gate": {
+          "type": "string",
+          "enum": [
+            "FAIL",
+            "BLOCKED"
+          ]
+        }
+      },
+      "required": [
+        "code",
+        "gate"
+      ],
+      "additionalProperties": false
+    },
+    "Report": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "stage_gate": {
+          "$ref": "#/$defs/StageGate"
+        },
+        "structural_verification": {
+          "type": "string",
+          "enum": [
+            "PASSED",
+            "FAILED",
+            "BLOCKED"
+          ]
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "benchmark_execution": {
+          "const": "NOT_RUN"
+        },
+        "artifact_authority": {
+          "const": "DRAFT"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Finding"
+          }
+        },
+        "coverage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Coverage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "stage_gate",
+        "structural_verification",
+        "semantic_verification",
+        "benchmark_execution",
+        "artifact_authority",
+        "findings",
+        "coverage"
+      ],
+      "additionalProperties": false
+    },
+    "VerificationReport": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "$ref": "#/$defs/SchemaVersion"
+        },
+        "stage_gate": {
+          "$ref": "#/$defs/StageGate"
+        },
+        "structural_verification": {
+          "type": "string",
+          "enum": [
+            "PASSED",
+            "FAILED",
+            "BLOCKED"
+          ]
+        },
+        "semantic_verification": {
+          "const": "UNVERIFIABLE"
+        },
+        "benchmark_execution": {
+          "const": "NOT_RUN"
+        },
+        "artifact_authority": {
+          "const": "DRAFT"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Finding"
+          }
+        },
+        "coverage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Coverage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subject_attempt_id": {
+          "$ref": "#/$defs/SafeId"
+        },
+        "subject_seal_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "stage_gate",
+        "structural_verification",
+        "semantic_verification",
+        "benchmark_execution",
+        "artifact_authority",
+        "findings",
+        "coverage",
+        "subject_attempt_id",
+        "subject_seal_sha256"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

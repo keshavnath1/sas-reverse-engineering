@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "scope": "public-synthetic",
+  "sources": [
+    {
+      "path": "project.sas.txt",
+      "sha256": "2a7c8a4bee118055acf4af1084342a0e12bd3c5b49a264743a54ab0a5ea85463",
+      "ranges": [
+        [
+          1,
+          1
+        ]
+      ],
+      "mode": "data"
+    },
+    {
+      "path": "order.sas.txt",
+      "sha256": "d1a7f4b6948913233f5a3fa4af9383c9bb99d020ced033e2cfae2ad0b4062e9a",
+      "ranges": [
+        [
+          1,
+          1
+        ]
+      ],
+      "mode": "sort"
+    }
+  ]
+}

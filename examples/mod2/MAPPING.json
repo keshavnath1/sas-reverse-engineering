@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "numeric_slots_in_non_class_order": ["n1","n2","n3","n4","n5","n6","n7","n8","n9","n10","n11","n12"],
+  "class_slots_in_class_order": ["c1","c2","c3","c4","c5"],
+  "levels": {
+    "c1": [["X   ","REFERENCE"],[".   ","ALT"],["Z   ","OTHER"]],
+    "c2": [["X   ","REFERENCE"],["Z   ","ALT"]],
+    "c3": [["X   ","REFERENCE"],["Z   ","ALT"]],
+    "c4": [["X   ","REFERENCE"],["Z   ","ALT"]],
+    "c5": [["X   ","REFERENCE"],["Z   ","ALT"]]
+  }
+}

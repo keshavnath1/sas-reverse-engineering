@@ -1,0 +1,16 @@
+[
+  {"id": "C01", "status": "A", "expected": [null, 1, 1]},
+  {"id": "C02", "status": "B", "overrides": {"id": 0, "n1": 0, "c1": "."}, "expected": [null, 2, 0]},
+  {"id": "C03", "status": "C", "expected": [0, null, null]},
+  {"id": "C04", "status": "C", "overrides": {"id": ".", "n1": ".", "c1": " "}, "expected": [0, null, null]},
+  {"id": "C05", "status": "A", "overrides": {"id": "."}, "expected": [3, 1, null]},
+  {"id": "C06", "status": "B", "overrides": {"id": ".A"}, "expected": [3, 2, null]},
+  {"id": "C07", "status": "A", "overrides": {"n1": "."}, "expected": [4, 1, null]},
+  {"id": "C08", "status": "B", "overrides": {"n12": "._"}, "expected": [4, 2, null]},
+  {"id": "C09", "status": "A", "overrides": {"c1": " "}, "expected": [5, 1, null]},
+  {"id": "C10", "status": "B", "overrides": {"c5": " "}, "expected": [5, 2, null]},
+  {"id": "C11", "status": "A", "overrides": {"id": ".", "n1": ".", "c1": " "}, "expected": [3, 1, null]},
+  {"id": "C12", "status": "B", "overrides": {"n1": ".", "c1": " "}, "expected": [4, 2, null]},
+  {"id": "P01", "status": "C", "mode": "isolated_pair", "expected": [null, null, 9]},
+  {"id": "P02", "status": "C", "mode": "isolated_pair", "overrides": {"id": "."}, "expected": [3, null, null]}
+]

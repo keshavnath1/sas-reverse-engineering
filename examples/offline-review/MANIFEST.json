@@ -1,0 +1,72 @@
+{
+  "accepted_preview_map_sha256": "218a0111e99f64d4869570e46e7fa951ff8dfe1db617e9d0d72f9dc06624658c",
+  "artifact_authority": "DRAFT",
+  "benchmark_execution": "NOT_RUN",
+  "files": {
+    "ADR_NATIVE.md": {
+      "bytes": 6716,
+      "sha256": "dd0f1211dfc98599f7316a3a8aeae08308b54453cc5de8025cd3837fc8dc36a7"
+    },
+    "ADR_SPARK.md": {
+      "bytes": 6718,
+      "sha256": "531cb320a8e681b315470819ddeeedecf7439e6fcdefb9d4a1735aa2f3fed80c"
+    },
+    "ARCHITECTURE.md": {
+      "bytes": 5244,
+      "sha256": "1000f00cec145697409f51cf43d01868ed2cf5d4e233853c6b708faa2b6ce934"
+    },
+    "DECISION_REVIEW.md": {
+      "bytes": 7881,
+      "sha256": "0c333a998546beffacade3cb7c54b420de31139651c9f543954bb28880276e3d"
+    },
+    "EVIDENCE.md": {
+      "bytes": 17635,
+      "sha256": "2e12f17fea8a55d5f8bf6f5e108a68575af82c5891cc70a8db349aa61d432ff7"
+    },
+    "MODULES.md": {
+      "bytes": 8947,
+      "sha256": "833d2b77fee8279d789f161ac7a2a55e0bc532d473e5850408b8e4cfc469df02"
+    },
+    "PRD.md": {
+      "bytes": 4466,
+      "sha256": "a0e06d1819ea41ca88aba2c3599d79ed50d4f16524dff406789f45e20c27963f"
+    },
+    "README.md": {
+      "bytes": 6578,
+      "sha256": "8dbd012221d721240ebf3d3856c22049466888c58a1540ed9ff97242b8c81f33"
+    },
+    "TIEOUT.json": {
+      "bytes": 15660,
+      "sha256": "aee7cbd480b1f6794888616af9c55e8896ecb13fa3dc1585d1b012f0a8508600"
+    }
+  },
+  "full_workflow_gate": "BLOCKED",
+  "manifest_file": "MANIFEST.json",
+  "manifest_hash_location": "Exact file digest in the command's stdout receipt.",
+  "original_decision_review_sha256": "9aa03933aa24121b786f3939e4e4bec3555302b43c117e3dda9333de9fa04afe",
+  "reconstruction_status": "PARTIAL",
+  "semantic_acceptance": "BLOCKED",
+  "semantic_verification": "UNVERIFIABLE",
+  "source_consistency": "PASSED",
+  "stage_gate": "BLOCKED",
+  "subject": {
+    "attempt_id": "preview-2",
+    "case_table_sha256": "7ca4c6b50cdc7f5b7ce2ee422f5adfe883dba82a39b064140fba2d7a70702342",
+    "fixture": "ordered_measurements_and_offsets",
+    "fixture_sha256": "dce463011111389bbd84901b2a94632305b287605af98493f3f88744e2f94716",
+    "graph_sha256": "19f41dea50825469a89d8fc545fee1d87f09af946d130d62de8f946d90b78017",
+    "run_id": "ordered-measurements",
+    "scope_manifest_sha256": "3bad52035b88cb4e827027f80cb0d7617dfb0e04414c91f111faf91bfe7354d0",
+    "source_fingerprint": "7517a3f1d064af2c15eb4bb0f3671659b4ea9b5acb9c39125dd9fb973a0a5d46",
+    "source_sha256": {
+      "enrich.sas": "09bae8bbb5c2b68e47801dbc865cd07b21f4953cec24ebcee043bcfea696ba91",
+      "prepare.sas": "1bc144d5ace53f06f765720a22d1ee2671cbcb13d5c1c2725cf34f8a8361e507"
+    },
+    "workspace_id": "mvp2-public-workspace"
+  },
+  "tieout_counts": {
+    "PASS": 7,
+    "UNVERIFIABLE": 2,
+    "deliberate FAIL": 8
+  }
+}

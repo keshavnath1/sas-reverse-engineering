@@ -1,0 +1,16 @@
+{
+  "scope": "public-synthetic",
+  "text_column": "annotation",
+  "input": [
+    {"reading": 3, "score": 7, "annotation": "later"},
+    {"reading": 1, "score": 4.0, "annotation": "first tie"},
+    {"reading": 1, "score": 4, "annotation": "second tie"},
+    {"reading": 1, "score": 4.0, "annotation": "duplicate after projection"}
+  ],
+  "expected": [
+    {"reading": 1, "score": 4.0},
+    {"reading": 1, "score": 4},
+    {"reading": 1, "score": 4.0},
+    {"reading": 3, "score": 7}
+  ]
+}

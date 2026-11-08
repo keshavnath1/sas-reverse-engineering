@@ -1,0 +1,23 @@
+# TF-1 validation
+
+Baseline `96cacb1665ee0500c5136e6673153d586073bae6`. [The developer command](../scripts/review_workflow.py) accepts exactly `mvp2` and `by-retain-and-sum`. Both explicit selections accept fresh `/tmp/review-<label>` destinations under the existing scratch-directory and exclusive write checks.
+
+| Selection | Subject and outcome |
+|---|---|
+| Omitted or `mvp2` | Ten files byte-identical to the accepted consolidated example. Graph `19f41dea50825469a89d8fc545fee1d87f09af946d130d62de8f946d90b78017`; manifest `3efe4f68b923a2a59b37041cf30663c856891beb265ccad395fc2078e6970952`. Source consistency PASSED, reconstruction PARTIAL, 17 existing behavioral controls. |
+| `by-retain-and-sum` | Eight files with revised rendering, original source, declared inputs and hand-authored expectations. Graph `6ec1a62ae2180e05c54c69f6f15a02ecd4678ee925fb37f29796ba7d2842c965`; manifest `7188c6130d14612e58d6020d64a8e55c5daa2f7b457b08fd584063520f579b9d`. Source consistency PASSED, reconstruction COMPLETE within the supported profile, behavioral evidence UNAVAILABLE. |
+
+The stateful adapter checks the original P2A declaration file digest before importing the fixed case and checks the exact graph binding and status after reconstruction. The package omits TIEOUT.json and DECISION_REVIEW.md. Its expectations are literal reference material from the existing public case. No behavioral oracle assessed them.
+
+The stateful package selects `two-fixture-preview/1`. This revision explains the RETAIN literal, FIRST.group reset, sum statement, LAST.subkey guard and represented recurrence with source fact links. It distinguishes SORT tie freedom, actual SET input order and the independent SQL ordering contract. A focused test exercises all three ordering rules on the MVP-2 graph under the revised renderer. Both MVP-2 command forms retain the accepted legacy rendering and historical digests. That preserved README still describes the original single-fixture command, and the accepted ADR wording retains the earlier ambiguity about ties.
+
+## Executed validation
+
+- Both explicit commands ran on macOS 26.6.2 (25G83), CPython 3.12.5, using `.venv/bin/python -IB scripts/review_workflow.py --fixture <choice> --destination <fresh-directory>`. Each exited 0. The stateful command's offline audit observed reconstruction, diagnostics and preview rendering, without behavioral or decision-report generation.
+- Six focused integration tests cover exact legacy output, closed selection, state and subject bindings, provenance, unavailable behavioral evidence, determinism, local links, overwrite refusal, altered declaration refusal and revised ordering. The initial focused harness shadowed `unittest.TestCase.run`; renaming its stored command result corrected that test error.
+- `.venv/bin/python -m unittest discover -s tests -v` exited 0 with **788/788** passing in 45.079 seconds on macOS. That covers all 782 existing regressions plus six TF-1 tests. The existing hosted workflow separately exercises development and installed-wheel runs and downstream drift.
+- Compared all 163 baseline tracked files, including all 23 accepted example files. Changes were confined to the approved command, rendering, skill and README files plus new tests and this record. The historical replay audit matched all 30 P1/P2A artifacts, both complete reports, eight frozen hashes and three diagnostic hashes. The downstream pin is `bc754e0f1204a99020c864df2a5b25983005e09c`.
+- Actual macOS `codex-cli 0.167.0-alpha.3.2` app-server `skills/list` returned all five revised skills enabled and zero parsing errors. Typed loading, native picker behavior and model completion through skill selection were untested.
+- Independent file-guided reviews followed all five skill files for each selected package. The MVP-2 review reconciled the existing 17 cases, including eight deliberate FAILs, and identified the unresolved include. The stateful review distinguished hand expectations from observed results and required an independent reference before candidate selection. It flagged generic STATE wording and irrelevant join concerns in the first draft. A follow-up confirmed the revised architecture cites the represented recurrence and both ADRs address state-specific obligations. These were file-guided reviews, separate from native discovery.
+
+Both packages carry DRAFT authority, UNVERIFIABLE semantic verification, BLOCKED semantic acceptance and NOT_RUN benchmarks. The COMPLETE reconstruction label describes the supported source profile. Independent SAS reference evidence, numerical tolerances and safe partition proof remain outstanding.

@@ -1,0 +1,53 @@
+{
+  "approval": {
+    "architecture": "REQUIRED",
+    "business_intent": "REQUIRED"
+  },
+  "binding": {
+    "evidence": {
+      "EVIDENCE.json": {
+        "bytes": 96706,
+        "sha256": "929d9f25210a8a8146de235193545ee9e7009c726ecb4ff3ce0b4bcc865c1a7c"
+      },
+      "INVENTORY.json": {
+        "bytes": 2587,
+        "sha256": "d76ff0aac23443fad99266351a5f02dfeb2ef2e2c3bab160994e1deeb14154d6"
+      }
+    },
+    "inputs": {
+      "enrich.sas.txt": {
+        "bytes": 203,
+        "sha256": "15a0af744e89c305c7ba81ed55fe9691b8b086bc58b2a7a4a711487243c88e32"
+      },
+      "main.sas.txt": {
+        "bytes": 378,
+        "sha256": "97d0535f5fdb5a9fc0b3065e8c0d9ac07fc192e905da82c907193e34b68c693a"
+      },
+      "profile.json": {
+        "bytes": 1370,
+        "sha256": "33b78c3f6f620923bd9529837f51a3df7bd89aa14e9e0f466ddc8c4c7e1d9063"
+      },
+      "scope.json": {
+        "bytes": 623,
+        "sha256": "fb2e8ef21778029108d0cdc2d8f2988ea43d933fc6eb6a72ba9755088f3c4cc9"
+      },
+      "settings.sas.txt": {
+        "bytes": 22,
+        "sha256": "25a884844a344b972dec89ccd0705e71e995a936bfbc7d24b52df660def4e62a"
+      }
+    },
+    "manifest_sha256": "c8e63ee5a954918bdbed5adda43f759412122e94bb106a86f780b333076441e4"
+  },
+  "execution": {
+    "category_policy": "PENDING",
+    "multiplicity_policy": "PENDING",
+    "ordering_policy": "PENDING"
+  },
+  "source_review_status": "DRAFT",
+  "status": "DRAFT",
+  "target": {
+    "distributed": "PENDING",
+    "runtime": "PENDING"
+  },
+  "version": 1
+}
