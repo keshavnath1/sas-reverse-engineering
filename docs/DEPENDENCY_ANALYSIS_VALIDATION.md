@@ -1,7 +1,7 @@
 # P3-A1 validation record
 
 Scope: private diagnostics over caller-supplied public synthetic graph values.
-Baseline `dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc`; see the [design](P3_A1_DESIGN.md)
+Baseline `dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc`; see the [design](DEPENDENCY_ANALYSIS_DESIGN.md)
 and [approved obligations](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/POST_CP3D_ROADMAP.md#proposed-exact-tests-and-acceptance).
 All 693 tests passed in the final macOS development, fresh-clone and installed-wheel
 runs and in both hosted Linux installation modes. The 26 new methods exercised
@@ -185,8 +185,8 @@ is on the canonical input, not a promise that output fits the same size.
 ## Changed files and proof limits
 
 New: `src/sas_re/_dependency_diagnostics.py`, `tests/dependency_vectors.py`,
-`tests/test_dependency_diagnostics.py`, `docs/P3_A1_DESIGN.md` and this report.
-Updated: `README.md`, `AGENTS.md`, `docs/APPROVALS.md`, `docs/OPEN_DECISIONS.md`,
+`tests/test_dependency_diagnostics.py`, `docs/DEPENDENCY_ANALYSIS_DESIGN.md` and this report.
+Updated: `README.md`, `AGENTS.md`, `docs/APPROVAL_HISTORY.md`, `docs/OPEN_DECISIONS.md`,
 `docs/BEST_PRACTICES_ADOPTION.md`. No other repository changes are part of P3-A1.
 
 No private inputs, SAS execution, provider calls, gold, Windows qualification,
@@ -263,7 +263,7 @@ environment. `pip check` found no broken requirements. The dependency lock and
 packaging version were not changed; no Windows installation was attempted.
 
 ```sh
-git add -- AGENTS.md README.md docs/APPROVALS.md docs/BEST_PRACTICES_ADOPTION.md docs/OPEN_DECISIONS.md docs/P3_A1_DESIGN.md docs/P3_A1_VALIDATION.md src/sas_re/_dependency_diagnostics.py tests/test_dependency_diagnostics.py
+git add -- AGENTS.md README.md docs/APPROVAL_HISTORY.md docs/BEST_PRACTICES_ADOPTION.md docs/OPEN_DECISIONS.md docs/DEPENDENCY_ANALYSIS_DESIGN.md docs/DEPENDENCY_ANALYSIS_VALIDATION.md src/sas_re/_dependency_diagnostics.py tests/test_dependency_diagnostics.py
 git diff --cached --check
 .venv/bin/python scripts/check_repository.py
 .venv/bin/python "$T/check_docs.py"

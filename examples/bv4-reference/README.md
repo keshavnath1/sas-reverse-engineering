@@ -67,7 +67,7 @@ Diagnostic row dumps are collection, not additional behavioral trials. Full-run
 fallthrough is structurally unreachable when the two allowed status values are
 exactly the two branch values. P01/P02 test the isolated pair and rejoin only.
 
-The [source-recovered prerequisite structure](../../docs/SM3B_VALIDATION.md) is
+The [source-recovered prerequisite structure](../../docs/MISSING_VALUE_RULES_VALIDATION.md) is
 unchanged in the full arms: rule 0 has none; rule 1 requires 0 false; rule 2
 requires 0 and 1 false; rule 3 requires only 0 false; rule 4 requires 0 and 3
 false; rule 5 requires 0, 3 and 4 false. Both label branches rejoin before rule 3.

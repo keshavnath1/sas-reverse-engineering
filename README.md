@@ -17,7 +17,7 @@ For people learning or presenting this repository, read the following existing g
 1. **This README:** the core idea, current workflow, five skills and supported starting commands.
 2. **[AGENTS.md](AGENTS.md) and [SECURITY.md](SECURITY.md):** operating rules, authorized input, human decisions and safety boundaries.
 3. **[Architecture](docs/ARCHITECTURE.md):** how evidence becomes requirements and design, who owns each part, and how optimization choices are challenged.
-4. **[Detailed INTAKE guide](docs/GOAL4B_P2A_INTAKE.md):** the existing operator steps, evidence handoff, citation preflight and script diagrams.
+4. **[Detailed INTAKE guide](docs/INTAKE_AND_REVIEW_GUIDE.md):** the existing operator steps, evidence handoff, citation preflight and script diagrams.
 5. **Only the example you need:** [modernization](examples/modernization/README.md) for design review; [running-balance](examples/running-balance/README.md) for its exact supported draft engineering runner; or [projection/SORT](examples/intg1/README.md) for its separate approval-gated route.
 
 For a design discussion, start with items 1–3. When running the walkthrough, also use the [installation instructions](#install-and-validate) and the relevant operator/example guide. You do not need to read every validation report or milestone plan first. Historical engineering records remain available [on demand](#engineering-history-and-qualification-plans).
@@ -57,7 +57,7 @@ See [practical usage and limitations](docs/ARCHITECTURE.md#using-jim-thompsons-p
    shows how to inventory and scope public synthetic inputs.
 2. **Generate evidence.** Run the existing Python source-review tools to bind
    original bytes and produce TRACE/MAP, coverage and unresolved findings.
-   The [multi-file INTAKE guide](docs/GOAL4B_P2A_INTAKE.md) covers literal
+   The [multi-file INTAKE guide](docs/INTAKE_AND_REVIEW_GUIDE.md) covers literal
    includes, typed synthetic inputs, and draft configuration. For an authorized
    private source, use only the [bounded source-review tool](scripts/review_source.py)
    and its explicit source hash and selected spans.
@@ -147,7 +147,7 @@ Draft authority is `DRAFT`, independent semantic verification is
 `UNVERIFIABLE`, and semantic acceptance is `BLOCKED` until independently
 supported. Record unperformed SAS reference and benchmark execution as
 `NOT_RUN`. See [repository rules](AGENTS.md), [security](SECURITY.md) and
-[approval boundaries](docs/APPROVALS.md).
+[approval boundaries](docs/APPROVAL_HISTORY.md).
 
 ## Install and validate
 
@@ -209,22 +209,28 @@ The team guides above explain today's workflow. The references below support a s
 
 The folder is reduced to **13 Markdown files**. `docs/goal4c/` and nonessential milestone/test reports are not shipped in this tree; their links below point to the immutable original version.
 
-- **Team guides:** `ARCHITECTURE.md` and `GOAL4B_P2A_INTAKE.md`.
-- **Contract and boundary references:** `COMPATIBILITY.md`, `P2A_DESIGN.md`, `P3_A1_DESIGN.md`, `APPROVALS.md`, `CP3_READINESS.md` and `WS1_VALIDATION.md`.
-- **Engineering compatibility references:** `MVP3_VALIDATION.md`, `P2A_FIXTURE_REVIEW.md`, `P3_A1_VALIDATION.md`, `PY1_VALIDATION.md` and `SM3B_VALIDATION.md`. These support existing execution, fixture metadata, script documentation or the retained example—not new user stages. `MVP3_VALIDATION.md` remains byte-for-byte unchanged because an existing runner checks its hash.
+- **Team guides:** `ARCHITECTURE.md` and `INTAKE_AND_REVIEW_GUIDE.md`.
+- **Contract and boundary references:** `DOWNSTREAM_COMPATIBILITY.md`, `SOURCE_RECONSTRUCTION_DESIGN.md`, `DEPENDENCY_ANALYSIS_DESIGN.md`, `APPROVAL_HISTORY.md`, `FILESYSTEM_SECURITY_READINESS.md` and `WORKSTATION_LAUNCHER_VALIDATION.md`.
+- **Engineering compatibility references:** `SYNTHETIC_TIEOUT_VALIDATION.md`, `SYNTHETIC_FIXTURE_REVIEW.md`, `DEPENDENCY_ANALYSIS_VALIDATION.md`, `PREPARATION_CANDIDATE_VALIDATION.md` and `MISSING_VALUE_RULES_VALIDATION.md`. These support existing execution, fixture metadata, script documentation or the retained example—not new user stages. `SYNTHETIC_TIEOUT_VALIDATION.md` remains byte-for-byte unchanged because an existing runner checks its hash.
+
+### Document naming convention
+
+Names describe the subject in `UPPER_SNAKE_CASE`, not the internal development milestone. `*_GUIDE.md` explains operator steps; `*_DESIGN.md` explains a supported component or contract; `*_VALIDATION.md` records checks and limitations, not a newly executed validation. `APPROVAL_HISTORY.md` is a chronological ledger, not blanket approval.
+
+Current instructions, skills and filesystem consumers use these descriptive paths. Frozen historical fixtures and original replay artifacts retain their old checkpoint identifiers and filename strings as provenance; they are not current file lookup instructions. For example, the original decision-review renderer and fixture declarations remain unchanged so their hashes and reproduced outputs still match. Inspect those original links in the [fixed historical version](https://github.com/keshavnath1/sas-reverse-engineering/tree/eb9794167339d1991800c290a2b24ac10a57edf8); use the renamed documents above for the current team copy. No hash, expected row, tolerance, approval or semantic acceptance rule was changed for this rename.
 
 ### Active references and continuing limits
 
-- **Source and dependency contracts:** [inventory design](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P1_DESIGN.md), [supported reconstruction forms](docs/P2A_DESIGN.md) and [dependency-diagnostic boundaries](docs/P3_A1_DESIGN.md). Consult them for the applicable skill or engineering question, not as extra user stages.
-- **Compatibility and platform limits:** [downstream pin](docs/COMPATIBILITY.md), [platform validation](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/CP1_VALIDATION.md), [platform readiness checkpoint](docs/CP3_READINESS.md) and [workstation validation](docs/WS1_VALIDATION.md). Read their dates, subjects and limits; native Windows evidence I/O remains blocked.
-- **Authority:** [repository rules](AGENTS.md), [security](SECURITY.md) and the [chronological scope-approval ledger](docs/APPROVALS.md). Historical engineering authorization is not a new workload, architecture, runtime or release approval.
+- **Source and dependency contracts:** [inventory design](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P1_DESIGN.md), [supported reconstruction forms](docs/SOURCE_RECONSTRUCTION_DESIGN.md) and [dependency-diagnostic boundaries](docs/DEPENDENCY_ANALYSIS_DESIGN.md). Consult them for the applicable skill or engineering question, not as extra user stages.
+- **Compatibility and platform limits:** [downstream pin](docs/DOWNSTREAM_COMPATIBILITY.md), [platform validation](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/CP1_VALIDATION.md), [platform readiness checkpoint](docs/FILESYSTEM_SECURITY_READINESS.md) and [workstation validation](docs/WORKSTATION_LAUNCHER_VALIDATION.md). Read their dates, subjects and limits; native Windows evidence I/O remains blocked.
+- **Authority:** [repository rules](AGENTS.md), [security](SECURITY.md) and the [chronological scope-approval ledger](docs/APPROVAL_HISTORY.md). Historical engineering authorization is not a new workload, architecture, runtime or release approval.
 
 ### Engineering history and qualification plans
 
 Use these records when investigating an implementation decision, recorded check or open qualification question. They do not need to be loaded wholesale into a Copilot session.
 
 - **How the implementation developed:** [historical implementation plan](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/IMPLEMENTATION_PLAN.md) and dated P/CP/WS/MVP/SK/SM/TF records in the [original documentation tree](https://github.com/keshavnath1/sas-reverse-engineering/tree/eb9794167339d1991800c290a2b24ac10a57edf8/docs). These are not copied into the team branch unless an existing consumer needs them. Each record retains its own commit, platform, commands and proof boundaries.
-- **Historical public demonstrations:** [original offline review](examples/offline-review/README.md), [public behavioral validation](docs/MVP3_VALIDATION.md), [recorded skill discovery/use](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/SK2_VALIDATION.md) and [one corrected public design-review approval](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/goal4c/README.md). These do not establish universal SAS equivalence or approval for another workload.
+- **Historical public demonstrations:** [original offline review](examples/offline-review/README.md), [public behavioral validation](docs/SYNTHETIC_TIEOUT_VALIDATION.md), [recorded skill discovery/use](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/SK2_VALIDATION.md) and [one corrected public design-review approval](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/goal4c/README.md). These do not establish universal SAS equivalence or approval for another workload.
 - **Plans and unresolved decisions:** [open decisions](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/OPEN_DECISIONS.md), [independent-evaluation readiness](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P2B_READINESS.md), [workstation/offline-kit planning](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/WS2A_OFFLINE_KIT_PLAN.md) and [SAS-reference/benchmark follow-up](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/GOAL1_REFERENCE_AND_BENCHMARK_PLAN.md). A plan is not an executed result or a released capability.
 - **Practice attribution and evidence:** [Jim Thompson practice ledger](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/BEST_PRACTICES_ADOPTION.md). The team-facing usage explanation is in the [architecture guide](docs/ARCHITECTURE.md#using-jim-thompsons-practices-without-changing-the-workflow).
 

@@ -38,7 +38,7 @@ for `profile.json`. Set `entrypoints` to the single file key
 `synthetic:main.sas` for the example, use module `main` for inputs, and leave
 `log_bindings` and `lst_bindings` empty. Supply typed column descriptors, bounded
 public sample rows where needed, and any declared input ordering. These are
-synthetic profile assumptions. The [P2A design](P2A_DESIGN.md) describes the
+synthetic profile assumptions. The [P2A design](SOURCE_RECONSTRUCTION_DESIGN.md) describes the
 supported source forms and interpretation limits.
 
 The package contains `INVENTORY.json`, canonical P2A `EVIDENCE.json`,

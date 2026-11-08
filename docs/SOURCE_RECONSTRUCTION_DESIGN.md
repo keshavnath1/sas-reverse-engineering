@@ -164,7 +164,7 @@ No token/model budget is consumed: D08-C has not selected a provider or runtime.
 
 ## Public review and P2B readiness
 
-[P2A_FIXTURE_REVIEW.md](P2A_FIXTURE_REVIEW.md) records separate expected-answer
+[SYNTHETIC_FIXTURE_REVIEW.md](SYNTHETIC_FIXTURE_REVIEW.md) records separate expected-answer
 authorship and review before the public semantic assertions were used. It does
 not claim OS isolation or human expert certification. Public examples and error
 messages are development material and must never be relabeled withheld gold.

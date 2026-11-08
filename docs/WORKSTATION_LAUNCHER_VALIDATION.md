@@ -62,7 +62,7 @@ and demo data remain outside Git.
 
 Manifest hashes cover sorted relative artifact paths and their original file contents
 via the existing per-file SHA-256 policy; individual bytes were compared, not just totals.
-The [eight frozen hashes](P3_A1_VALIDATION.md#frozen-identities) and the three recorded
+The [eight frozen hashes](DEPENDENCY_ANALYSIS_VALIDATION.md#frozen-identities) and the three recorded
 P3-A1 implementation/test hashes were recomputed and all matched. The compatibility
 pin remains `bc754e0f1204a99020c864df2a5b25983005e09c`. No Agent-mastery changes.
 
@@ -110,7 +110,7 @@ separate fixture copies. Baseline/candidate replay commands/outputs and individu
 hashes are recorded locally in `$T/{baseline,candidate}-preservation.json`.
 
 Added `scripts/workstation.sh`, `tests/test_workstation.py`, `docs/WS1_DESIGN.md` and
-this report. Updated `README.md`, `AGENTS.md`, `docs/APPROVALS.md`,
+this report. Updated `README.md`, `AGENTS.md`, `docs/APPROVAL_HISTORY.md`,
 `docs/OPEN_DECISIONS.md` and `docs/BEST_PRACTICES_ADOPTION.md`. Of 105 baseline tracked
 files, the 100 outside those five documentation edits remained byte- and executable-mode
 identical. No dependency, workflow, package source, frozen contract, parser, historical

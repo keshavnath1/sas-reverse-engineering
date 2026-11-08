@@ -200,7 +200,7 @@ runpy.run_path(sys.argv[0], run_name='__main__')
             scratch = Path(tmp)
             for name in ("scripts/mvp4_review.py", "scripts/mvp1_demo.py", "scripts/mvp3_tieout.py",
                          "tests/mvp2_fixture.py", "tests/p2a_support.py", "tests/mvp2_expectations.py",
-                         "tests/mvp3_cases.py", "docs/MVP3_VALIDATION.md", "examples/mvp2/EVIDENCE.md",
+                         "tests/mvp3_cases.py", "docs/SYNTHETIC_TIEOUT_VALIDATION.md", "examples/mvp2/EVIDENCE.md",
                          "examples/mvp2/ADR_NATIVE.md", "examples/mvp2/ADR_SPARK.md"):
                 target = scratch / name
                 target.parent.mkdir(exist_ok=True, parents=True)

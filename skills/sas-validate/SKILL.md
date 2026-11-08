@@ -22,4 +22,4 @@ acceptance BLOCKED, and unperformed execution NOT_RUN.
 ## Reference material
 
 For the original offline example, see [`MANIFEST.json`](../../examples/offline-review/MANIFEST.json), [`EVIDENCE.md`](../../examples/offline-review/EVIDENCE.md), [`TIEOUT.json`](../../examples/offline-review/TIEOUT.json), [`DECISION_REVIEW.md`](../../examples/offline-review/DECISION_REVIEW.md).
-For its related technical details, see [mvp3_cases.py](../../tests/mvp3_cases.py), [mvp3_tieout.py](../../scripts/mvp3_tieout.py), [MVP3_VALIDATION.md](../../docs/MVP3_VALIDATION.md).
+For its related technical details, see [mvp3_cases.py](../../tests/mvp3_cases.py), [mvp3_tieout.py](../../scripts/mvp3_tieout.py), [SYNTHETIC_TIEOUT_VALIDATION.md](../../docs/SYNTHETIC_TIEOUT_VALIDATION.md).

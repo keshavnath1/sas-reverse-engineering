@@ -237,7 +237,7 @@ class ReviewWorkflowTests(unittest.TestCase):
             shutil.copytree(ROOT / "examples/mvp2", clone / "examples/mvp2")
             shutil.copytree(ROOT / "examples/mvp4", clone / "examples/mvp4")
             (clone / "docs").mkdir()
-            shutil.copyfile(ROOT / "docs/MVP3_VALIDATION.md", clone / "docs/MVP3_VALIDATION.md")
+            shutil.copyfile(ROOT / "docs/SYNTHETIC_TIEOUT_VALIDATION.md", clone / "docs/SYNTHETIC_TIEOUT_VALIDATION.md")
             (clone / "tests").mkdir()
             for name in ("mvp2_expectations.py", "mvp2_fixture.py", "mvp3_cases.py", "p2a_support.py"):
                 shutil.copyfile(ROOT / "tests" / name, clone / "tests" / name)

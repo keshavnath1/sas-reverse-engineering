@@ -22,10 +22,10 @@ intent, configuration choices, and exact-byte approvals.
   SAS equivalence. Keep draft authority, independent verification UNVERIFIABLE,
   and semantic acceptance BLOCKED unless the relevant evidence supports a change.
   Mark reference and benchmark execution NOT_RUN when unperformed.
-- Follow [security](SECURITY.md) and [approval boundaries](docs/APPROVALS.md).
+- Follow [security](SECURITY.md) and [approval boundaries](docs/APPROVAL_HISTORY.md).
   Preserve the existing platform and launcher restrictions. Native Windows
-  evidence I/O remains BLOCKED. See [workstation validation](docs/WS1_VALIDATION.md)
-  and [platform readiness](docs/CP3_READINESS.md) for their specific limits.
+  evidence I/O remains BLOCKED. See [workstation validation](docs/WORKSTATION_LAUNCHER_VALIDATION.md)
+  and [platform readiness](docs/FILESYSTEM_SECURITY_READINESS.md) for their specific limits.
 - For repository changes, run relevant tests and the repository guard. Use the
   [installation and validation guide](README.md#install-and-validate) for full
   regressions and installed-wheel checks. Report local and hosted results separately.

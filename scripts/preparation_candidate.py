@@ -1,6 +1,6 @@
 """PY-1: one pure, unverified development candidate, not a SAS interpreter.
 
-Direct calls only; see docs/PY1_VALIDATION.md for the typed public contract.
+Direct calls only; see docs/PREPARATION_CANDIDATE_VALIDATION.md for the typed public contract.
 No source reading, reconstruction, reference-output loading or publication.
 """
 

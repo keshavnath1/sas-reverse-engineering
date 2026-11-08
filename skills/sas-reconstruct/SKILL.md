@@ -15,7 +15,7 @@ description: Recover SAS transformations, state and dependencies from an authori
 3. Return a TRACE/MAP summary with supported, partial, unsupported, and
    uninspected coverage. Surface unresolved includes, macros, descriptors,
    execution order and dataset versions. Use the
-   [source subset guide](../../docs/P2A_DESIGN.md) for supported forms.
+   [source subset guide](../../docs/SOURCE_RECONSTRUCTION_DESIGN.md) for supported forms.
 
 For fresh evidence use the [operator guide](../../README.md). Native Windows
 evidence I/O remains BLOCKED.

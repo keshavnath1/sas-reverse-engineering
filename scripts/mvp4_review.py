@@ -19,7 +19,7 @@ REFERENCES = {
     "examples/mvp2/EVIDENCE.md": "2e12f17fea8a55d5f8bf6f5e108a68575af82c5891cc70a8db349aa61d432ff7",
     "examples/mvp2/ADR_NATIVE.md": "dd0f1211dfc98599f7316a3a8aeae08308b54453cc5de8025cd3837fc8dc36a7",
     "examples/mvp2/ADR_SPARK.md": "531cb320a8e681b315470819ddeeedecf7439e6fcdefb9d4a1735aa2f3fed80c",
-    "docs/MVP3_VALIDATION.md": "d14e589f12ef8f5689f4f314ba8055542e88b68db52bccd527eb930a442e228d",
+    "docs/SYNTHETIC_TIEOUT_VALIDATION.md": "d14e589f12ef8f5689f4f314ba8055542e88b68db52bccd527eb930a442e228d",
 }
 
 

@@ -112,7 +112,7 @@ On 2026-11-05 the user accepted CP2 within its approved scope at
 implementation design only**. Approved: read-only review of CP1/CP2 bindings,
 native Windows security design, proposed POSIX physical-alias strengthening,
 fail-closed outcomes, adversarial tests/qualification instructions, and necessary
-decision/practice-ledger updates. Deliverables are `CP3_READINESS.md` and
+decision/practice-ledger updates. Deliverables are `FILESYSTEM_SECURITY_READINESS.md` and
 `CP3_SECURITY_TEST_PLAN.md`. Missing host owner, independent security reviewer,
 filesystem assumptions and approval requirements must remain OPEN.
 
@@ -201,8 +201,8 @@ at `dba5b3aa5a60ef384bfc57a90b46ca72ea4f27dc` and approved **P3-A1 only**.
 The explicit development-order exception allows one private, pure dependency
 and blocker diagnostic over supplied in-memory public synthetic canonical v2
 graphs before P2B. Scope includes independent public vectors, exact A01–A26
-obligations, preservation checks, the [design](P3_A1_DESIGN.md),
-[validation](P3_A1_VALIDATION.md) and necessary ledger updates.
+obligations, preservation checks, the [design](DEPENDENCY_ANALYSIS_DESIGN.md),
+[validation](DEPENDENCY_ANALYSIS_VALIDATION.md) and necessary ledger updates.
 
 Keep the 667 baseline tests, frozen contracts, identity and sealed bytes, POSIX
 behavior, dependency lock and downstream pin. Only existing synthetic regression
@@ -270,7 +270,7 @@ This covers one read-only Bash launcher for exactly one of `--help`, `--version`
 or `status`, the six W01–W06 test families, usage/validation documentation and
 necessary ledger updates. Preserve all 693 existing regressions and historical
 synthetic evidence. Stop at WS-1 review. See the [design](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/WS1_DESIGN.md) and
-[validation record](WS1_VALIDATION.md).
+[validation record](WORKSTATION_LAUNCHER_VALIDATION.md).
 
 The production installation inventory and its independently authenticated pin
 are outstanding. The shipped launcher leaves both fields empty and returns
@@ -283,7 +283,7 @@ UNVERIFIABLE, independent acceptance BLOCKED and benchmarks NOT_RUN.
 
 On 2026-11-06 the user accepted WS-1 at
 `767b2c3154de7fb451c4278e22f25633d9a025d0` within its documented, tested
-scope. The [WS-1 validation record](WS1_VALIDATION.md) attributes the launcher
+scope. The [WS-1 validation record](WORKSTATION_LAUNCHER_VALIDATION.md) attributes the launcher
 results to macOS ARM64 development runs and hosted Linux x64 CI. Successful
 dispatch used synthetic approval records. The repository launcher retains empty
 approval slots and returns bootstrap BLOCKED/2 for each valid verb. Native
@@ -316,7 +316,7 @@ report](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339
 publication, native Windows access and runtime selection retain their separate gates.
 
 At `a82ff2b1f0ae26e545f1e1640eb4ed697f33e56b` the user accepted MVP-2 as an
-engineering demonstration and authorized the [MVP-3 behavioral tie-out](MVP3_VALIDATION.md).
+engineering demonstration and authorized the [MVP-3 behavioral tie-out](SYNTHETIC_TIEOUT_VALIDATION.md).
 Its authority covers a public standard-library reference, frozen synthetic cases and
 local candidate checks. The unresolved include, full-workflow acceptance, B1 and
 runtime selection retain their separate gates. Stop at MVP-3 for review.

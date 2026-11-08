@@ -2,7 +2,7 @@
 
 Reviewed baseline: `fe3bbe98704fd33fb9516b53e8786e516dce9e1e`.
 Prepared 2026-11-05. CP2 is accepted within its approved scope. This checkpoint
-authorizes **planning and implementation design only**; see [APPROVALS.md](APPROVALS.md).
+authorizes **planning and implementation design only**; see [APPROVAL_HISTORY.md](APPROVAL_HISTORY.md).
 No native reader, publisher, lock, schema, dependency or test implementation is
 added. Native Windows execution and qualification remain **BLOCKED**.
 
@@ -20,7 +20,7 @@ PROPOSED means future design, not implemented or proven. OPEN identifies missing
 human decisions or evidence; an unavailable required guarantee must yield BLOCKED.
 Public documentation describes APIs, not qualification of this application.
 
-Inspected: AGENTS.md, SECURITY.md, README.md, APPROVALS.md, OPEN_DECISIONS.md,
+Inspected: AGENTS.md, SECURITY.md, README.md, APPROVAL_HISTORY.md, OPEN_DECISIONS.md,
 BEST_PRACTICES_ADOPTION.md, CROSS_PLATFORM_PORTABILITY_PLAN.md, CP1/CP2 designs and
 validation reports; `platform_io`, `safeio`, `_posix_io`, `authorization`,
 `_authorization_paths`, `evidence`, P1/P2A workflows, frozen contracts, relevant
@@ -359,7 +359,7 @@ ARM64, using the existing CPython 3.12.5 environment. No dependency was installe
 | Preservation/documentation command reproduced below | Exit 0; 66 baseline files outside the four edited Markdown files byte-identical; six changed/new Markdown files UTF-8/LF, balanced fences and existing local-link targets |
 | Static AST count within that command | 16 + 17 + 12 = 45 CP2 test definitions; **not a test execution** |
 | `git diff --check` | Exit 0; no whitespace errors |
-| `git add AGENTS.md docs/APPROVALS.md docs/OPEN_DECISIONS.md docs/BEST_PRACTICES_ADOPTION.md docs/CP3_READINESS.md docs/CP3_SECURITY_TEST_PLAN.md` | Exit 0; only six Markdown files staged |
+| `git add AGENTS.md docs/APPROVAL_HISTORY.md docs/OPEN_DECISIONS.md docs/BEST_PRACTICES_ADOPTION.md docs/FILESYSTEM_SECURITY_READINESS.md docs/CP3_SECURITY_TEST_PLAN.md` | Exit 0; only six Markdown files staged |
 | `.venv/bin/python scripts/check_repository.py` | Exit 0; PASS, no prohibited tracked paths or selected credential-pattern matches; not complete DLP |
 | `git diff --cached --check` | Initial exit 2: one extra blank line at readiness EOF; removed; rerun exit 0. Preservation and repository guard reruns also exited 0 |
 
@@ -376,9 +376,9 @@ Reproducible command actually executed (reads only the development checkout/Git)
 import ast, hashlib, json, re, subprocess
 from pathlib import Path
 baseline = "fe3bbe98704fd33fb9516b53e8786e516dce9e1e"
-edited = {"AGENTS.md", "docs/APPROVALS.md", "docs/OPEN_DECISIONS.md",
+edited = {"AGENTS.md", "docs/APPROVAL_HISTORY.md", "docs/OPEN_DECISIONS.md",
           "docs/BEST_PRACTICES_ADOPTION.md"}
-added = {"docs/CP3_READINESS.md", "docs/CP3_SECURITY_TEST_PLAN.md"}
+added = {"docs/FILESYSTEM_SECURITY_READINESS.md", "docs/CP3_SECURITY_TEST_PLAN.md"}
 names = subprocess.check_output(["git", "ls-tree", "-r", "--name-only", baseline],
                                 text=True).splitlines()
 checked = 0
@@ -441,7 +441,7 @@ An inspection also tried nonexistent `.github/workflows/scaffold.yml` (exit 1),
 then located and read the actual `foundation.yml`; no workflow was changed.
 
 Files in this checkpoint: two new readiness/test documents; updates only to
-AGENTS.md, APPROVALS.md, OPEN_DECISIONS.md and BEST_PRACTICES_ADOPTION.md. No native
+AGENTS.md, APPROVAL_HISTORY.md, OPEN_DECISIONS.md and BEST_PRACTICES_ADOPTION.md. No native
 reader, harness, publisher, lock or dependency change is included. Stop for explicit
 CP3 implementation approval; Windows qualification and the missing decisions stay
 BLOCKED/OPEN as specified above.

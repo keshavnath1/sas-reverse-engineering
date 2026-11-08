@@ -114,8 +114,8 @@ class SkillDefinitionTests(unittest.TestCase):
 
     def test_analysis_and_validation_links_bind_the_existing_subject(self):
         references = {
-            "sas-analyze": ("src/sas_re/_dependency_diagnostics.py", "docs/P3_A1_DESIGN.md"),
-            "sas-validate": ("tests/mvp3_cases.py", "scripts/mvp3_tieout.py", "docs/MVP3_VALIDATION.md"),
+            "sas-analyze": ("src/sas_re/_dependency_diagnostics.py", "docs/DEPENDENCY_ANALYSIS_DESIGN.md"),
+            "sas-validate": ("tests/mvp3_cases.py", "scripts/mvp3_tieout.py", "docs/SYNTHETIC_TIEOUT_VALIDATION.md"),
         }
         for name, sources in references.items():
             with self.subTest(skill=name):
