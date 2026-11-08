@@ -80,7 +80,7 @@ the evidence flow, and runtime decision criteria.
 
 ### Reading the Python implementation
 
-Use the [Python module map and contributor standards](docs/ARCHITECTURE.md#python-structure-where-to-read-the-implementation) to connect the design to code. Public modules cover parsing, semantic reconstruction, evidence, authorization and attempts. Private filesystem implementations live in `src/sas_re/_filesystem/`; dependency analysis and review rendering live in `src/sas_re/_review/`. Existing public imports, CLI commands and operator script names remain available.
+Start with the [package code guide and flow diagrams](src/sas_re/README.md), then use the [Python module map and contributor standards](docs/ARCHITECTURE.md#python-structure-where-to-read-the-implementation) to connect the design to code. Public modules cover parsing, semantic reconstruction, evidence, authorization and attempts. Private filesystem implementations live in `src/sas_re/_filesystem/`; dependency analysis and review rendering live in `src/sas_re/_review/`. Existing public imports, CLI commands and operator script names remain available.
 
 The [test guide](tests/README.md) explains `core/`, `reconstruction/`, `workflow/`, `platform_checks/` and `support/`. Test names describe the behavior being checked rather than a development milestone. A few frozen evaluators/adapters retain their original paths and bytes; they are documented exceptions, not new starting points. Optional Ruff formatting/basic lint configuration is in `pyproject.toml`, with no runtime dependency or lockfile change.
 
