@@ -22,9 +22,9 @@ class ConditionalSortExportTests(unittest.TestCase):
     review = integration.PreparationGateIntegrationTests.review
 
     def test_public_gate_controls_export_and_manifest(self):
-        prep = self.review("examples/mig3/preparation.sas.txt", "--lines", "1:12",
+        prep = self.review("tests/fixtures/candidate-execution/preparation-rules/preparation.sas.txt", "--lines", "1:12",
                            "--recover-status-rules", "--recover-missing-exclusions")
-        pop = self.review("examples/mig4/population.sas.txt", "--lines", "1:1", "--lines", "14:14",
+        pop = self.review("tests/fixtures/candidate-execution/population-gates/population.sas.txt", "--lines", "1:1", "--lines", "14:14",
                           "--recover-sql-gates")
         args = ("--preparation-evidence", str(prep), "--population-evidence", str(pop))
         captures = []

@@ -14,7 +14,7 @@ from test_plan_modernization import configured_arguments
 from test_review_workflow import ROOT, call, remove_destination
 
 
-EXAMPLE = ROOT / "examples/mig2"
+EXAMPLE = ROOT / "tests/fixtures/candidate-execution/projection-and-sort"
 
 
 @unittest.skipUnless(sys.platform in ("darwin", "linux"), "Existing POSIX evidence workflow")

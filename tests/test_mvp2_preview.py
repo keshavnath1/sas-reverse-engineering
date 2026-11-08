@@ -42,7 +42,7 @@ class HistoricalPreviewTests(unittest.TestCase):
             "MODULES.md": "902a4e57d339a45fa6d245dc75f2f8e9775d7a949395e0eb50801b45da19aeda",
             "PRD.md": "de83688ceef11315a859bbfe68d310c21fd7a0cdd182c216934b906b55489f7c",
         }
-        actual = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT / "examples/mvp1").iterdir()}
+        actual = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT / "tests/fixtures/source-reconstruction/single-source-preview").iterdir()}
         self.assertEqual(actual, accepted)
 
 
@@ -263,7 +263,7 @@ class MultiModulePreviewTests(unittest.TestCase):
                 name = item["name"]
                 raw = (destination / name).read_bytes()
                 self.assertEqual(raw, self.docs[name].encode())
-                self.assertEqual(raw, (ROOT / "examples/mvp2" / name).read_bytes())
+                self.assertEqual(raw, (ROOT / "tests/fixtures/source-reconstruction/dependency-aware-preview" / name).read_bytes())
                 self.assertEqual((len(raw), hashlib.sha256(raw).hexdigest()), (item["bytes"], item["sha256"]))
                 for field, status in AUTHORITY.items():
                     self.assertIn(f"{field}: {status}\n", raw.decode())

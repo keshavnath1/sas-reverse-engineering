@@ -12,7 +12,7 @@ from test_review_workflow import ROOT, call, remove_destination
 
 
 SCRIPT = ROOT / "scripts/migrate_preparation.py"
-SOURCE = ROOT / "examples/mig3/preparation.sas.txt"
+SOURCE = ROOT / "tests/fixtures/candidate-execution/preparation-rules/preparation.sas.txt"
 
 
 @unittest.skipUnless(sys.platform in ("darwin", "linux"), "Existing POSIX evidence workflow")

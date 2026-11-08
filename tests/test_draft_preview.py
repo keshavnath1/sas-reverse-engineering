@@ -23,7 +23,7 @@ from test_dependency_diagnostics import offline_calls
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SAMPLE = ROOT / "examples" / "mvp1"
+SAMPLE = ROOT / "tests/fixtures/source-reconstruction/single-source-preview"
 FILES = {"PRD.md", "MODULES.md", "ARCHITECTURE.md", "ADR_NATIVE.md", "ADR_SPARK.md", "EVIDENCE.md"}
 OP_ID = r"op_[0-9a-f]{64}"
 RECORD_ID = r"(?:op|ds|col|edge)_[0-9a-f]{64}"

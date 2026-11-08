@@ -12,7 +12,7 @@ import uuid
 from test_review_workflow import ROOT, call, remove_destination
 
 
-EXAMPLE = ROOT / "examples/mig2"
+EXAMPLE = ROOT / "tests/fixtures/candidate-execution/projection-and-sort"
 SCRIPT = ROOT / "scripts/migrate_projection_sort.py"
 
 
@@ -128,11 +128,18 @@ class ConfigurableMigrationTests(unittest.TestCase):
                 scope_path.write_text(json.dumps(scope), encoding="utf-8")
                 self.assert_refused(self.package(self.intake), reason)
 
-    def test_mig1_manifest_retains_baseline_bytes(self):
-        package = self.package(ROOT / "examples/copilot-review/public-input")
+    def test_projection_manifest_binds_unchanged_fixture_and_relocated_code(self):
+        package = self.package(ROOT / "tests/fixtures/source-reconstruction/agent-review/public-input")
         output = self.destination("mig1")
         result = call(output, script=ROOT / "scripts/migration_candidate.py",
                       extra=("--package", str(package)))
         self.assertEqual(result.returncode, 0, result.stderr)
+        # Historical manifest 2b25ea6 remains bound to the pre-relocation code.
+        # Only the candidate locator/code identity changed; input and case truth did not.
+        manifest = json.loads((output / "MANIFEST.json").read_bytes())
+        self.assertEqual(manifest["input_manifest_sha256"],
+                         "8bfc638d5c4db4f60001010ee7abbb3db175c29f44696b0403c621fed953227a")
+        self.assertEqual(manifest["files"]["CASES.json"]["sha256"],
+                         "2377b8ea027a44f6f59c96f1f195d631988435278b8fd1997a0da52535fd787e")
         self.assertEqual(sha256((output / "MANIFEST.json").read_bytes()).hexdigest(),
-                         "2b25ea613396644b8b5544fd61db453987f1a2be539b73dd0ee9def76ffbe42f")
+                         "6d8acd03366865568e7906aa4aaac50d90022f10a794dac8ab5f2d2ffd5666d5")

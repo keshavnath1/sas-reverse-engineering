@@ -20,4 +20,4 @@ acceptance BLOCKED, and unperformed execution NOT_RUN.
 
 ## Reference material
 
-For the original offline example, see [`EVIDENCE.md`](../../examples/offline-review/EVIDENCE.md), [`PRD.md`](../../examples/offline-review/PRD.md), [`MODULES.md`](../../examples/offline-review/MODULES.md).
+For the original offline example, see [`EVIDENCE.md`](../../tests/fixtures/source-reconstruction/offline-review-package/EVIDENCE.md), [`PRD.md`](../../tests/fixtures/source-reconstruction/offline-review-package/PRD.md), [`MODULES.md`](../../tests/fixtures/source-reconstruction/offline-review-package/MODULES.md).

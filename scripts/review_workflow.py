@@ -144,7 +144,7 @@ def _assemble(scratch):
     if set(files) != set(FILES) or digest(hashes) != PREVIEW_MAP_SHA256:
         raise ValueError("Generated preview differs from the accepted six-file digest")
     for name in FILES:
-        if files[name] != (ROOT / "examples/mvp2" / name).read_bytes():
+        if files[name] != (ROOT / "tests/fixtures/source-reconstruction/dependency-aware-preview" / name).read_bytes():
             raise ValueError(f"Accepted preview differs: {name}")
 
     report = build_report()
@@ -152,7 +152,7 @@ def _assemble(scratch):
         raise ValueError("Reconstruction and tie-out authority disagree")
     files["TIEOUT.json"] = (json.dumps(report, allow_nan=False) + "\n").encode("utf-8")
     review = render_review(graph, files["TIEOUT.json"])
-    if content_hash(review) != ORIGINAL_REVIEW_SHA256 or review != (ROOT / "examples/mvp4/DECISION_REVIEW.md").read_bytes():
+    if content_hash(review) != ORIGINAL_REVIEW_SHA256 or review != (ROOT / "tests/fixtures/source-reconstruction/decision-review/DECISION_REVIEW.md").read_bytes():
         raise ValueError("Original decision review mismatch")
     short_ids = {case_id.split("-", 1)[0] for case_id in cases["CASES"]}
     files["DECISION_REVIEW.md"] = portable_review(review, short_ids)

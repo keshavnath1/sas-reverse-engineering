@@ -18,12 +18,12 @@ from review_intake import identity, json_bytes
 ROOT = Path(__file__).resolve().parents[1]
 LIMIT = 262144
 PINS = {
-    "examples/mig3/preparation.sas.txt": "dccdf7b4b11eba5fd7369157c7b3e8ef002d3b8c7bf2c9a5547dc80e161b8cf8",
-    "examples/mig4/population.sas.txt": "21e16d05e77999c9b2de565c7f1348d9d4b9aae27736024ca286062f8731d110",
-    "examples/mig3/CASES.json": "4b8eb9867cc2a32c793f134fb28d684576ea486592822441e0a3d7ae8a4e0865",
-    "examples/mig5/SCENARIOS.json": "945d503e01a88a45c50078d1eaa11c5d95237fb1eb98420797bbfe4aff088faf",
-    "scripts/migrate_preparation.py": "91c632829174f1b9075a8b4bccaf8d67df13be30ea94cf86df053ed9a81f1bbe",
-    "scripts/migrate_population.py": "12358fadc1f69da1019119d587c83072d6bb6d26f9875494ac817113a7bbb015",
+    "tests/fixtures/candidate-execution/preparation-rules/preparation.sas.txt": "dccdf7b4b11eba5fd7369157c7b3e8ef002d3b8c7bf2c9a5547dc80e161b8cf8",
+    "tests/fixtures/candidate-execution/population-gates/population.sas.txt": "21e16d05e77999c9b2de565c7f1348d9d4b9aae27736024ca286062f8731d110",
+    "tests/fixtures/candidate-execution/preparation-rules/CASES.json": "4b8eb9867cc2a32c793f134fb28d684576ea486592822441e0a3d7ae8a4e0865",
+    "tests/fixtures/candidate-execution/preparation-and-population/SCENARIOS.json": "945d503e01a88a45c50078d1eaa11c5d95237fb1eb98420797bbfe4aff088faf",
+    "scripts/migrate_preparation.py": "b8d9e19ec287401e8807f0b656ed6d22fe00343217ca5289d2d85c85a76d7789",
+    "scripts/migrate_population.py": "d5811bc6ac0641f6a1cad542aa174f46526b0d150ee9d5ab115131b54c0d4041",
     "scripts/preparation_candidate.py": "9f0c1f3e16d99be58299bd4c156783112aff43aaf41334082a9c3244d0df9547",
 }
 EVIDENCE_PINS = (
@@ -78,11 +78,11 @@ def build_package(preparation_path, population_path):
     if tuple(identity(raw)["sha256"] for raw in (prep_evidence, pop_evidence)) != EVIDENCE_PINS:
         raise ValueError("MIGRATION_EVIDENCE_MISMATCH")
 
-    prep_source, pop_source = "examples/mig3/preparation.sas.txt", "examples/mig4/population.sas.txt"
+    prep_source, pop_source = "tests/fixtures/candidate-execution/preparation-rules/preparation.sas.txt", "tests/fixtures/candidate-execution/population-gates/population.sas.txt"
     preparation = bind_rules(inputs[prep_source], PINS[prep_source], prep_evidence)
     population = bind_plan(inputs[pop_source], PINS[pop_source], pop_evidence)
-    scenario_spec = _parse_json(inputs["examples/mig5/SCENARIOS.json"])
-    cases = {row["id"]: row for row in (*_parse_json(inputs["examples/mig3/CASES.json"]),
+    scenario_spec = _parse_json(inputs["tests/fixtures/candidate-execution/preparation-and-population/SCENARIOS.json"])
+    cases = {row["id"]: row for row in (*_parse_json(inputs["tests/fixtures/candidate-execution/preparation-rules/CASES.json"]),
                                         *scenario_spec["additional_cases"])}
     runs, checks = zip(*(run_scenario(scenario, cases, preparation, population)
                          for scenario in scenario_spec["scenarios"]), strict=True)

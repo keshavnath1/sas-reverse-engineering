@@ -1,11 +1,11 @@
 # Run the public running-balance candidate
 
 This draft engineering package implements the exact public project in the
-[INTAKE modernization example](../modernization/README.md). Start there to
+[INTAKE modernization example](../sas-modernization/README.md). Start there to
 replay reconstruction from the three SAS files. The
-[requirements, TRACE/MAP, design and ADR](../modernization/REVIEW.md) and the
-[migration profile](../modernization/evidence/migration-profile.yaml) and
-[tie-out draft](../modernization/evidence/tie-out.yaml) retain their original
+[requirements, TRACE/MAP, design and ADR](../../tests/fixtures/running-balance-workload/REVIEW.md) and the
+[migration profile](../../tests/fixtures/running-balance-workload/evidence/migration-profile.yaml) and
+[tie-out draft](../../tests/fixtures/running-balance-workload/evidence/tie-out.yaml) retain their original
 bytes and pending decisions.
 
 From the repository root in the prepared Python 3.12 environment, run:
@@ -63,7 +63,7 @@ semantic acceptance is BLOCKED, and historical provenance is UNBOUND.
 
 ## Run from a fresh INTAKE review
 
-Follow the [offline INTAKE guide](../modernization/README.md) to generate a
+Follow the [offline INTAKE guide](../sas-modernization/README.md) to generate a
 fresh evidence directory. Pass its canonical path and the original INTAKE
 directory to the existing runner:
 

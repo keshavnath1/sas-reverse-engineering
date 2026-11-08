@@ -18,7 +18,7 @@ For people learning or presenting this repository, read the following existing g
 2. **[AGENTS.md](AGENTS.md) and [SECURITY.md](SECURITY.md):** operating rules, authorized input, human decisions and safety boundaries.
 3. **[Architecture](docs/ARCHITECTURE.md):** how evidence becomes requirements and design, who owns each part, and how optimization choices are challenged.
 4. **[Detailed INTAKE guide](docs/INTAKE_AND_REVIEW_GUIDE.md):** the existing operator steps, evidence handoff, citation preflight and script diagrams.
-5. **Only the example you need:** [modernization](examples/modernization/README.md) for design review; [running-balance](examples/running-balance/README.md) for its exact supported draft engineering runner; or [projection/SORT](examples/intg1/README.md) for its separate approval-gated route.
+5. **Only the walkthrough you need:** [SAS modernization](examples/sas-modernization/README.md) for design review; [running balance](examples/running-balance/README.md) for its exact supported draft engineering runner; or [governed continuation](examples/governed-continuation/README.md) for its separate approval-gated route.
 
 For a design discussion, start with items 1–3. When running the walkthrough, also use the [installation instructions](#install-and-validate) and the relevant operator/example guide. You do not need to read every validation report or milestone plan first. Historical engineering records remain available [on demand](#engineering-history-and-qualification-plans).
 
@@ -53,7 +53,7 @@ See [practical usage and limitations](docs/ARCHITECTURE.md#using-jim-thompsons-p
 
 1. **Scope the input.** Identify the entry point, authorized source files or
    spans, and any descriptors or run artifacts. Keep private material outside
-   Git. The [multi-file operator example](examples/modernization/README.md)
+   Git. The [multi-file operator example](examples/sas-modernization/README.md)
    shows how to inventory and scope public synthetic inputs.
 2. **Generate evidence.** Run the existing Python source-review tools to bind
    original bytes and produce TRACE/MAP, coverage and unresolved findings.
@@ -67,7 +67,7 @@ See [practical usage and limitations](docs/ARCHITECTURE.md#using-jim-thompsons-p
    Record business decisions and human approval separately from the evidence.
 4. **Check candidate fit.** The [running-balance example](examples/running-balance/README.md)
    runs an exact supported public workload from fresh verified INTAKE evidence.
-   The [projection and SORT guide](examples/intg1/README.md) shows a separate
+   The [projection and SORT guide](examples/governed-continuation/README.md) shows a separate
    approval-gated route. Use the existing gate and exact-byte human approval
    where publication is gated. Unsupported workflows stop at review.
 
@@ -88,19 +88,19 @@ scratch=$(mktemp -d /tmp/sas-team-handoff-XXXXXX)
 scratch=$(cd "$scratch" && pwd -P)
 
 mkdir "$scratch/INTAKE"
-cp examples/modernization/source/* "$scratch/INTAKE/"
+cp tests/fixtures/running-balance-workload/source/* "$scratch/INTAKE/"
 evidence="/tmp/sas-re-int1-${scratch##*/}"
 python3.12 -IB scripts/review_intake.py --p2a --modernization-drafts --intake "$scratch/INTAKE" --destination "$evidence"
 ```
 
 The command generates `INVENTORY.json`, `EVIDENCE.json`, `MANIFEST.json`,
 `MODERNIZATION_REVIEW.md`, and the migration profile and tie-out YAML drafts.
-The example's [PRD and architecture review](examples/modernization/REVIEW.md)
+The example's [PRD and architecture review](tests/fixtures/running-balance-workload/REVIEW.md)
 is authored draft prose. To draft or revise it with Copilot, open a session
 and supply the generated evidence and handoff yourself. Review the resulting
 claims and configuration choices with the team.
 
-The [source-review guide](examples/modernization/README.md) stops at design
+The [source-review guide](examples/sas-modernization/README.md) stops at design
 review. The [running-balance guide](examples/running-balance/README.md)
 covers a separate draft engineering runner for the same exact public inputs.
 After generating evidence above, run it from the same shell:
@@ -201,9 +201,15 @@ The team guides above explain today's workflow. The references below support a s
 | --- | --- |
 | `scripts/` | The guides identify the operator commands. The same directory also holds internal helpers, candidate runners, CI utilities, and earlier replay commands. |
 | `src/sas_re/` | Core Python implementation for inventory, reconstruction, evidence checks, and diagnostics. |
-| `tests/` | Engineering expectations, compatibility checks, and reproducible replays. |
+| `tests/` | Engineering expectations, compatibility checks, and reproducible replays. Required public inputs and frozen packages are grouped under `tests/fixtures/`. |
 | `docs/` | Two main team guides plus the retained contract, boundary and compatibility-reference files listed below. |
-| `examples/` | Existing public examples and supported continuation guides; their execution contracts are unchanged. |
+| `examples/` | Three descriptive team walkthroughs: SAS modernization, running balance, and governed continuation. |
+
+### Examples versus engineering fixtures
+
+The [examples folder](examples/README.md) now contains only the three walkthroughs, not development milestone directories. Required fixtures are physically grouped as `source-reconstruction/`, `candidate-execution/` and `running-balance-workload/` under [tests/fixtures](tests/fixtures/README.md). Nonessential trial snapshots and the unrun reference experiment remain available in the original Git revision rather than the team tree.
+
+Retained source, expected-case, coefficient, evidence and frozen-package bytes are unchanged. Explicit callers and two implementation pins were updated for the human-approved relocation; this is code/path provenance maintenance, not a changed oracle or relaxed test. Newly generated manifests necessarily identify the new paths and code. Preserve old packages/approvals under their original revision and obtain fresh approvals where required. Frozen internal checkpoint identifiers and links remain historical; use the current walkthroughs for navigation.
 
 ### What remains in docs
 
@@ -230,8 +236,8 @@ Current instructions, skills and filesystem consumers use these descriptive path
 Use these records when investigating an implementation decision, recorded check or open qualification question. They do not need to be loaded wholesale into a Copilot session.
 
 - **How the implementation developed:** [historical implementation plan](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/IMPLEMENTATION_PLAN.md) and dated P/CP/WS/MVP/SK/SM/TF records in the [original documentation tree](https://github.com/keshavnath1/sas-reverse-engineering/tree/eb9794167339d1991800c290a2b24ac10a57edf8/docs). These are not copied into the team branch unless an existing consumer needs them. Each record retains its own commit, platform, commands and proof boundaries.
-- **Historical public demonstrations:** [original offline review](examples/offline-review/README.md), [public behavioral validation](docs/SYNTHETIC_TIEOUT_VALIDATION.md), [recorded skill discovery/use](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/SK2_VALIDATION.md) and [one corrected public design-review approval](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/goal4c/README.md). These do not establish universal SAS equivalence or approval for another workload.
+- **Historical public demonstrations:** [original offline review](tests/fixtures/source-reconstruction/offline-review-package/README.md), [public behavioral validation](docs/SYNTHETIC_TIEOUT_VALIDATION.md), [recorded skill discovery/use](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/SK2_VALIDATION.md) and [one corrected public design-review approval](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/goal4c/README.md). These do not establish universal SAS equivalence or approval for another workload.
 - **Plans and unresolved decisions:** [open decisions](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/OPEN_DECISIONS.md), [independent-evaluation readiness](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/P2B_READINESS.md), [workstation/offline-kit planning](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/WS2A_OFFLINE_KIT_PLAN.md) and [SAS-reference/benchmark follow-up](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/GOAL1_REFERENCE_AND_BENCHMARK_PLAN.md). A plan is not an executed result or a released capability.
 - **Practice attribution and evidence:** [Jim Thompson practice ledger](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/BEST_PRACTICES_ADOPTION.md). The team-facing usage explanation is in the [architecture guide](docs/ARCHITECTURE.md#using-jim-thompsons-practices-without-changing-the-workflow).
 
-Historical links are pinned to `eb9794167339d1991800c290a2b24ac10a57edf8`, not a moving branch tip. The original branch and Git history are not deleted or rewritten. This cleanup removes documents only from the team's current tree; surviving historical-reference links point to their original bytes. It does not change test counts, approvals, schemas, operator commands or runtime behavior.
+Historical links use immutable commit IDs, not moving branch tips. The original branch and Git history are not deleted or rewritten. This cleanup removes nonessential material only from the team's current tree and relocates required fixtures; historical-reference links point to their original bytes. Script names and CLI protocols, schemas, expected results, tolerances and approval rules are unchanged. Caller paths and implementation identities change only as described above.

@@ -20,7 +20,7 @@ from test_dependency_diagnostics import offline_calls
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SAMPLE = ROOT / "examples/mvp4/DECISION_REVIEW.md"
+SAMPLE = ROOT / "tests/fixtures/source-reconstruction/decision-review/DECISION_REVIEW.md"
 SCRIPT = ROOT / "scripts/mvp4_review.py"
 LINK = re.compile(r"\[([^]\n]+)\]\(([^)\n]+)\)")
 # Minimal witnesses required for these distinct obligations. An overlapping case can
@@ -123,7 +123,7 @@ class DecisionReviewTests(unittest.TestCase):
         self.assertNotRegex(self.text, r"(?i)\b(?:\d+(?:\.\d+)?[x×] faster|HUMAN_APPROVED)\b")
         self.assertIn("ADR_NATIVE.md", self.text)
         self.assertIn("ADR_SPARK.md", self.text)
-        evidence = (ROOT / "examples/mvp2/EVIDENCE.md").read_text()
+        evidence = (ROOT / "tests/fixtures/source-reconstruction/dependency-aware-preview/EVIDENCE.md").read_text()
         heads = {h.lower().replace(" ", "-") for h in re.findall(r"(?m)^#{1,6} (.+)$", evidence)}
         for anchor in re.findall(r"EVIDENCE\.md#(\w[\w-]*)", self.text):
             self.assertIn(anchor, heads)
@@ -200,8 +200,8 @@ runpy.run_path(sys.argv[0], run_name='__main__')
             scratch = Path(tmp)
             for name in ("scripts/mvp4_review.py", "scripts/mvp1_demo.py", "scripts/mvp3_tieout.py",
                          "tests/mvp2_fixture.py", "tests/p2a_support.py", "tests/mvp2_expectations.py",
-                         "tests/mvp3_cases.py", "docs/SYNTHETIC_TIEOUT_VALIDATION.md", "examples/mvp2/EVIDENCE.md",
-                         "examples/mvp2/ADR_NATIVE.md", "examples/mvp2/ADR_SPARK.md"):
+                         "tests/mvp3_cases.py", "docs/SYNTHETIC_TIEOUT_VALIDATION.md", "tests/fixtures/source-reconstruction/dependency-aware-preview/EVIDENCE.md",
+                         "tests/fixtures/source-reconstruction/dependency-aware-preview/ADR_NATIVE.md", "tests/fixtures/source-reconstruction/dependency-aware-preview/ADR_SPARK.md"):
                 target = scratch / name
                 target.parent.mkdir(exist_ok=True, parents=True)
                 shutil.copyfile(ROOT / name, target)
@@ -214,7 +214,7 @@ runpy.run_path(sys.argv[0], run_name='__main__')
             self.assertEqual(control.returncode, 0, control.stderr)
             self.assertEqual(control.stdout, SAMPLE.read_bytes())
 
-            adr = scratch / "examples/mvp2/ADR_SPARK.md"
+            adr = scratch / "tests/fixtures/source-reconstruction/dependency-aware-preview/ADR_SPARK.md"
             original_adr = adr.read_bytes()
             adr.write_bytes(original_adr + b"\nAltered synthetic ADR.\n")
             changed = invoke()

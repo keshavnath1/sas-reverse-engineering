@@ -12,7 +12,7 @@ from test_review_workflow import ROOT, call
 
 
 SCRIPT = ROOT / "scripts/score_prepared_logistic.py"
-EXAMPLE = ROOT / "examples/mod2"
+EXAMPLE = ROOT / "tests/fixtures/candidate-execution/fixed-logistic-scoring"
 MODEL = EXAMPLE / "model.sas.txt"
 COLUMNS = ["intercept", *(f"n{i}" for i in range(1, 13)), "c1:ALT", "c1:OTHER",
            "c2:ALT", "c3:ALT", "c4:ALT", "c5:ALT"]
@@ -24,9 +24,9 @@ class FixedLogisticScoringTests(unittest.TestCase):
     review = integration.PreparationGateIntegrationTests.review
 
     def test_public_pre_sort_scores_and_block_are_reproducible(self):
-        prep = self.review("examples/mig3/preparation.sas.txt", "--lines", "1:12",
+        prep = self.review("tests/fixtures/candidate-execution/preparation-rules/preparation.sas.txt", "--lines", "1:12",
                            "--recover-status-rules", "--recover-missing-exclusions")
-        pop = self.review("examples/mig4/population.sas.txt", "--lines", "1:1", "--lines", "14:14",
+        pop = self.review("tests/fixtures/candidate-execution/population-gates/population.sas.txt", "--lines", "1:1", "--lines", "14:14",
                           "--recover-sql-gates")
         args = ("--model-source", str(MODEL), "--model-source-sha256", sha256(MODEL.read_bytes()).hexdigest(),
                 "--preparation-evidence", str(prep), "--population-evidence", str(pop))

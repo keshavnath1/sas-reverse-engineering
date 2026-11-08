@@ -21,7 +21,7 @@ class PopulationMigrationTests(unittest.TestCase):
         temp = TemporaryDirectory()
         self.addCleanup(temp.cleanup)
         self.source = Path(temp.name).resolve() / "population.sas"
-        self.source.write_bytes((ROOT / "examples/mig4/population.sas.txt").read_bytes())
+        self.source.write_bytes((ROOT / "tests/fixtures/candidate-execution/population-gates/population.sas.txt").read_bytes())
         self.digest = sha256(self.source.read_bytes()).hexdigest()
 
     def destination(self, checkpoint):

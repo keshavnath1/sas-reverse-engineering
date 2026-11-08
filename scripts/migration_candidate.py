@@ -15,7 +15,7 @@ from review_intake import identity, json_bytes
 
 
 PACKAGE_SHA256 = "8bfc638d5c4db4f60001010ee7abbb3db175c29f44696b0403c621fed953227a"
-EXAMPLE = Path(__file__).resolve().parents[1] / "examples/mig1"
+EXAMPLE = Path(__file__).resolve().parents[1] / "tests/fixtures/candidate-execution/projection"
 AUTHORITY = {
     "artifact_authority": "DRAFT",
     "behavioral_evidence": "UNAVAILABLE",

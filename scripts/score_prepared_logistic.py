@@ -19,7 +19,7 @@ from review_intake import identity, json_bytes
 from review_source import single_review
 
 
-EXAMPLE = ROOT / "examples/mod2"
+EXAMPLE = ROOT / "tests/fixtures/candidate-execution/fixed-logistic-scoring"
 SOURCE_PROFILES = {
     "fe1bbbd9e531d53103aad52caafbd616a8365e9bcc81241ffa466aaa1c218f85": (417, 441),
     "0f6741a10b6fc29de02fdd9a4500c95f2cc948814d109c1643cfd893a7e58a4c": (1, 10),

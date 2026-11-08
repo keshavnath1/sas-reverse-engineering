@@ -26,7 +26,7 @@ acceptance BLOCKED, and unperformed execution NOT_RUN.
 
 ## Reference material
 
-For the original offline example, see [`MANIFEST.json`](../../examples/offline-review/MANIFEST.json), [`EVIDENCE.md`](../../examples/offline-review/EVIDENCE.md).
+For the original offline example, see [`MANIFEST.json`](../../tests/fixtures/source-reconstruction/offline-review-package/MANIFEST.json), [`EVIDENCE.md`](../../tests/fixtures/source-reconstruction/offline-review-package/EVIDENCE.md).
 
 To replay that original public example on supported POSIX with an unused destination:
 

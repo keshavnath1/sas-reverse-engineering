@@ -17,7 +17,7 @@ from review_intake import identity, json_bytes
 from review_source import MAX_SPAN_BYTES, dependency_review
 
 
-EXAMPLE = Path(__file__).resolve().parents[1] / "examples/mig4"
+EXAMPLE = Path(__file__).resolve().parents[1] / "tests/fixtures/candidate-execution/population-gates"
 LIMIT = 262144
 
 

@@ -1,4 +1,4 @@
-# GATE-1 evidence-claim acceptance contract
+# Evidence claims and exact-byte human approval
 
 Use the existing POSIX development installation and a public two-source
 INT-3 review directory. The gate reads the supplied record and package and

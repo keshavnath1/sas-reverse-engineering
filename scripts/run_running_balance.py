@@ -13,7 +13,7 @@ from sas_re.safeio import EvidenceError, enumerate_files, secure_read
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from review_intake import STATUS_FIELDS, identity, json_bytes
 
-PACKAGE = Path(__file__).resolve().parents[1] / "examples/modernization"
+PACKAGE = Path(__file__).resolve().parents[1] / "tests/fixtures/running-balance-workload"
 PACKAGE_SHA256 = "cdf18e8c860931eef0e537986184c274a134811eb0909ac97393ec6774caef73"
 MAX_VALUE = 2 ** 20
 NUMBER = re.compile(r"[+-]?[0-9]{1,10}(?:\.[0-9]{1,10})?")

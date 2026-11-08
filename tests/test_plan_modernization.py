@@ -18,7 +18,7 @@ class ModernizationPlanningTests(unittest.TestCase):
     def setUp(self):
         self.root = Path(self.enterContext(TemporaryDirectory())).resolve()
         self.intake = self.root / "INTAKE"
-        shutil.copytree(ROOT / "examples/mig2/public-input", self.intake)
+        shutil.copytree(ROOT / "tests/fixtures/candidate-execution/projection-and-sort/public-input", self.intake)
         self.package = self.destination("int1")
         result = call(self.package, script=ROOT / "scripts/review_intake.py",
                       extra=("--intake", str(self.intake), "--modernization-drafts"))
@@ -78,7 +78,7 @@ class ModernizationPlanningTests(unittest.TestCase):
         self.assertEqual(before, {path.name: path.read_bytes() for path in self.package.iterdir()})
 
         destination = self.destination("intg1")
-        rows = ROOT / "examples/mig2/CASES.json"
+        rows = ROOT / "tests/fixtures/candidate-execution/projection-and-sort/CASES.json"
         result = call(destination, script=ROOT / "scripts/review_to_migration.py", extra=(
             "--intake", str(self.intake), "--package", str(self.package),
             "--rows", str(rows), "--rows-sha256", "0" * 64,
@@ -124,7 +124,7 @@ class ModernizationPlanningTests(unittest.TestCase):
                 path.write_bytes(original)
 
     def test_other_valid_intake_scope_has_no_candidate_plan(self):
-        self.intake = ROOT / "examples/public-intake"
+        self.intake = ROOT / "tests/fixtures/source-reconstruction/intake-sources"
         destination = self.destination("int1")
         result = call(destination, script=ROOT / "scripts/review_intake.py",
                       extra=("--intake", str(self.intake), "--modernization-drafts"))

@@ -34,9 +34,9 @@ class PreparationGateIntegrationTests(unittest.TestCase):
         return output.resolve() / "EVIDENCE.json"
 
     def test_integrated_outcomes_replay_and_refuse_changed_evidence(self):
-        prep = self.review("examples/mig3/preparation.sas.txt", "--lines", "1:12",
+        prep = self.review("tests/fixtures/candidate-execution/preparation-rules/preparation.sas.txt", "--lines", "1:12",
                            "--recover-status-rules", "--recover-missing-exclusions")
-        pop = self.review("examples/mig4/population.sas.txt", "--lines", "1:1", "--lines", "14:14",
+        pop = self.review("tests/fixtures/candidate-execution/population-gates/population.sas.txt", "--lines", "1:1", "--lines", "14:14",
                           "--recover-sql-gates")
         args = ("--preparation-evidence", str(prep), "--population-evidence", str(pop))
         copies = []

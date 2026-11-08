@@ -12,7 +12,7 @@ from test_review_workflow import ROOT, call, remove_destination
 
 
 SCRIPT = ROOT / "scripts/migration_candidate.py"
-PUBLIC = ROOT / "examples/copilot-review"
+PUBLIC = ROOT / "tests/fixtures/source-reconstruction/agent-review"
 
 
 @unittest.skipUnless(sys.platform in ("darwin", "linux"), "Existing POSIX evidence workflow")

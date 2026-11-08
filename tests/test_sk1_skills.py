@@ -22,7 +22,7 @@ from test_review_workflow import FILES, STATUS, free_destination, remove_destina
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SAMPLE = ROOT / "examples/offline-review"
+SAMPLE = ROOT / "tests/fixtures/source-reconstruction/offline-review-package"
 SKILLS = {
     "sas-reconstruct": {"MANIFEST.json", "EVIDENCE.md"},
     "sas-specify": {"EVIDENCE.md", "PRD.md", "MODULES.md"},

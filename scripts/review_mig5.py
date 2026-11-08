@@ -21,7 +21,7 @@ from review_source import dependency_review, single_review
 REVISION = "public-mig5-review/1"
 DOWNSTREAM_REVISION = "public-mig5-downstream-review/1"
 MODEL = "MODEL_EVIDENCE.json"
-MODEL_SOURCE = "examples/mod2/model.sas.txt"
+MODEL_SOURCE = "tests/fixtures/candidate-execution/fixed-logistic-scoring/model.sas.txt"
 MODEL_SHA256 = "0f6741a10b6fc29de02fdd9a4500c95f2cc948814d109c1643cfd893a7e58a4c"
 BRANCH_RUNNERS = ("scripts/migrate_sort_export.py", "scripts/score_prepared_logistic.py",
                   "scripts/mvp1_demo.py")
@@ -42,8 +42,8 @@ def build_subject(scenario=None):
             source_bytes[name] = raw
     runner = ROOT / "scripts/migrate_preparation_gates.py"
     inputs["scripts/migrate_preparation_gates.py"] = identity(secure_read(runner.parent, runner.name, LIMIT))
-    prep = "examples/mig3/preparation.sas.txt"
-    pop = "examples/mig4/population.sas.txt"
+    prep = "tests/fixtures/candidate-execution/preparation-rules/preparation.sas.txt"
+    pop = "tests/fixtures/candidate-execution/population-gates/population.sas.txt"
     prep_evidence, prep_report = single_review(
         source_bytes[prep], (1, 12), PINS[prep], recover_rules=True, recover_missing=True)
     pop_evidence, pop_report = dependency_review(
@@ -87,7 +87,7 @@ def add_downstream_subject(files, manifest, scenario):
     files.update(fixtures)
     files[MODEL] = json_bytes(model_evidence)
     manifest["inputs"][MODEL_SOURCE] = identity(source)
-    manifest["inputs"].update({f"examples/mod2/{name}": identity(raw)
+    manifest["inputs"].update({f"tests/fixtures/candidate-execution/fixed-logistic-scoring/{name}": identity(raw)
                                for name, raw in fixtures.items()})
     manifest["inputs"].update({name: identity(read_input(name)) for name in BRANCH_RUNNERS})
     manifest["sources"].append({"path": MODEL_SOURCE, "evidence": MODEL})
@@ -120,7 +120,7 @@ def run_downstream(upstream, subject):
             or score_manifest["source_review"] != subject["files"][MODEL]
             or any(score_manifest["source"][key] != inputs[MODEL_SOURCE][key]
                    for key in ("sha256", "bytes"))
-            or any(score_manifest["fixtures"][name] != inputs[f"examples/mod2/{name}"]
+            or any(score_manifest["fixtures"][name] != inputs[f"tests/fixtures/candidate-execution/fixed-logistic-scoring/{name}"]
                    for name in ("MAPPING.json", "COEFFICIENTS.json"))):
         raise ValueError("MIGRATION_APPROVED_INPUTS_CHANGED")
     files = {name: export[name] for name in ("SORTED_ROWS.json", "PREPARED_EXPORT.csv")}

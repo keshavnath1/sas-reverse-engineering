@@ -44,7 +44,7 @@ class TwoFixtureTests(unittest.TestCase):
         self.addCleanup(remove_destination, dest)
         run = call(dest, extra=('--fixture', 'mvp2'))
         self.assertEqual(run.returncode, 0, run.stderr)
-        sample = ROOT / 'examples/offline-review'
+        sample = ROOT / 'tests/fixtures/source-reconstruction/offline-review-package'
         self.assertEqual({p.name: p.read_bytes() for p in dest.iterdir()},
                          {p.name: p.read_bytes() for p in sample.iterdir()})
         self.assertNotEqual(json.loads((dest / 'MANIFEST.json').read_bytes())['subject']['graph_sha256'], STATE_GRAPH)

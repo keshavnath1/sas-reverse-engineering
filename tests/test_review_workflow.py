@@ -97,13 +97,13 @@ class ReviewWorkflowTests(unittest.TestCase):
         self.assertTrue(STAGES <= set(observed[1].decode().split(",")), second.stderr)
         self.assertEqual({p.name: p.read_bytes() for p in dest.iterdir()}, self.files)
         self.assertEqual(set(self.files), FILES)
-        sample = ROOT / "examples/offline-review"
+        sample = ROOT / "tests/fixtures/source-reconstruction/offline-review-package"
         self.assertEqual({p.name: p.read_bytes() for p in sample.iterdir()}, self.files)
 
     def test_original_preview_bytes_tieout_and_review_content(self):
         for name in PREVIEWS:
             with self.subTest(name=name):
-                self.assertEqual(self.files[name], (ROOT / "examples/mvp2" / name).read_bytes())
+                self.assertEqual(self.files[name], (ROOT / "tests/fixtures/source-reconstruction/dependency-aware-preview" / name).read_bytes())
         raw = self.files["TIEOUT.json"]
         self.assertEqual(hashlib.sha256(raw).hexdigest(), TIEOUT_SHA)
         tieout = json.loads(raw)
@@ -115,7 +115,7 @@ class ReviewWorkflowTests(unittest.TestCase):
         self.assertEqual(tieout["unresolved_include"],
                          {"operation": "O4", "target": "postcheck.sas", "verdict": "UNVERIFIABLE"})
         # All decisions, evidence labels and prose survive relocation; only link destinations may change.
-        historical = (ROOT / "examples/mvp4/DECISION_REVIEW.md").read_text()
+        historical = (ROOT / "tests/fixtures/source-reconstruction/decision-review/DECISION_REVIEW.md").read_text()
         localized = self.files["DECISION_REVIEW.md"].decode()
         self.assertEqual(LINK.sub(r"[\1](dest)", historical), LINK.sub(r"[\1](dest)", localized))
 
@@ -175,7 +175,7 @@ class ReviewWorkflowTests(unittest.TestCase):
                     self.assertIn(unquote(dest.fragment), anchors.get(path, set()), link)
 
         # Check that localization points to the *right* local witness, not just a valid heading.
-        historical = LINK.findall((ROOT / "examples/mvp4/DECISION_REVIEW.md").read_text())
+        historical = LINK.findall((ROOT / "tests/fixtures/source-reconstruction/decision-review/DECISION_REVIEW.md").read_text())
         actual = LINK.findall(docs["DECISION_REVIEW.md"])
         self.assertEqual(len(actual), len(historical))
         for (label, old), (_, new) in zip(historical, actual):
@@ -234,11 +234,11 @@ class ReviewWorkflowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             clone = Path(folder)
             shutil.copytree(ROOT / "scripts", clone / "scripts", ignore=shutil.ignore_patterns("__pycache__"))
-            shutil.copytree(ROOT / "examples/mvp2", clone / "examples/mvp2")
-            shutil.copytree(ROOT / "examples/mvp4", clone / "examples/mvp4")
+            shutil.copytree(ROOT / "tests/fixtures/source-reconstruction/dependency-aware-preview", clone / "tests/fixtures/source-reconstruction/dependency-aware-preview")
+            shutil.copytree(ROOT / "tests/fixtures/source-reconstruction/decision-review", clone / "tests/fixtures/source-reconstruction/decision-review")
             (clone / "docs").mkdir()
             shutil.copyfile(ROOT / "docs/SYNTHETIC_TIEOUT_VALIDATION.md", clone / "docs/SYNTHETIC_TIEOUT_VALIDATION.md")
-            (clone / "tests").mkdir()
+            (clone / "tests").mkdir(exist_ok=True)
             for name in ("mvp2_expectations.py", "mvp2_fixture.py", "mvp3_cases.py", "p2a_support.py"):
                 shutil.copyfile(ROOT / "tests" / name, clone / "tests" / name)
             script = clone / "scripts/review_workflow.py"
@@ -246,7 +246,7 @@ class ReviewWorkflowTests(unittest.TestCase):
             self.addCleanup(remove_destination, control)
             ready = call(control, script=script)
             self.assertEqual(ready.returncode, 0, ready.stderr)
-            for name, added in (("examples/mvp2/ADR_SPARK.md", None),
+            for name, added in (("tests/fixtures/source-reconstruction/dependency-aware-preview/ADR_SPARK.md", None),
                                 ("tests/mvp3_cases.py", b"\n# altered\n"),
                                 ("tests/mvp2_expectations.py", b'\nraise RuntimeError("UNVERIFIED_DECLARATION_EXECUTED")\n')):
                 with self.subTest(name=name):

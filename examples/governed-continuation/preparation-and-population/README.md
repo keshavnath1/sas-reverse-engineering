@@ -1,4 +1,4 @@
-# INTG-3A pinned public MIG-5 operator review
+# Governed preparation and population continuation
 
 Use the existing Python 3.12 development environment from the checkout
 root. This opt-in route uses the checked-in public preparation and
@@ -28,9 +28,9 @@ between SAS declarations, unresolved runtime behavior and Python choices.
 The report anchors refer to the original source byte coordinates.
 
 Save the complete deliverables and material claims outside the package
-using the [existing GATE-1 record and approval contract](../gate1/README.md).
+using the [existing GATE-1 record and approval contract](../claim-approval/README.md).
 Use the SHA-256 of this subject's `MANIFEST.json` in the claim record.
-The [claim preflight](../gate1/README.md#prepare-a-copilot-draft-for-review)
+The [claim preflight](../claim-approval/README.md#prepare-a-copilot-draft-for-review)
 can wrap flat deliverables, prepare unreviewed claims and show GATE-1
 findings before human review.
 GATE-1 requires a source declaration claim from each evidence file.
@@ -74,7 +74,7 @@ subject, scenario suite and output bytes. The route ends at the population
 gates. SAS semantic verification remains `UNVERIFIABLE` and acceptance
 `BLOCKED`.
 
-The [MIG-2 operator command](../intg1/README.md) still uses its existing
+The [MIG-2 operator command](../README.md) still uses its existing
 arguments and output schema. Fresh MIG-2 manifests record the new
 GATE-1 implementation digest. Previously published manifests retain
 their original bytes.

@@ -46,7 +46,7 @@ class BehavioralTieoutTests(unittest.TestCase):
         self.assertEqual(FIXTURES["mvp2"]["offsets"], original["work.offsets"])
         graph_hash = "19f41dea50825469a89d8fc545fee1d87f09af946d130d62de8f946d90b78017"
         self.assertIn(graph_hash, json.dumps(self.report))
-        self.assertIn(graph_hash, (ROOT / "examples/mvp2/EVIDENCE.md").read_text())
+        self.assertIn(graph_hash, (ROOT / "tests/fixtures/source-reconstruction/dependency-aware-preview/EVIDENCE.md").read_text())
 
     def test_changed_source_cannot_be_reported_as_the_historical_subject(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -54,7 +54,7 @@ class BehavioralTieoutTests(unittest.TestCase):
             (scratch / "scripts").mkdir()
             (scratch / "tests").mkdir()
             shutil.copyfile(SCRIPT, scratch / "scripts" / SCRIPT.name)
-            shutil.copytree(ROOT / "examples/mvp2", scratch / "examples/mvp2")
+            shutil.copytree(ROOT / "tests/fixtures/source-reconstruction/dependency-aware-preview", scratch / "tests/fixtures/source-reconstruction/dependency-aware-preview")
             for name in ("mvp2_expectations.py", "mvp3_cases.py"):
                 shutil.copyfile(ROOT / "tests" / name, scratch / "tests" / name)
             command = [sys.executable, "-IBS", scratch / "scripts" / SCRIPT.name, "--case", "B01-published-workflow"]

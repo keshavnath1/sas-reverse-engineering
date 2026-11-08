@@ -19,7 +19,7 @@ from review_intake import identity, json_bytes
 from review_source import MAX_SPAN_BYTES, single_review
 
 
-EXAMPLE = Path(__file__).resolve().parents[1] / "examples/mig3"
+EXAMPLE = Path(__file__).resolve().parents[1] / "tests/fixtures/candidate-execution/preparation-rules"
 NUMERIC_FIELDS = [f"n{i}" for i in range(1, 13)]
 CHARACTER_FIELDS = [f"c{i}" for i in range(1, 6)]
 

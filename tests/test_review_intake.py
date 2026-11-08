@@ -13,7 +13,7 @@ import uuid
 from test_review_workflow import ROOT, call, remove_destination
 
 
-FIXTURE = ROOT / "examples/public-intake"
+FIXTURE = ROOT / "tests/fixtures/source-reconstruction/intake-sources"
 SCRIPT = ROOT / "scripts/review_intake.py"
 
 

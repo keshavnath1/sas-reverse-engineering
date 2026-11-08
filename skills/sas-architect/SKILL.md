@@ -22,4 +22,4 @@ acceptance BLOCKED, and unperformed execution NOT_RUN.
 
 ## Reference material
 
-For the original offline example, see [`ARCHITECTURE.md`](../../examples/offline-review/ARCHITECTURE.md), [`ADR_NATIVE.md`](../../examples/offline-review/ADR_NATIVE.md), [`ADR_SPARK.md`](../../examples/offline-review/ADR_SPARK.md), [`DECISION_REVIEW.md`](../../examples/offline-review/DECISION_REVIEW.md), [`TIEOUT.json`](../../examples/offline-review/TIEOUT.json).
+For the original offline example, see [`ARCHITECTURE.md`](../../tests/fixtures/source-reconstruction/offline-review-package/ARCHITECTURE.md), [`ADR_NATIVE.md`](../../tests/fixtures/source-reconstruction/offline-review-package/ADR_NATIVE.md), [`ADR_SPARK.md`](../../tests/fixtures/source-reconstruction/offline-review-package/ADR_SPARK.md), [`DECISION_REVIEW.md`](../../tests/fixtures/source-reconstruction/offline-review-package/DECISION_REVIEW.md), [`TIEOUT.json`](../../tests/fixtures/source-reconstruction/offline-review-package/TIEOUT.json).

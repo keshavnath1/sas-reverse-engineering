@@ -21,5 +21,5 @@ acceptance BLOCKED, and unperformed execution NOT_RUN.
 
 ## Reference material
 
-For the original offline example, see [`MANIFEST.json`](../../examples/offline-review/MANIFEST.json), [`EVIDENCE.md`](../../examples/offline-review/EVIDENCE.md), [`TIEOUT.json`](../../examples/offline-review/TIEOUT.json), [`DECISION_REVIEW.md`](../../examples/offline-review/DECISION_REVIEW.md).
+For the original offline example, see [`MANIFEST.json`](../../tests/fixtures/source-reconstruction/offline-review-package/MANIFEST.json), [`EVIDENCE.md`](../../tests/fixtures/source-reconstruction/offline-review-package/EVIDENCE.md), [`TIEOUT.json`](../../tests/fixtures/source-reconstruction/offline-review-package/TIEOUT.json), [`DECISION_REVIEW.md`](../../tests/fixtures/source-reconstruction/offline-review-package/DECISION_REVIEW.md).
 For its related technical details, see [mvp3_cases.py](../../tests/mvp3_cases.py), [mvp3_tieout.py](../../scripts/mvp3_tieout.py), [SYNTHETIC_TIEOUT_VALIDATION.md](../../docs/SYNTHETIC_TIEOUT_VALIDATION.md).

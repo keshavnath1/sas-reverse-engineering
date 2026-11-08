@@ -11,7 +11,7 @@ import uuid
 from test_review_workflow import ROOT, call, remove_destination
 
 
-EXAMPLE = ROOT / "examples/copilot-review"
+EXAMPLE = ROOT / "tests/fixtures/source-reconstruction/agent-review"
 
 
 @unittest.skipUnless(sys.platform in ("darwin", "linux"), "Existing POSIX evidence workflow")

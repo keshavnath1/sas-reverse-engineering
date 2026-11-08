@@ -1,4 +1,4 @@
-# INTG-1 public INTAKE-to-migration review
+# Governed projection-and-sort continuation
 
 Run these steps from the repository root with the existing Python 3.12
 development installation on macOS or Linux. Use public synthetic files
@@ -32,8 +32,8 @@ hash alone establishes neither runtime provenance nor SAS behavior.
 ## 1. Generate evidence and pause
 
 ```bash
-intake=examples/mig2/public-input
-rows=examples/mig2/CASES.json
+intake=tests/fixtures/candidate-execution/projection-and-sort/public-input
+rows=tests/fixtures/candidate-execution/projection-and-sort/CASES.json
 rows_sha=f797f50799e89ee9e8d4de15e5ad718136606b1acc4e852d21f4abc86da7bb64
 python3.12 -IB scripts/review_intake.py --intake "$intake" \
   --destination /tmp/sas-re-int1-intg1-example --modernization-drafts
@@ -42,7 +42,7 @@ python3.12 -IB scripts/review_intake.py --intake "$intake" \
 Set `package` to the directory containing the review entry point shown in the
 receipt. Use its physical path, typically under `/private/tmp` on macOS
 and `/tmp` on Linux. A new public workload can replace the example if it
-meets the [INT-3 and MIG-2 input contract](../mig2/README.md). Keep the
+meets the [INT-3 and MIG-2 input contract](../../tests/fixtures/candidate-execution/projection-and-sort/README.md). Keep the
 evidence package unchanged.
 
 With `--modernization-drafts`, open `MODERNIZATION_REVIEW.md` for the
@@ -163,7 +163,7 @@ unavailable. An expected candidate block publishes diagnostics only.
 ## 2. Review the claims and approve the exact record
 
 Save a `claims.json` outside the evidence package using the
-[GATE-1 record contract](../gate1/README.md). Ask Copilot to propose the record
+[GATE-1 record contract](claim-approval/README.md). Ask Copilot to propose the record
 or assemble it manually. Include the full text of the five deliverables
 and the exact package manifest digest. Use the GATE-1 deliverable keys,
 literal claim text from each section, stable claim IDs and resolvable
@@ -216,4 +216,4 @@ verification, BLOCKED semantic acceptance, NOT_RUN reference and benchmark
 execution, and UNBOUND historical source/run provenance.
 
 For the opt-in pinned public preparation and population gate suite, see the
-[INTG-3A MIG-5 operator workflow](../intg3a/README.md).
+[INTG-3A MIG-5 operator workflow](preparation-and-population/README.md).

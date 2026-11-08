@@ -303,7 +303,7 @@ CP4 and CP5 retain their separate gates.
 On 2026-11-06 the user accepted WS-2A as documentation at
 `6e403722d64d15a41b4205cb074bb8d928fad3a2` and authorized MVP-1 as a
 bounded development experiment. One public synthetic workflow may feed a private,
-in-memory [draft architecture preview](../examples/mvp1/ARCHITECTURE.md).
+in-memory [draft architecture preview](../tests/fixtures/source-reconstruction/single-source-preview/ARCHITECTURE.md).
 Authority stays DRAFT; verification UNVERIFIABLE, semantic acceptance BLOCKED,
 benchmarks NOT_RUN. Stop for review of the package. Runtime selection, operational
 P3/P4, P2B evaluation, Windows access, packaging, publication and downstream
@@ -311,7 +311,7 @@ integration require separate decisions.
 
 At `022c672d244a522e25a5aded7f29513f51875b69` the user accepted MVP-1 only
 as a public synthetic demonstration and approved the bounded MVP-2 experiment.
-Its [multi-module draft](../examples/mvp2/ARCHITECTURE.md) and [validation
+Its [multi-module draft](../tests/fixtures/source-reconstruction/dependency-aware-preview/ARCHITECTURE.md) and [validation
 report](https://github.com/keshavnath1/sas-reverse-engineering/blob/eb9794167339d1991800c290a2b24ac10a57edf8/docs/MVP2_VALIDATION.md) are for review. Independent evaluation, migration,
 publication, native Windows access and runtime selection retain their separate gates.
 
@@ -323,12 +323,12 @@ runtime selection retain their separate gates. Stop at MVP-3 for review.
 
 At `8e9c0484a21c1fa8211f7a5418bac62a4bc1bd48` the user accepted MVP-3
 within its public synthetic development scope and authorized MVP-4 only. Its
-[decision review](../examples/mvp4/DECISION_REVIEW.md) links the accepted controls
+[decision review](../tests/fixtures/source-reconstruction/decision-review/DECISION_REVIEW.md) links the accepted controls
 to the existing draft alternatives. Runtime selection, execution, semantic
 certification and migration approval remain separate decisions. Stop at MVP-4.
 
 The user accepted MVP-4 at `4a19ea1242e8aba685bef3dd53c222f6fde8d6b8`
 within its synthetic engineering scope and authorized a single
-[offline developer workflow](../examples/offline-review/README.md) for the same
+[offline developer workflow](../tests/fixtures/source-reconstruction/offline-review-package/README.md) for the same
 fixture. The grant covers consolidation and validation only. Stop for usability
 review before choosing another product capability.
