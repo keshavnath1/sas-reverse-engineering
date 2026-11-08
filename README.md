@@ -14,13 +14,35 @@ Requirements + architecture + validation plan for human review
 
 We are not translating SAS line by line. We first recover the business rules and dependencies, then compare better Python or distributed designs without losing required behavior. Correctness must later be proved by SAS tie-out; optimization must later be proved by representative benchmarks.
 
+## Our core design
+
+**SAS tells us what the system does today. Requirements define what must be preserved. Architecture decides how the modern system should do it.**
+
+First, reverse-engineer the authorized programs, includes and attributable logs/LST into one factual record. Recover rules, inputs/outputs, state, dependencies and unknowns—not just the syntax. Derive a draft PRD, capability map and module specifications from that record; humans confirm the intended behavior rather than accepting every legacy quirk.
+
+Next, compare better execution designs: shared preparation, vectorized Python, a scenario-keyed distributed plan or independent tasks where dependency analysis supports them. Candidate ADRs explain the alternatives, invariants, costs and proof needed. A fresh reviewer checks those claims against original SAS before a human selects the architecture.
+
+This branch stops at a **reviewed draft architecture package**. Later implementation must pass two separate checks: SAS correctness tie-out and measured performance in the selected runtime. Neither a diagram nor an ADR guarantees a speedup. The [full design explanation](DESIGN.md) connects these ideas using the three-scenario example and explains PRD, module specifications, HLD, LLD and ADRs in plain language.
+
 ## Read these three files
 
 - **[README.md](README.md):** what the team does and what it receives.
-- **[DESIGN.md](DESIGN.md):** why we built this workflow, its roles and decisions.
+- **[DESIGN.md](DESIGN.md):** the core architecture, worked example and practical use of Jim Thompson's guidance.
 - **[AGENTS.md](AGENTS.md):** the instructions the AI must follow.
 
 Everything else supports that story. No historical run evidence, candidate implementations, test suite or milestone archive is shipped in this branch's current tree. Existing history and the original branches are preserved; this is not history deletion or a replacement for the engineering runtime.
+
+## Jim Thompson's practices: how the team uses them
+
+We adapt Jim's guidance on planning, feedback loops and subagents—not merely mention it:
+
+- **Inspect before planning:** `AGENTS.md` and `understand` require original source reading before requirements/design. Ask the agent to show facts and unknowns before recommending Spark.
+- **Define success:** `specify` and `design` connect `PRD.md`, `MODULES.md` and `VALIDATION_PLAN.md`. Ask what must stay the same and how correctness and efficiency would be checked.
+- **Separate author and reviewer:** `review` receives original intake and drafts, writes findings only, and does not repair its own review subject. Request an actual fresh context where supported.
+- **Bound feedback:** `orchestrate` permits one author correction and fresh re-review. Reject unsupported parallelism instead of changing facts or weakening checks to pass.
+- **Persist progress:** private run `PROGRESS.md` records the next action outside chat; resume an exact named run through source checking and a new linked run.
+
+See [Jim's practices and usage examples](DESIGN.md#jim-thompsons-practices-how-to-use-them-here) for the source attribution, exact file links and limits. Our document feedback loop is not an executed SAS test loop. Automatic drafting also differs from Jim's human-approved implementation phase exits; downstream decisions remain human-owned.
 
 ## Start in three steps
 
