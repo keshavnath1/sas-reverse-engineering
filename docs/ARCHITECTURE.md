@@ -2,8 +2,10 @@
 
 The system turns authorized SAS source into traceable evidence, reviewable
 designs, and executable Python for explicitly supported candidate contracts.
-[The workflow and component diagrams](GOAL4B_P2A_INTAKE.md#workflow-architecture)
-show the operator sequence, Python calls, and artifact handoffs.
+
+This is the team's detailed **design explanation**. Use the [README reading path](../README.md#team-reading-path) for onboarding and the [existing INTAKE guide](GOAL4B_P2A_INTAKE.md#workflow-architecture) for operator steps, Python calls and artifact handoffs. The guides explain different parts of the same existing system; they are not separate workflows.
+
+Read [the core design](#what-the-existing-design-is-trying-to-achieve), [component boundaries](#evidence-and-execution-boundaries), [five skills](#how-the-five-skills-collaborate) and [runtime choices](#runtime-and-optimization-decisions) for the main story. [Jim's practical usage guidance](#using-jim-thompsons-practices-without-changing-the-workflow) follows. The retrospective practice-evidence mapping at the end is optional engineering reference, not another team stage.
 
 ## What the existing design is trying to achieve
 
@@ -93,6 +95,8 @@ The [practice ledger](BEST_PRACTICES_ADOPTION.md#sources-and-attribution) attrib
 **Keep plans and human decisions reviewable.** Use the existing linked design and review records, exact evidence versions and applicable approval route. Preserve historical results and do not invent a signoff or weaken criteria to obtain a pass. Private source and review material remain outside Git under the current security policy. No new `PROGRESS.md` state machine or additional artifact family is required by this explanation.
 
 ## Modernization Best Practices — Evidence and Design Alignment
+
+**On-demand engineering reference.** The table preserves existing retrospective claims and their limitations. For everyday usage, use [the practical guidance above](#using-jim-thompsons-practices-without-changing-the-workflow). Other dated reports and qualification plans are grouped in the [README's engineering-history section](../README.md#engineering-history-and-qualification-plans); their original records and paths remain unchanged.
 
 The branch's [engineering-practice ledger](BEST_PRACTICES_ADOPTION.md#sources-and-attribution)
 records the pinned primary sources and paraphrases of Jim Thompson's guidance.

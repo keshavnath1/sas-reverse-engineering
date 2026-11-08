@@ -4,16 +4,29 @@ Understand legacy SAS logic and dependencies before deciding what to
 modernize. The repository turns authorized source into traceable evidence
 and draft designs, with executable Python for explicitly supported workloads.
 
-**Start here:** [Architecture](docs/ARCHITECTURE.md) ·
+**Start here:** [Team reading path](#team-reading-path) ·
 [Public INTAKE walkthrough](#run-the-public-walkthrough) ·
 [Five Copilot skills](#use-the-five-skills) ·
-[Scope and evidence](#scope-and-evidence)
+[Scope and evidence](#scope-and-evidence) ·
+[Engineering references](#engineering-references)
+
+## Team reading path
+
+For people learning or presenting this repository, read the following existing guides in order. This is a **human reading path**, not a new agent execution order; agents still follow `AGENTS.md` and the applicable skill and operator contracts.
+
+1. **This README:** the core idea, current workflow, five skills and supported starting commands.
+2. **[AGENTS.md](AGENTS.md) and [SECURITY.md](SECURITY.md):** operating rules, authorized input, human decisions and safety boundaries.
+3. **[Architecture](docs/ARCHITECTURE.md):** how evidence becomes requirements and design, who owns each part, and how optimization choices are challenged.
+4. **[Detailed INTAKE guide](docs/GOAL4B_P2A_INTAKE.md):** the existing operator steps, evidence handoff, citation preflight and script diagrams.
+5. **Only the example you need:** [modernization](examples/modernization/README.md) for design review; [running-balance](examples/running-balance/README.md) for its exact supported draft engineering runner; or [projection/SORT](examples/intg1/README.md) for its separate approval-gated route.
+
+For a design discussion, start with items 1–3. When running the walkthrough, also use the [installation instructions](#install-and-validate) and the relevant operator/example guide. You do not need to read every validation report or milestone plan first. Historical engineering records remain available [on demand](#engineering-history-and-qualification-plans).
 
 ## The core design, in plain language
 
 **Recover what SAS does, identify what must be preserved, and design how the modern system should execute it.** Preserve business behavior, not every SAS block or incidental serial step.
 
-The existing Python tools first reconstruct the supported source subset into evidence, TRACE/MAP, dependencies and explicit gaps. The five existing skills use that evidence to draft requirements, analyze constraints, propose validation and compare architectures. Humans confirm intent and review design/configuration. Execution is available only through the existing supported candidate contracts and their applicable approval routes.
+**Python tools reconstruct supported source and bind its evidence. Copilot skills interpret that evidence and draft requirements/design. Humans confirm intent and review the decisions.** Execution is available only through the existing supported candidate contracts and their applicable approval routes.
 
 ```text
 Authorized scope → existing Python reconstruction → evidence / TRACE / MAP
@@ -21,7 +34,7 @@ Authorized scope → existing Python reconstruction → evidence / TRACE / MAP
     → human review → supported candidate route, or stop with explicit gaps
 ```
 
-For example, an optimization proposal may share preparation or split scenarios, but only if ordering, state, multiplicity and producer-consumer constraints are preserved. Distributed designs remain proposals, not measured improvements. Read [the design explanation](docs/ARCHITECTURE.md#what-the-existing-design-is-trying-to-achieve) before the implementation details.
+The [architecture guide](docs/ARCHITECTURE.md#what-the-existing-design-is-trying-to-achieve) explains PRD, module specifications, HLD/LLD and ADRs, using an illustrative scenario example. It also separates preserved behavior from optimized execution and future correctness/performance proof. Those details are kept there rather than repeated across onboarding documents.
 
 This branch preserves the functional `design/team-handoff` baseline. Its changes are explanation and navigation only: no replacement engine, new orchestration workflow, renamed skills or new checkers. The handoff is human-invoked; it is not an autonomous intake-to-package driver. Historical records and validation assets remain for compatibility, but are not the team's starting reading list.
 
@@ -182,6 +195,8 @@ the installed application must not import source code from that checkout.
 
 ## Engineering references
 
+The team guides above explain today's workflow. The references below support a specific contract, restriction or engineering question; they are **not another onboarding sequence**.
+
 | Repository area | What to look for |
 | --- | --- |
 | `scripts/` | The guides identify the operator commands. The same directory also holds internal helpers, candidate runners, CI utilities, and earlier replay commands. |
@@ -189,16 +204,19 @@ the installed application must not import source code from that checkout.
 | `tests/` | Engineering expectations, compatibility checks, and reproducible replays. |
 | `docs/` and `examples/` | Current operator guides alongside preserved design, validation, approval, and demonstration records. |
 
-Earlier implementation plans and milestone records describe their original
-scope. Use the current [architecture guide](docs/ARCHITECTURE.md) and
-operator walkthrough for today’s workflow.
+### Active references and continuing limits
 
-- [Inventory design](docs/P1_DESIGN.md), [reconstruction coverage](docs/P2A_DESIGN.md)
-  and [dependency diagnostics](docs/P3_A1_DESIGN.md)
-- [Historical implementation plan](docs/IMPLEMENTATION_PLAN.md),
-  [original offline example](examples/offline-review/README.md) and
-  [public behavioral validation](docs/MVP3_VALIDATION.md)
-- [Platform readiness](docs/CP3_READINESS.md), [workstation validation](docs/WS1_VALIDATION.md)
-  and [compatibility and downstream pin](docs/COMPATIBILITY.md)
-- [Recorded design approval](docs/goal4c/README.md) and
-  [reference and benchmark plan](docs/GOAL1_REFERENCE_AND_BENCHMARK_PLAN.md)
+- **Source and dependency contracts:** [inventory design](docs/P1_DESIGN.md), [supported reconstruction forms](docs/P2A_DESIGN.md) and [dependency-diagnostic boundaries](docs/P3_A1_DESIGN.md). Consult them for the applicable skill or engineering question, not as extra user stages.
+- **Compatibility and platform limits:** [downstream pin](docs/COMPATIBILITY.md), [platform validation](docs/CP1_VALIDATION.md), [platform readiness checkpoint](docs/CP3_READINESS.md) and [workstation validation](docs/WS1_VALIDATION.md). Read their dates, subjects and limits; native Windows evidence I/O remains blocked.
+- **Authority:** [repository rules](AGENTS.md), [security](SECURITY.md) and the [chronological scope-approval ledger](docs/APPROVALS.md). Historical engineering authorization is not a new workload, architecture, runtime or release approval.
+
+### Engineering history and qualification plans
+
+Use these records when investigating an implementation decision, recorded check or open qualification question. They do not need to be loaded wholesale into a Copilot session.
+
+- **How the implementation developed:** [historical implementation plan](docs/IMPLEMENTATION_PLAN.md) and dated P/CP/WS/MVP/SK/SM/TF design and validation records under `docs/`. Each record retains its own commit, platform, commands and proof boundaries.
+- **Historical public demonstrations:** [original offline review](examples/offline-review/README.md), [public behavioral validation](docs/MVP3_VALIDATION.md), [recorded skill discovery/use](docs/SK2_VALIDATION.md) and [one corrected public design-review approval](docs/goal4c/README.md). These do not establish universal SAS equivalence or approval for another workload.
+- **Plans and unresolved decisions:** [open decisions](docs/OPEN_DECISIONS.md), [independent-evaluation readiness](docs/P2B_READINESS.md), [workstation/offline-kit planning](docs/WS2A_OFFLINE_KIT_PLAN.md) and [SAS-reference/benchmark follow-up](docs/GOAL1_REFERENCE_AND_BENCHMARK_PLAN.md). A plan is not an executed result or a released capability.
+- **Practice attribution and evidence:** [Jim Thompson practice ledger](docs/BEST_PRACTICES_ADOPTION.md). The team-facing usage explanation is in the [architecture guide](docs/ARCHITECTURE.md#using-jim-thompsons-practices-without-changing-the-workflow).
+
+All records remain at their original paths. Some historical files are still referenced by skills, tests or execution: `docs/MVP3_VALIDATION.md`, for example, is an exact-byte hash-pinned input to an existing review command. This navigation consolidation does not merge, rewrite, move or delete those records, and does not change historical test counts, approvals or runtime behavior.
