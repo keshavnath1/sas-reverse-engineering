@@ -24,7 +24,13 @@ Everything else supports that story. No historical run evidence, candidate imple
 
 ## Start in three steps
 
-1. Open the **repository root** in your approved VS Code Copilot Agent Mode or Codex environment.
+1. Clone this clean branch, then open its **repository root** in your approved VS Code Copilot Agent Mode or Codex environment:
+
+   ```sh
+   git clone --branch design/skills-first-team --single-branch --depth 1 https://github.com/keshavnath1/sas-reverse-engineering.git sas-design
+   cd sas-design
+   ```
+
 2. Add authorized SAS programs, includes, logs, LST files and available reference outputs under `intake/`. Optional: add `intake/context.md` with the goal, entry point and platform constraints. No separate scope/profile JSON is required.
 3. Send:
 
