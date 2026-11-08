@@ -1,8 +1,13 @@
 # SAS Reverse Engineering and Computation Architecture Planner
 
-Start with an authorized SAS INTAKE. Recover the logic and dependencies the
-source supports, review the modernization design, and run an existing Python
-candidate when the evidence matches its contract.
+Understand legacy SAS logic and dependencies before deciding what to
+modernize. The repository turns authorized source into traceable evidence
+and draft designs, with executable Python for explicitly supported workloads.
+
+**Start here:** [Architecture](docs/ARCHITECTURE.md) ·
+[Public INTAKE walkthrough](#run-the-public-walkthrough) ·
+[Five Copilot skills](#use-the-five-skills) ·
+[Scope and evidence](#scope-and-evidence)
 
 ## From INTAKE to modernization
 
@@ -89,36 +94,30 @@ supported. Record unperformed SAS reference and benchmark execution as
 
 ## Install and validate
 
-Python 3.12 is required; local validation and CI pin 3.12.5. The complete runtime
-and packaging dependency closure is SHA-256 locked. The lock currently supports
-CPython 3.12 macOS arm64 and manylinux x86_64. Publication uses POSIX filesystem
-APIs. CP1 keeps pure commands and bundled contract inspection independent of the
-POSIX backend, and rejects Windows evidence I/O before reading inputs. Actual
-native Windows qualification is BLOCKED: no approved Windows environment was
-available, and the lock has not been extended. No model or runtime engine
-dependency is included. Git is needed only for development/repository checks and
-explicit downstream drift checks, not ordinary installed core operations.
-
-See [CP1 design](docs/CP1_DESIGN.md) and [CP1 validation](docs/CP1_VALIDATION.md)
-for exact tested environments and limitations. No new Windows installation is
-authorized by the following existing POSIX installation recipe.
+Use Python 3.12 on a supported POSIX host. The dependency lock covers
+CPython 3.12 on macOS arm64 and manylinux x86_64. Native Windows evidence
+I/O remains blocked. See [platform validation](docs/CP1_VALIDATION.md) for
+tested environments and limits.
 
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install --require-hashes --only-binary=:all: -r requirements.lock
 python -m pip install --no-deps --no-build-isolation -e .
-python -m pip check
-python -m unittest discover -s tests -v
-python scripts/check_repository.py
 sas-re status
 ```
 
-For offline installation, add `--no-index --find-links /path/to/wheels` to the
-hash-locked install. Keep hash checking enabled. Run the repository guard after
-staging new files; it checks index and working-tree content, not arbitrary PII.
-Synthetic test files are generated in temporary directories from labeled Python
-strings. No raw SAS/log/LST exception was added to Git exclusions.
+For offline installation, add `--no-index --find-links /path/to/wheels`
+to the hash-locked dependency install.
+
+For repository validation, run the following checks. The repository guard
+checks tracked and staged content. Keep private SAS inputs outside Git.
+
+```sh
+python -m pip check
+python -m unittest discover -s tests -v
+python scripts/check_repository.py
+```
 
 Build and test the installed wheel from another directory:
 
@@ -137,13 +136,25 @@ The last path must identify installed site-packages for a wheel validation run.
 The test files retain their checkout location for the P0 Git/reference tests;
 the installed application must not import source code from that checkout.
 
-## Technical and historical references
+## Engineering references
 
-- [Original offline review](examples/offline-review/README.md) and
-  [behavioral validation](docs/MVP3_VALIDATION.md)
-- [Evidence inventory](docs/P1_DESIGN.md), [bounded reconstruction](docs/P2A_DESIGN.md)
+| Repository area | What to look for |
+| --- | --- |
+| `scripts/` | The guides identify the operator commands. The same directory also holds internal helpers, candidate runners, CI utilities, and earlier replay commands. |
+| `src/sas_re/` | Core Python implementation for inventory, reconstruction, evidence checks, and diagnostics. |
+| `tests/` | Engineering expectations, compatibility checks, and reproducible replays. |
+| `docs/` and `examples/` | Current operator guides alongside preserved design, validation, approval, and demonstration records. |
+
+Earlier implementation plans and milestone records describe their original
+scope. Use the current [architecture guide](docs/ARCHITECTURE.md) and
+operator walkthrough for today’s workflow.
+
+- [Inventory design](docs/P1_DESIGN.md), [reconstruction coverage](docs/P2A_DESIGN.md)
   and [dependency diagnostics](docs/P3_A1_DESIGN.md)
-- [Platform readiness](docs/CP3_READINESS.md) and [workstation launcher](docs/WS1_VALIDATION.md)
-- [Compatibility and downstream pin](docs/COMPATIBILITY.md)
-- [Approved public design review](docs/goal4c/README.md) and
+- [Historical implementation plan](docs/IMPLEMENTATION_PLAN.md),
+  [original offline example](examples/offline-review/README.md) and
+  [public behavioral validation](docs/MVP3_VALIDATION.md)
+- [Platform readiness](docs/CP3_READINESS.md), [workstation validation](docs/WS1_VALIDATION.md)
+  and [compatibility and downstream pin](docs/COMPATIBILITY.md)
+- [Recorded design approval](docs/goal4c/README.md) and
   [reference and benchmark plan](docs/GOAL1_REFERENCE_AND_BENCHMARK_PLAN.md)
