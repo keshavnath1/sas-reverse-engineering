@@ -12,6 +12,8 @@ and draft designs, with executable Python for explicitly supported workloads.
 
 ## Team reading path
 
+For a presentation-ready example, start with the [seven-part SAS and REA walkthrough](walkthrough/01-start-here.md).
+
 For people learning or presenting this repository, read the following existing guides in order. This is a **human reading path**, not a new agent execution order; agents still follow `AGENTS.md` and the applicable skill and operator contracts.
 
 1. **This README:** the core idea, current workflow, five skills and supported starting commands.
